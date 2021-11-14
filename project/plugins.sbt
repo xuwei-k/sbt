@@ -1,5 +1,3 @@
-ThisBuild / useCoursier := false
-
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-Ywarn-unused:_,-imports")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.0.0")
