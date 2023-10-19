@@ -1,3 +1,11 @@
+javacOptions ++= {
+  if (scala.util.Properties.isJavaAtLeast("21")) {
+    Seq("-proc:none")
+  } else {
+    Nil
+  }
+}
+
 TaskKey[Unit]("checkJavaFailures") := {
   val reporter = savedReporter.value
   val ignore = (compile in Compile).failure.value
