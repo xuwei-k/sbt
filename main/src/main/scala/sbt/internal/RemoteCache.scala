@@ -56,7 +56,7 @@ object RemoteCache {
 
   lazy val defaultCacheLocation: File = SysProp.globalLocalCache
 
-  lazy val globalSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val globalSettings: Seq[Def.Setting[?]] = Seq(
     remoteCacheId := "",
     remoteCacheIdCandidates := Nil,
     pushRemoteCacheTo :== None,
@@ -69,7 +69,7 @@ object RemoteCache {
     },
   )
 
-  lazy val projectSettings: Seq[Def.Setting[_]] = (Seq(
+  lazy val projectSettings: Seq[Def.Setting[?]] = (Seq(
     pushRemoteCache := (Def.taskDyn {
       val arts = (pushRemoteCacheConfiguration / remoteCacheArtifacts).value
       val configs = arts flatMap { art =>
@@ -164,7 +164,7 @@ object RemoteCache {
   @nowarn
   def configCacheSettings[A <: RemoteCacheArtifact](
       cacheArtifactTask: Def.Initialize[Task[A]]
-  ): Seq[Def.Setting[_]] =
+  ): Seq[Def.Setting[?]] =
     inTask(packageCache)(
       Seq(
         packageCache.in(Defaults.TaskZero) := {

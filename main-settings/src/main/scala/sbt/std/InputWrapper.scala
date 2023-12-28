@@ -137,7 +137,7 @@ object InputWrapper {
     ContextUtil.selectMacroImpl[T](c) { (ts, pos) =>
       ts.tree.tpe match {
         case tpe if tpe <:< c.weakTypeOf[Initialize[T]] =>
-          if (c.weakTypeOf[T] <:< c.weakTypeOf[InputTask[_]]) {
+          if (c.weakTypeOf[T] <:< c.weakTypeOf[InputTask[?]]) {
             c.abort(
               pos,
               """`value` is removed from input tasks. Use `evaluated` or `inputTaskValue`.

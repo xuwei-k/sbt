@@ -47,8 +47,8 @@ private[sbt] trait NodeView[F[_]] {
   def inline[A](a: F[A]): Option[() => A]
 }
 final class Triggers[F[_]](
-    val runBefore: collection.Map[F[_], Seq[F[_]]],
-    val injectFor: collection.Map[F[_], Seq[F[_]]],
+    val runBefore: collection.Map[F[?], Seq[F[?]]],
+    val injectFor: collection.Map[F[?], Seq[F[?]]],
     val onComplete: RMap[F, Result] => RMap[F, Result]
 )
 
@@ -57,12 +57,12 @@ private[sbt] final class Execute[F[_] <: AnyRef](
     triggers: Triggers[F],
     progress: ExecuteProgress[F]
 )(implicit view: NodeView[F]) {
-  type Strategy = CompletionService[F[_], Completed]
+  type Strategy = CompletionService[F[?], Completed]
 
-  private[this] val forward = idMap[F[_], IDSet[F[_]]]
-  private[this] val reverse = idMap[F[_], Iterable[F[_]]]
+  private[this] val forward = idMap[F[?], IDSet[F[?]]]
+  private[this] val reverse = idMap[F[?], Iterable[F[?]]]
   private[this] val callers = pMap[F, Compose[IDSet, F]#Apply]
-  private[this] val state = idMap[F[_], State]
+  private[this] val state = idMap[F[?], State]
   private[this] val viewCache = pMap[F, Node[F, *]]
   private[this] val results = pMap[F, Result]
 
@@ -169,7 +169,7 @@ private[sbt] final class Execute[F[_] <: AnyRef](
     results(node) = result
     state(node) = Done
     progress.afterCompleted(node, result)
-    remove(reverse.asInstanceOf[Map[F[A], Iterable[F[_]]]], node) foreach { dep =>
+    remove(reverse.asInstanceOf[Map[F[A], Iterable[F[?]]]], node) foreach { dep =>
       notifyDone(node, dep)
     }
     callers.remove(node).toList.flatten.foreach { c =>
@@ -194,11 +194,11 @@ private[sbt] final class Execute[F[_] <: AnyRef](
       case Inc(i)      => Inc(Incomplete(Some(node), tpe = i.tpe, causes = i :: Nil))
     }
 
-  def notifyDone(node: F[_], dependent: F[_])(implicit strategy: Strategy): Unit = {
+  def notifyDone(node: F[?], dependent: F[?])(implicit strategy: Strategy): Unit = {
     val f = forward(dependent)
     f -= node
     if (f.isEmpty) {
-      remove[F[_], IDSet[F[_]]](forward, dependent)
+      remove[F[?], IDSet[F[?]]](forward, dependent)
       ready(dependent)
     }
   }
@@ -224,7 +224,7 @@ private[sbt] final class Execute[F[_] <: AnyRef](
 
     val v = register(node)
     val deps = dependencies(v) ++ runBefore(node)
-    val active = IDSet[F[_]](deps filter notDone)
+    val active = IDSet[F[?]](deps filter notDone)
     progress.afterRegistered(
       node,
       deps,
@@ -314,28 +314,28 @@ private[sbt] final class Execute[F[_] <: AnyRef](
   def remove[K, V](map: Map[K, V], k: K): V =
     map.remove(k).getOrElse(sys.error("Key '" + k + "' not in map :\n" + map))
 
-  def addReverse(node: F[_], dependent: F[_]): Unit = reverse(node) ++= Seq(dependent)
+  def addReverse(node: F[?], dependent: F[?]): Unit = reverse(node) ++= Seq(dependent)
   def addCaller[A](caller: F[A], target: F[A]): Unit =
     callers.getOrUpdate(target, IDSet.create[F[A]]) += caller
 
-  def dependencies(node: F[_]): Iterable[F[_]] = dependencies(viewCache(node))
-  def dependencies(v: Node[F, _]): Iterable[F[_]] =
+  def dependencies(node: F[?]): Iterable[F[?]] = dependencies(viewCache(node))
+  def dependencies(v: Node[F, ?]): Iterable[F[?]] =
     v.alist.toList(v.in).filter(dep => view.inline(dep).isEmpty)
 
-  def runBefore(node: F[_]): Seq[F[_]] = getSeq(triggers.runBefore, node)
-  def triggeredBy(node: F[_]): Seq[F[_]] = getSeq(triggers.injectFor, node)
-  def getSeq(map: collection.Map[F[_], Seq[F[_]]], node: F[_]): Seq[F[_]] =
-    map.getOrElse(node, nilSeq[F[_]])
+  def runBefore(node: F[?]): Seq[F[?]] = getSeq(triggers.runBefore, node)
+  def triggeredBy(node: F[?]): Seq[F[?]] = getSeq(triggers.injectFor, node)
+  def getSeq(map: collection.Map[F[?], Seq[F[?]]], node: F[?]): Seq[F[?]] =
+    map.getOrElse(node, nilSeq[F[?]])
 
   // Contracts
 
-  def addedInv(node: F[_]): Unit = topologicalSort(node) foreach addedCheck
-  def addedCheck(node: F[_]): Unit = {
+  def addedInv(node: F[?]): Unit = topologicalSort(node) foreach addedCheck
+  def addedCheck(node: F[?]): Unit = {
     assert(added(node), "Not added: " + node)
     assert(viewCache contains node, "Not in view cache: " + node)
     dependencyCheck(node)
   }
-  def dependencyCheck(node: F[_]): Unit = {
+  def dependencyCheck(node: F[?]): Unit = {
     dependencies(node) foreach { dep =>
       def onOpt[A](o: Option[A])(f: A => Boolean) = o match {
         case None => false; case Some(x) => f(x)
@@ -345,15 +345,15 @@ private[sbt] final class Execute[F[_] <: AnyRef](
       assert(done(dep) ^ (checkForward && checkReverse))
     }
   }
-  def pendingInv(node: F[_]): Unit = {
+  def pendingInv(node: F[?]): Unit = {
     assert(atState(node, Pending))
     assert((dependencies(node) ++ runBefore(node)) exists notDone)
   }
-  def runningInv(node: F[_]): Unit = {
+  def runningInv(node: F[?]): Unit = {
     assert(dependencies(node) forall done)
     assert(!(forward contains node))
   }
-  def newPre(node: F[_]): Unit = {
+  def newPre(node: F[?]): Unit = {
     isNew(node)
     assert(!(reverse contains node))
     assert(!(forward contains node))
@@ -362,11 +362,11 @@ private[sbt] final class Execute[F[_] <: AnyRef](
     assert(!(results contains node))
   }
 
-  def topologicalSort(node: F[_]): Seq[F[_]] = {
-    val seen = IDSet.create[F[_]]
-    def visit(n: F[_]): List[F[_]] =
-      (seen process n)(List[F[_]]()) {
-        node :: dependencies(n).foldLeft(List[F[_]]()) { (ss, dep) =>
+  def topologicalSort(node: F[?]): Seq[F[?]] = {
+    val seen = IDSet.create[F[?]]
+    def visit(n: F[?]): List[F[?]] =
+      (seen process n)(List[F[?]]()) {
+        node :: dependencies(n).foldLeft(List[F[?]]()) { (ss, dep) =>
           visit(dep) ::: ss
         }
       }
@@ -374,7 +374,7 @@ private[sbt] final class Execute[F[_] <: AnyRef](
     visit(node).reverse
   }
 
-  def readyInv(node: F[_]): Unit = {
+  def readyInv(node: F[?]): Unit = {
     assert(dependencies(node) forall done)
     assert(!(forward contains node))
   }
@@ -408,14 +408,14 @@ private[sbt] final class Execute[F[_] <: AnyRef](
 
   // state testing
 
-  def pending(d: F[_]) = atState(d, Pending)
-  def running(d: F[_]) = atState(d, Running)
-  def calling(d: F[_]) = atState(d, Calling)
-  def done(d: F[_]) = atState(d, Done)
-  def notDone(d: F[_]) = !done(d)
-  def atState(d: F[_], s: State) = state.get(d) == Some(s)
-  def isNew(d: F[_]) = !added(d)
-  def added(d: F[_]) = state contains d
+  def pending(d: F[?]) = atState(d, Pending)
+  def running(d: F[?]) = atState(d, Running)
+  def calling(d: F[?]) = atState(d, Calling)
+  def done(d: F[?]) = atState(d, Done)
+  def notDone(d: F[?]) = !done(d)
+  def atState(d: F[?], s: State) = state.get(d) == Some(s)
+  def isNew(d: F[?]) = !added(d)
+  def added(d: F[?]) = state contains d
   def complete = state.values.forall(_ == Done)
 
   def pre(f: => Unit) = if (checkPreAndPostConditions) f

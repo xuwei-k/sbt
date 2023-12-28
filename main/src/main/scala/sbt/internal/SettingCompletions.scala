@@ -40,7 +40,7 @@ private[sbt] object SettingCompletions {
    * overriding all previous definitions of the underlying AttributeKey.
    * The settings injected by this method cannot be later persisted by the `session save` command.
    */
-  def setAll(extracted: Extracted, settings: Seq[Setting[_]]): SetResult = {
+  def setAll(extracted: Extracted, settings: Seq[Setting[?]]): SetResult = {
     import extracted._
     val r = relation(extracted.structure, true)
     val allDefs = Def
@@ -48,16 +48,16 @@ private[sbt] object SettingCompletions {
         Def.compiled(extracted.structure.settings, true)(
           structure.delegates,
           structure.scopeLocal,
-          implicitly[Show[ScopedKey[_]]]
+          implicitly[Show[ScopedKey[?]]]
         )
       )
       .keys
     val projectScope = Load.projectScope(currentRef)
-    def resolve(s: Setting[_]): Seq[Setting[_]] =
+    def resolve(s: Setting[?]): Seq[Setting[?]] =
       Load.transformSettings(projectScope, currentRef.build, rootProject, s :: Nil)
 
     @nowarn
-    def rescope[T](setting: Setting[T]): Seq[Setting[_]] = {
+    def rescope[T](setting: Setting[T]): Seq[Setting[?]] = {
       val akey = setting.key.key
       val global = ScopedKey(Global, akey)
       val globalSetting = resolve(Def.setting(global, setting.init, setting.pos))
@@ -76,7 +76,7 @@ private[sbt] object SettingCompletions {
   /** Implementation of the `set` command that will reload the current project with `settings`
    *  appended to the current settings.
    */
-  def setThis(extracted: Extracted, settings: Seq[Def.Setting[_]], arg: String): SetResult = {
+  def setThis(extracted: Extracted, settings: Seq[Def.Setting[?]], arg: String): SetResult = {
     import extracted._
     val append =
       Load.transformSettings(Load.projectScope(currentRef), currentRef.build, rootProject, settings)
@@ -91,9 +91,9 @@ private[sbt] object SettingCompletions {
 
   private[this] def setResult(
       session: SessionSettings,
-      r: Relation[ScopedKey[_], ScopedKey[_]],
-      redefined: Seq[Setting[_]],
-  )(implicit show: Show[ScopedKey[_]]): SetResult = {
+      r: Relation[ScopedKey[?], ScopedKey[?]],
+      redefined: Seq[Setting[?]],
+  )(implicit show: Show[ScopedKey[?]]): SetResult = {
     val redefinedKeys = redefined.map(_.key).toSet
     val affectedKeys = redefinedKeys.flatMap(r.reverse)
     def summary(verbose: Boolean): String = setSummary(redefinedKeys, affectedKeys, verbose)
@@ -101,12 +101,12 @@ private[sbt] object SettingCompletions {
   }
 
   private[this] def setSummary(
-      redefined: Set[ScopedKey[_]],
-      affected: Set[ScopedKey[_]],
+      redefined: Set[ScopedKey[?]],
+      affected: Set[ScopedKey[?]],
       verbose: Boolean,
-  )(implicit display: Show[ScopedKey[_]]): String = {
+  )(implicit display: Show[ScopedKey[?]]): String = {
     val QuietLimit = 3
-    def strings(in: Set[ScopedKey[_]]): Seq[String] = in.toSeq.map(sk => display.show(sk)).sorted
+    def strings(in: Set[ScopedKey[?]]): Seq[String] = in.toSeq.map(sk => display.show(sk)).sorted
     def lines(in: Seq[String]): (String, Boolean) =
       if (in.isEmpty)
         ("no settings or tasks.", false)
@@ -144,10 +144,10 @@ private[sbt] object SettingCompletions {
    */
   def settingParser(
       settings: Settings[Scope],
-      rawKeyMap: Map[String, AttributeKey[_]],
+      rawKeyMap: Map[String, AttributeKey[?]],
       context: ResolvedProject,
   ): Parser[String] = {
-    val keyMap: Map[String, AttributeKey[_]] =
+    val keyMap: Map[String, AttributeKey[?]] =
       rawKeyMap.map { case (k, v) => (keyScalaID(k), v) }.toMap
     val full = for {
       defineKey <- scopedKeyParser(keyMap, settings, context)
@@ -160,15 +160,15 @@ private[sbt] object SettingCompletions {
 
   /** Parser for a Scope+AttributeKey (ScopedKey). */
   def scopedKeyParser(
-      keyMap: Map[String, AttributeKey[_]],
+      keyMap: Map[String, AttributeKey[?]],
       settings: Settings[Scope],
       context: ResolvedProject
-  ): Parser[ScopedKey[_]] = {
+  ): Parser[ScopedKey[?]] = {
     val cutoff = KeyRanks.MainCutoff
     val keyCompletions = fixedCompletions { (seen, level) =>
       completeKey(seen, keyMap, level, cutoff, 10).toSet
     }
-    val keyID: Parser[AttributeKey[_]] = scalaID(keyMap, "key")
+    val keyID: Parser[AttributeKey[?]] = scalaID(keyMap, "key")
     val keyParser = token(keyID, keyCompletions)
     for (key <- keyParser; scope <- scopeParser(key, settings, context))
       yield ScopedKey(scope, key)
@@ -181,7 +181,7 @@ private[sbt] object SettingCompletions {
    * Parser for the initialization expression for the assignment method `assign` on the key `sk`.
    * `scopedKeyP` is used to parse and complete the input keys for an initialization that depends on other keys.
    */
-  def valueParser(sk: ScopedKey[_], assign: Assign.Value): Parser[Seq[ScopedKey[_]]] = {
+  def valueParser(sk: ScopedKey[?], assign: Assign.Value): Parser[Seq[ScopedKey[?]]] = {
     val fullTypeString = keyTypeString(sk.key)
     val typeString = if (assignNoAppend(assign)) fullTypeString else "..."
     if (assign == Assign.Update) {
@@ -199,7 +199,7 @@ private[sbt] object SettingCompletions {
    * only known axis values for configurations and tasks and only in that order.
    */
   def scopeParser(
-      key: AttributeKey[_],
+      key: AttributeKey[?],
       settings: Settings[Scope],
       context: ResolvedProject
   ): Parser[Scope] = {
@@ -247,14 +247,14 @@ private[sbt] object SettingCompletions {
       "configuration",
     )
     val taskParser =
-      axisParser[AttributeKey[_]](_.task, k => keyScalaID(k.label), _.description, "task")
+      axisParser[AttributeKey[?]](_.task, k => keyScalaID(k.label), _.description, "task")
     val nonGlobal = (configParser ~ taskParser) map { case (c, t) => Scope(This, c, t, Zero) }
     val global = inParser ~> token((Space ~ GlobalID) ^^^ Global)
     global | nonGlobal
   }
 
   /** Parser for the assignment method (such as `:=`) for defining `key`. */
-  def assign(key: ScopedKey[_]): Parser[Assign.Value] = {
+  def assign(key: ScopedKey[?]): Parser[Assign.Value] = {
     val completions = fixedCompletions { (seen, _) =>
       completeAssign(seen, key).toSet
     }
@@ -280,7 +280,7 @@ private[sbt] object SettingCompletions {
    * Completions for an assignment method for `key` given the tab completion `level` and existing partial string `seen`.
    * This will filter possible assignment methods based on the underlying type of `key`, so that only `<<=` is shown for input tasks, for example.
    */
-  def completeAssign(seen: String, key: ScopedKey[_]): Seq[Completion] = {
+  def completeAssign(seen: String, key: ScopedKey[?]): Seq[Completion] = {
     val allowed: Iterable[Assign.Value] =
       if (appendable(key.key)) Assign.values
       else assignNoAppend
@@ -293,7 +293,7 @@ private[sbt] object SettingCompletions {
 
   def completeKey(
       seen: String,
-      keys: Map[String, AttributeKey[_]],
+      keys: Map[String, AttributeKey[?]],
       level: Int,
       prominentCutoff: Int,
       detailLimit: Int
@@ -353,11 +353,11 @@ private[sbt] object SettingCompletions {
   def configScalaID(c: String): String = Util.quoteIfKeyword(c.capitalize)
 
   /** Applies a function on the underlying manifest for T for `key` depending if it is for a `Setting[T]`, `Task[T]`, or `InputTask[T]`.*/
-  def keyType[S](key: AttributeKey[_])(
-      onSetting: Manifest[_] => S,
-      onTask: Manifest[_] => S,
-      onInput: Manifest[_] => S
-  )(implicit tm: Manifest[Task[_]], im: Manifest[InputTask[_]]): S = {
+  def keyType[S](key: AttributeKey[?])(
+      onSetting: Manifest[?] => S,
+      onTask: Manifest[?] => S,
+      onInput: Manifest[?] => S
+  )(implicit tm: Manifest[Task[?]], im: Manifest[InputTask[?]]): S = {
     def argTpe = key.manifest.typeArguments.head
     val TaskClass = tm.runtimeClass
     val InputTaskClass = im.runtimeClass
@@ -369,19 +369,19 @@ private[sbt] object SettingCompletions {
   }
 
   /** For a Task[T], InputTask[T], or Setting[T], this returns the manifest for T. */
-  def keyUnderlyingType(key: AttributeKey[_]): Manifest[_] = keyType(key)(idFun, idFun, idFun)
+  def keyUnderlyingType(key: AttributeKey[?]): Manifest[?] = keyType(key)(idFun, idFun, idFun)
 
   /**
    * Returns a string representation of the underlying type T for a `key` representing a `Setting[T]`, `Task[T]`, or `InputTask[T]`.
    * This string representation is currently a cleaned up toString of the underlying Manifest.
    */
-  def keyTypeString[T](key: AttributeKey[_]): String = {
-    val mfToString = (mf: Manifest[_]) => complete.TypeString.cleanup(mf.toString)
+  def keyTypeString[T](key: AttributeKey[?]): String = {
+    val mfToString = (mf: Manifest[?]) => complete.TypeString.cleanup(mf.toString)
     keyType(key)(mfToString, mfToString, mfToString)
   }
 
   /** True if the `key` represents a setting or task that may be appended using an assignment method such as `+=`. */
-  def appendable(key: AttributeKey[_]): Boolean = {
+  def appendable(key: AttributeKey[?]): Boolean = {
     val underlying = keyUnderlyingType(key).runtimeClass
     appendableClasses.exists(_ isAssignableFrom underlying)
   }
@@ -417,9 +417,9 @@ private[sbt] object SettingCompletions {
 
   /** Class values to approximate which types can be appended*/
   val appendableClasses = Seq(
-    classOf[Seq[_]],
-    classOf[Map[_, _]],
-    classOf[Set[_]],
+    classOf[Seq[?]],
+    classOf[Map[?, ?]],
+    classOf[Set[?]],
     classOf[Int],
     classOf[Double],
     classOf[Long],

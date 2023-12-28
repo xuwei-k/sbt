@@ -44,7 +44,7 @@ object LineReader {
     !java.lang.Boolean.getBoolean("sbt.disable.cont") && Signals.supported(Signals.CONT)
   val MaxHistorySize = 500
 
-  private def completer(parser: Parser[_]): Completer = new Completer {
+  private def completer(parser: Parser[?]): Completer = new Completer {
     def complete(lr: JLineReader, pl: ParsedLine, candidates: JList[Candidate]): Unit = {
       Parser.completions(parser, pl.line(), 10).get.foreach { c =>
         /*
@@ -101,7 +101,7 @@ object LineReader {
     inputrcFileUrl().map(in => sbt.io.IO.readBytes(in.openStream()))
   def createReader(
       historyPath: Option[File],
-      parser: Parser[_],
+      parser: Parser[?],
       terminal: Terminal,
   ): LineReader = {
     // We may want to consider insourcing LineReader.java from jline. We don't otherwise
@@ -324,14 +324,14 @@ private[sbt] class InputStreamWrapper(is: InputStream, val poll: Duration)
 
 final class FullReader(
     historyPath: Option[File],
-    complete: Parser[_],
+    complete: Parser[?],
     val handleCONT: Boolean,
     terminal: Terminal
 ) extends JLine {
   @deprecated("Use the constructor with no injectThreadSleep parameter", "1.4.0")
   def this(
       historyPath: Option[File],
-      complete: Parser[_],
+      complete: Parser[?],
       handleCONT: Boolean = LineReader.HandleCONT,
       injectThreadSleep: Boolean = false
   ) =

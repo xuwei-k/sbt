@@ -19,7 +19,7 @@ sealed trait KList[+M[_]] {
   def transform[N[_]](f: M ~> N): Transform[N]
 
   /** Folds this list using a function that operates on the homogeneous type of the elements of this list. */
-  def foldr[B](f: (M[_], B) => B, init: B): B
+  def foldr[B](f: (M[?], B) => B, init: B): B
 
   /** Applies `f` to the elements of this list in the applicative functor defined by `ap`. */
   def apply[N[x] >: M[x], Z](f: Transform[Id] => Z)(implicit ap: Applicative[N]): N[Z]
@@ -28,7 +28,7 @@ sealed trait KList[+M[_]] {
   def traverse[N[_], P[_]](f: M ~> (N ∙ P)#l)(implicit np: Applicative[N]): N[Transform[P]]
 
   /** Discards the heterogeneous type information and constructs a plain List from this KList's elements. */
-  def toList: List[M[_]]
+  def toList: List[M[?]]
 }
 object KList {
   type Aux[+M[_], Transform0[N[_]]] = KList[M] { type Transform[N[_]] = Transform0[N] }
@@ -38,7 +38,7 @@ final case class KCons[H, +T <: KList[M], +M[_]](head: M[H], tail: T) extends KL
   final type Transform[N[_]] = KCons[H, tail.Transform[N], N]
 
   def transform[N[_]](f: M ~> N) = KCons(f(head), tail.transform(f))
-  def toList: List[M[_]] = head :: tail.toList
+  def toList: List[M[?]] = head :: tail.toList
 
   def apply[N[x] >: M[x], Z](f: Transform[Id] => Z)(implicit ap: Applicative[N]): N[Z] = {
     val g = (t: tail.Transform[Id]) => (h: H) => f(KCons[H, tail.Transform[Id], Id](h, t))
@@ -52,13 +52,13 @@ final case class KCons[H, +T <: KList[M], +M[_]](head: M[H], tail: T) extends KL
   }
 
   def :^:[A, N[x] >: M[x]](h: N[A]) = KCons(h, this)
-  override def foldr[B](f: (M[_], B) => B, init: B): B = f(head, tail.foldr(f, init))
+  override def foldr[B](f: (M[?], B) => B, init: B): B = f(head, tail.foldr(f, init))
 }
 
 sealed abstract class KNil extends KList[NothingK] {
   final type Transform[N[_]] = KNil
   final def transform[N[_]](f: NothingK ~> N): Transform[N] = KNil
-  final def foldr[B](f: (NothingK[_], B) => B, init: B): B = init
+  final def foldr[B](f: (NothingK[?], B) => B, init: B): B = init
   final def toList = Nil
   final def apply[N[x], Z](f: KNil => Z)(implicit ap: Applicative[N]): N[Z] = ap.pure(f(KNil))
 

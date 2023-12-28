@@ -18,7 +18,7 @@ object TestUtil {
     tb.eval(tb.parse(code))
   }
 
-  def mkToolbox(compileOptions: String = ""): ToolBox[_ <: scala.reflect.api.Universe] = {
+  def mkToolbox(compileOptions: String = ""): ToolBox[? <: scala.reflect.api.Universe] = {
     val m = scala.reflect.runtime.currentMirror
     import scala.tools.reflect.ToolBox
     m.mkToolBox(options = compileOptions)

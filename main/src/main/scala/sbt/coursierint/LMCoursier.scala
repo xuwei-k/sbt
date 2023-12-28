@@ -323,7 +323,7 @@ object LMCoursier {
       logger.debug(s"downloaded $url")
   }
 
-  def publicationsSetting(packageConfigs: Seq[(Configuration, CConfiguration)]): Def.Setting[_] = {
+  def publicationsSetting(packageConfigs: Seq[(Configuration, CConfiguration)]): Def.Setting[?] = {
     csrPublications := CoursierArtifactsTasks.coursierPublicationsTask(packageConfigs: _*).value
   }
 

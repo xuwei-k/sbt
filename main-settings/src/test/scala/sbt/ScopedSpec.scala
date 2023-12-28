@@ -21,11 +21,11 @@ object ScopedSpec extends Properties("Scoped") {
   val intManifest = manifest[Int]
   val stringManifest = manifest[String]
 
-  implicit val arbManifest: Arbitrary[Manifest[_]] =
+  implicit val arbManifest: Arbitrary[Manifest[?]] =
     Arbitrary(Gen.oneOf(intManifest, stringManifest))
 
   property("setting keys are structurally equal") = {
-    forAll { (label: Label, manifest: Manifest[_], scope: Scope) =>
+    forAll { (label: Label, manifest: Manifest[?], scope: Scope) =>
       val k1 = settingKey(label, manifest, scope)
       val k2 = settingKey(label, manifest, scope)
       expectEq(k1, k2)
@@ -33,7 +33,7 @@ object ScopedSpec extends Properties("Scoped") {
   }
 
   property("task keys are structurally equal") = {
-    forAll { (label: Label, manifest: Manifest[_], scope: Scope) =>
+    forAll { (label: Label, manifest: Manifest[?], scope: Scope) =>
       val k1 = taskKey(label, manifest, scope)
       val k2 = taskKey(label, manifest, scope)
       expectEq(k1, k2)
@@ -41,7 +41,7 @@ object ScopedSpec extends Properties("Scoped") {
   }
 
   property("input keys are structurally equal") = {
-    forAll { (label: Label, manifest: Manifest[_], scope: Scope) =>
+    forAll { (label: Label, manifest: Manifest[?], scope: Scope) =>
       val k1 = inputKey(label, manifest, scope)
       val k2 = inputKey(label, manifest, scope)
       expectEq(k1, k2)
@@ -49,7 +49,7 @@ object ScopedSpec extends Properties("Scoped") {
   }
 
   property("different key types are not equal") = {
-    forAll { (label: Label, manifest: Manifest[_], scope: Scope) =>
+    forAll { (label: Label, manifest: Manifest[?], scope: Scope) =>
       val settingKey1 = settingKey(label, manifest, scope)
       val taskKey1 = taskKey(label, manifest, scope)
       val inputKey1 = inputKey(label, manifest, scope)

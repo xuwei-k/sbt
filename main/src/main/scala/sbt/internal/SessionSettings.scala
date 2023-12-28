@@ -35,9 +35,9 @@ import sbt.io.IO
 final case class SessionSettings(
     currentBuild: URI,
     currentProject: Map[URI, String],
-    original: Seq[Setting[_]],
+    original: Seq[Setting[?]],
     append: SessionMap,
-    rawAppend: Seq[Setting[_]],
+    rawAppend: Seq[Setting[?]],
     currentEval: () => Eval
 ) {
 
@@ -79,19 +79,19 @@ final case class SessionSettings(
    * @param ss  The raw settings to include
    * @return A new SessionSettings with the appended settings.
    */
-  def appendRaw(ss: Seq[Setting[_]]): SessionSettings = copy(rawAppend = rawAppend ++ ss)
+  def appendRaw(ss: Seq[Setting[?]]): SessionSettings = copy(rawAppend = rawAppend ++ ss)
 
   /**
    * @return  A combined list of all Setting[_] objects for the current session, in priority order.
    */
-  def mergeSettings: Seq[Setting[_]] = original ++ merge(append) ++ rawAppend
+  def mergeSettings: Seq[Setting[?]] = original ++ merge(append) ++ rawAppend
 
   /**
    * @return  A new SessionSettings object where additional transient settings are removed.
    */
   def clearExtraSettings: SessionSettings = copy(append = Map.empty, rawAppend = Nil)
 
-  private[this] def merge(map: SessionMap): Seq[Setting[_]] =
+  private[this] def merge(map: SessionMap): Seq[Setting[?]] =
     map.values.toSeq.flatten[SessionSetting].map(_._1)
 
   private[this] def modify(map: SessionMap, onSeq: Endo[Seq[SessionSetting]]): SessionMap = {
@@ -103,7 +103,7 @@ final case class SessionSettings(
 object SessionSettings {
 
   /** A session setting is simply a tuple of a Setting[_] and the strings which define it. */
-  type SessionSetting = (Setting[_], Seq[String])
+  type SessionSetting = (Setting[?], Seq[String])
 
   type SessionMap = Map[ProjectRef, Seq[SessionSetting]]
   type SbtConfigFile = (File, Seq[String])
@@ -206,9 +206,9 @@ object SessionSettings {
   def writeSettings(
       pref: ProjectRef,
       settings: List[SessionSetting],
-      original: Seq[Setting[_]],
+      original: Seq[Setting[?]],
       structure: BuildStructure
-  ): (Seq[SessionSetting], Seq[Setting[_]]) = {
+  ): (Seq[SessionSetting], Seq[Setting[?]]) = {
     val project =
       Project.getProject(pref, structure).getOrElse(sys.error("Invalid project reference " + pref))
     val writeTo: File = BuildPaths
@@ -219,7 +219,7 @@ object SessionSettings {
 
     val path = writeTo.getAbsolutePath
     val (inFile, other, _) =
-      original.reverse.foldLeft((List[Setting[_]](), List[Setting[_]](), Set.empty[ScopedKey[_]])) {
+      original.reverse.foldLeft((List[Setting[?]](), List[Setting[?]](), Set.empty[ScopedKey[?]])) {
         case ((in, oth, keys), s) =>
           s.pos match {
             case RangePosition(`path`, _) if !keys.contains(s.key) => (s :: in, oth, keys + s.key)
@@ -227,7 +227,7 @@ object SessionSettings {
           }
       }
 
-    val (_, oldShifted, replace) = inFile.foldLeft((0, List[Setting[_]](), Seq[SessionSetting]())) {
+    val (_, oldShifted, replace) = inFile.foldLeft((0, List[Setting[?]](), Seq[SessionSetting]())) {
       case ((offs, olds, repl), s) =>
         val RangePosition(_, r @ LineRange(start, end)) = s.pos
         settings find (_._1.key == s.key) match {

@@ -26,19 +26,19 @@ import scala.annotation.nowarn
 final class BuildStructure(
     val units: Map[URI, LoadedBuildUnit],
     val root: URI,
-    val settings: Seq[Setting[_]],
+    val settings: Seq[Setting[?]],
     val data: Settings[Scope],
     val index: StructureIndex,
     val streams: State => Streams,
     val delegates: Scope => Seq[Scope],
     val scopeLocal: ScopeLocal,
-    private[sbt] val compiledMap: Map[ScopedKey[_], Def.Compiled[_]],
+    private[sbt] val compiledMap: Map[ScopedKey[?], Def.Compiled[?]],
 ) {
   @deprecated("Used the variant that takes a compiledMap", "1.4.0")
   def this(
       units: Map[URI, LoadedBuildUnit],
       root: URI,
-      settings: Seq[Setting[_]],
+      settings: Seq[Setting[?]],
       data: Settings[Scope],
       index: StructureIndex,
       streams: State => Streams,
@@ -79,8 +79,8 @@ final class BuildStructure(
 
 // information that is not original, but can be reconstructed from the rest of BuildStructure
 final class StructureIndex(
-    val keyMap: Map[String, AttributeKey[_]],
-    val taskToKey: Map[Task[_], ScopedKey[Task[_]]],
+    val keyMap: Map[String, AttributeKey[?]],
+    val taskToKey: Map[Task[?], ScopedKey[Task[?]]],
     val triggers: Triggers[Task],
     val keyIndex: KeyIndex,
     val aggregateKeyIndex: KeyIndex,
@@ -98,7 +98,7 @@ final class LoadedBuildUnit(
     val unit: BuildUnit,
     val defined: Map[String, ResolvedProject],
     val rootProjects: Seq[String],
-    val buildSettings: Seq[Setting[_]]
+    val buildSettings: Seq[Setting[?]]
 ) extends BuildUnitBase {
 
   /**
@@ -284,13 +284,13 @@ final class LoadedBuild(val root: URI, val units: Map[URI, LoadedBuildUnit]) {
 
 final class PartBuild(val root: URI, val units: Map[URI, PartBuildUnit])
 
-sealed trait BuildUnitBase { def rootProjects: Seq[String]; def buildSettings: Seq[Setting[_]] }
+sealed trait BuildUnitBase { def rootProjects: Seq[String]; def buildSettings: Seq[Setting[?]] }
 
 final class PartBuildUnit(
     val unit: BuildUnit,
     val defined: Map[String, Project],
     val rootProjects: Seq[String],
-    val buildSettings: Seq[Setting[_]]
+    val buildSettings: Seq[Setting[?]]
 ) extends BuildUnitBase {
 
   def resolve(f: Project => ResolvedProject): LoadedBuildUnit =
@@ -300,7 +300,7 @@ final class PartBuildUnit(
 }
 
 object BuildStreams {
-  type Streams = sbt.std.Streams[ScopedKey[_]]
+  type Streams = sbt.std.Streams[ScopedKey[?]]
 
   final val GlobalPath = "_global"
   final val BuildUnitPath = "_build"
@@ -315,7 +315,7 @@ object BuildStreams {
     (s get Keys.stateStreams) getOrElse {
       std.Streams(
         path(units, root, data)(_),
-        displayFull: ScopedKey[_] => String,
+        displayFull: ScopedKey[?] => String,
         LogManager.construct(data, s), {
           val factory =
             s.get(Keys.cacheStoreFactoryFactory).getOrElse(InMemoryCacheStore.factory(0))
@@ -326,14 +326,14 @@ object BuildStreams {
   }
 
   def path(units: Map[URI, LoadedBuildUnit], root: URI, data: Settings[Scope])(
-      scoped: ScopedKey[_]
+      scoped: ScopedKey[?]
   ): File =
     resolvePath(projectPath(units, root, scoped, data), nonProjectPath(scoped))
 
   def resolvePath(base: File, components: Seq[String]): File =
     components.foldLeft(base)((b, p) => new File(b, p))
 
-  def pathComponent[T](axis: ScopeAxis[T], scoped: ScopedKey[_], label: String)(
+  def pathComponent[T](axis: ScopeAxis[T], scoped: ScopedKey[?], label: String)(
       show: T => String
   ): String =
     axis match {
@@ -385,7 +385,7 @@ object BuildStreams {
   def projectPath(
       units: Map[URI, LoadedBuildUnit],
       root: URI,
-      scoped: ScopedKey[_],
+      scoped: ScopedKey[?],
       data: Settings[Scope]
   ): File =
     scoped.scope.project match {

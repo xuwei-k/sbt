@@ -18,7 +18,7 @@ import sbt.io.IO
 final case class Scope(
     project: ScopeAxis[Reference],
     config: ScopeAxis[ConfigKey],
-    task: ScopeAxis[AttributeKey[_]],
+    task: ScopeAxis[AttributeKey[?]],
     extra: ScopeAxis[AttributeMap]
 ) {
   @deprecated(Scope.inIsDeprecated, "1.5.0")
@@ -26,15 +26,15 @@ final case class Scope(
     copy(project = Select(project), config = Select(config))
 
   @deprecated(Scope.inIsDeprecated, "1.5.0")
-  def in(config: ConfigKey, task: AttributeKey[_]): Scope =
+  def in(config: ConfigKey, task: AttributeKey[?]): Scope =
     copy(config = Select(config), task = Select(task))
 
   @deprecated(Scope.inIsDeprecated, "1.5.0")
-  def in(project: Reference, task: AttributeKey[_]): Scope =
+  def in(project: Reference, task: AttributeKey[?]): Scope =
     copy(project = Select(project), task = Select(task))
 
   @deprecated(Scope.inIsDeprecated, "1.5.0")
-  def in(project: Reference, config: ConfigKey, task: AttributeKey[_]): Scope =
+  def in(project: Reference, config: ConfigKey, task: AttributeKey[?]): Scope =
     copy(project = Select(project), config = Select(config), task = Select(task))
 
   @deprecated(Scope.inIsDeprecated, "1.5.0")
@@ -44,7 +44,7 @@ final case class Scope(
   def in(config: ConfigKey): Scope = copy(config = Select(config))
 
   @deprecated(Scope.inIsDeprecated, "1.5.0")
-  def in(task: AttributeKey[_]): Scope = copy(task = Select(task))
+  def in(task: AttributeKey[?]): Scope = copy(task = Select(task))
 
   override def toString: String = this match {
     case Scope(Zero, Zero, Zero, Zero) => "Global"
@@ -87,9 +87,9 @@ object Scope {
     case s                                       => s
   }
 
-  def fillTaskAxis(scope: Scope, key: AttributeKey[_]): Scope =
+  def fillTaskAxis(scope: Scope, key: AttributeKey[?]): Scope =
     scope.task match {
-      case _: Select[_] => scope
+      case _: Select[?] => scope
       case _            => scope.copy(task = Select(key))
     }
 
@@ -285,7 +285,7 @@ object Scope {
       rootProject: URI => String,
       projectInherit: ProjectRef => Seq[ProjectRef],
       configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey],
-      taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
+      taskInherit: AttributeKey[?] => Seq[AttributeKey[?]],
       extraInherit: (ResolvedReference, AttributeMap) => Seq[AttributeMap]
   ): Scope => Seq[Scope] =
     delegates(
@@ -306,7 +306,7 @@ object Scope {
       rootProject: URI => String,
       projectInherit: ProjectRef => Seq[ProjectRef],
       configInherit: (ResolvedReference, ConfigKey) => Seq[ConfigKey],
-      taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
+      taskInherit: AttributeKey[?] => Seq[AttributeKey[?]],
   ): Scope => Seq[Scope] = {
     val index = delegates(refs, configurations, projectInherit, configInherit)
     scope => indexedDelegates(resolve, index, rootProject, taskInherit)(scope)
@@ -317,7 +317,7 @@ object Scope {
       resolve: Reference => ResolvedReference,
       index: DelegateIndex,
       rootProject: URI => String,
-      taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
+      taskInherit: AttributeKey[?] => Seq[AttributeKey[?]],
       extraInherit: (ResolvedReference, AttributeMap) => Seq[AttributeMap]
   )(rawScope: Scope): Seq[Scope] =
     indexedDelegates(resolve, index, rootProject, taskInherit)(rawScope)
@@ -326,7 +326,7 @@ object Scope {
       resolve: Reference => ResolvedReference,
       index: DelegateIndex,
       rootProject: URI => String,
-      taskInherit: AttributeKey[_] => Seq[AttributeKey[_]],
+      taskInherit: AttributeKey[?] => Seq[AttributeKey[?]],
   )(rawScope: Scope): Seq[Scope] = {
     val scope = Scope.replaceThis(GlobalScope)(rawScope)
 

@@ -78,7 +78,7 @@ object BuildServerProtocol {
     }
   )
 
-  lazy val globalSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val globalSettings: Seq[Def.Setting[?]] = Seq(
     bspConfig := {
       if (bspEnabled.value) {
         BuildServerConnection.writeConnectionFile(
@@ -251,7 +251,7 @@ object BuildServerProtocol {
   )
 
   // This will be scoped to Compile, Test, IntegrationTest etc
-  lazy val configSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val configSettings: Seq[Def.Setting[?]] = Seq(
     bspTargetIdentifier := {
       val ref = thisProjectRef.value
       val c = configuration.value

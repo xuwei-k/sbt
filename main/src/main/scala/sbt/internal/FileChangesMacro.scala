@@ -59,7 +59,7 @@ object FileChangesMacro {
       c.universe.reify(outputFileStamps)
     )
   }
-  def rescope[T](left: TaskKey[_], right: TaskKey[T]): TaskKey[T] =
+  def rescope[T](left: TaskKey[?], right: TaskKey[T]): TaskKey[T] =
     Scoped.scopedTask(left.scope.copy(task = Select(left.key)), right.key)
   def rescope[T](left: Scope, right: TaskKey[T]): TaskKey[T] =
     Scoped.scopedTask(left, right.key)

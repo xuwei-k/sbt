@@ -311,7 +311,7 @@ final class ContextUtil[C <: blackbox.Context](val ctx: C) {
                 changeOwner(qual, currentOwner, initialOwner) // Fixes https://github.com/sbt/sbt/issues/1150
                 finalTx(t)
               case Converted.Failure(p, m)       => ctx.abort(p, m)
-              case _: Converted.NotApplicable[_] => super.transform(tree)
+              case _: Converted.NotApplicable[?] => super.transform(tree)
             }
           case _ => super.transform(tree)
         }

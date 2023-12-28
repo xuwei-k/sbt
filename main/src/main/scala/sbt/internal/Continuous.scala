@@ -171,7 +171,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
    */
   private def getConfig(
       state: State,
-      scopedKey: ScopedKey[_],
+      scopedKey: ScopedKey[?],
       compiledMap: CompiledMap,
       dynamicInputs: mutable.Set[DynamicInput],
   )(implicit extracted: Extracted, logger: Logger): Config = {
@@ -216,15 +216,15 @@ private[sbt] object Continuous extends DeprecatedContinuous {
   // This is defined so we can assign a task key to a command to parse the WatchSettings.
   private[this] val globalWatchSettingKey =
     taskKey[Unit]("Internal task key. Not actually used.").withRank(KeyRanks.Invisible)
-  private def parseCommand(command: String, state: State): Seq[ScopedKey[_]] = {
+  private def parseCommand(command: String, state: State): Seq[ScopedKey[?]] = {
     // Collect all of the scoped keys that are used to delegate the multi commands. These are
     // necessary to extract all of the transitive globs that we need to monitor during watch.
     // We have to add the <~ Parsers.any.* to ensure that we're able to extract the input key
     // from input tasks.
-    val scopedKeyParser: Parser[Seq[ScopedKey[_]]] = Act.aggregatedKeyParser(state) <~ Parsers.any.*
-    @tailrec def impl(current: String): Seq[ScopedKey[_]] = {
+    val scopedKeyParser: Parser[Seq[ScopedKey[?]]] = Act.aggregatedKeyParser(state) <~ Parsers.any.*
+    @tailrec def impl(current: String): Seq[ScopedKey[?]] = {
       Parser.parse(current, scopedKeyParser) match {
-        case Right(scopedKeys: Seq[ScopedKey[_]]) => scopedKeys
+        case Right(scopedKeys: Seq[ScopedKey[?]]) => scopedKeys
         case Left(e) =>
           val aliases = BasicCommands.allAliases(state)
           aliases.collectFirst { case (`command`, aliased) => aliased } match {
@@ -237,7 +237,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
                   throw new IllegalStateException(msg)
               }
           }
-        case _ => Nil: Seq[ScopedKey[_]]
+        case _ => Nil: Seq[ScopedKey[?]]
       }
     }
     impl(command)
@@ -924,7 +924,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
    * @param key the [[ScopedKey]] instance that sets the [[Scope]] for the settings we're extracting
    * @param extracted the [[Extracted]] instance for the build
    */
-  private final class WatchSettings private[Continuous] (val key: ScopedKey[_])(
+  private final class WatchSettings private[Continuous] (val key: ScopedKey[?])(
       implicit extracted: Extracted
   ) {
     val antiEntropy: FiniteDuration =
@@ -985,13 +985,13 @@ private[sbt] object Continuous extends DeprecatedContinuous {
     def arguments(logger: Logger): Arguments = new Arguments(logger, inputs())
   }
 
-  private def getStartMessage(key: ScopedKey[_])(implicit e: Extracted): StartMessage = Some {
+  private def getStartMessage(key: ScopedKey[?])(implicit e: Extracted): StartMessage = Some {
     lazy val default = key.get(watchStartMessage).getOrElse(Watch.defaultStartWatch)
     key.get(deprecatedWatchingMessage).map(Left(_)).getOrElse(Right(default))
   }
 
   private def getTriggerMessage(
-      key: ScopedKey[_]
+      key: ScopedKey[?]
   )(implicit e: Extracted): TriggerMessage = {
     lazy val default =
       key.get(watchTriggeredMessage).getOrElse(Watch.defaultOnTriggerMessage)
@@ -1025,7 +1025,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
     }
   }
 
-  private implicit class ScopedKeyOps(val scopedKey: ScopedKey[_]) extends AnyVal {
+  private implicit class ScopedKeyOps(val scopedKey: ScopedKey[?]) extends AnyVal {
 
     /**
      * Gets the value for a setting key scoped to the wrapped [[ScopedKey]]. If the task axis is not

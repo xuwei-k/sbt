@@ -239,7 +239,7 @@ object IvyXml {
 
   def generateIvyXmlSettings(
       shadedConfigOpt: Option[Configuration] = None
-  ): Seq[Setting[_]] =
+  ): Seq[Setting[?]] =
     (needsIvyXml ++ needsIvyXmlLocal).map(makeIvyXmlBefore(_, shadedConfigOpt))
 
 }

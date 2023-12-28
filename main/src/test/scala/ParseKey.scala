@@ -120,7 +120,7 @@ object ParseKey extends Properties {
     } yield Def.setting(ScopedKey(scope, t.key), Def.value(""))
   }
 
-  final case class StructureKeyMask(structure: Structure, key: ScopedKey[_], mask: ScopeMask)
+  final case class StructureKeyMask(structure: Structure, key: ScopedKey[?], mask: ScopeMask)
 
   val arbStructureKeyMask: Gen[StructureKeyMask] =
     (for {
@@ -153,7 +153,7 @@ object ParseKey extends Properties {
     checkName.getOrElse(true)
   }
 
-  def resolve(structure: Structure, key: ScopedKey[_], mask: ScopeMask): ScopedKey[_] =
+  def resolve(structure: Structure, key: ScopedKey[?], mask: ScopeMask): ScopedKey[?] =
     ScopedKey(
       Resolve(structure.extra, Select(structure.current), key.key, mask)(key.scope),
       key.key
@@ -161,10 +161,10 @@ object ParseKey extends Properties {
 
   def parseCheck(
       structure: Structure,
-      key: ScopedKey[_],
+      key: ScopedKey[?],
       mask: ScopeMask,
       showZeroConfig: Boolean = false,
-  )(f: ScopedKey[_] => hedgehog.Result): hedgehog.Result = {
+  )(f: ScopedKey[?] => hedgehog.Result): hedgehog.Result = {
     val s = displayMasked(key, mask, showZeroConfig)
     val parser = makeParser(structure)
     val parsed = Parser.result(parser, s).left.map(_().toString)
@@ -188,7 +188,7 @@ object ParseKey extends Properties {
   // then a scoped key like `foo/<conf>/foo/name` would render as `foo/name`
   // which would be interpreted as `foo/Zero/Zero/name`
   // so we mitigate this by explicitly displaying the configuration axis set to Zero
-  def hasAmbiguousLowercaseAxes(key: ScopedKey[_], structure: Structure): Boolean = {
+  def hasAmbiguousLowercaseAxes(key: ScopedKey[?], structure: Structure): Boolean = {
     val label = key.key.label
     val allProjects = for {
       uri <- structure.keyIndex.buildURIs

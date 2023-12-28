@@ -56,7 +56,7 @@ import java.util.concurrent.{ Executor, Executors, ExecutorCompletionService }
 import annotation.tailrec
 
 object ConcurrentRestrictions {
-  private[this] val completionServices = new java.util.WeakHashMap[CompletionService[_, _], Boolean]
+  private[this] val completionServices = new java.util.WeakHashMap[CompletionService[?, ?], Boolean]
   import scala.collection.JavaConverters._
   def cancelAll() = completionServices.keySet.asScala.toVector.foreach {
     case a: AutoCloseable => a.close()
@@ -229,7 +229,7 @@ object ConcurrentRestrictions {
       /** Tasks that cannot be run yet because they cannot execute concurrently with the currently running tasks.*/
       private[this] val pending = new LinkedList[Enqueue]
 
-      private[this] val sentinels: mutable.ListBuffer[JFuture[_]] = mutable.ListBuffer.empty
+      private[this] val sentinels: mutable.ListBuffer[JFuture[?]] = mutable.ListBuffer.empty
 
       def cancelSentinels(): Unit = {
         sentinels.toList foreach { s =>

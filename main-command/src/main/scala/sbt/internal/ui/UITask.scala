@@ -55,7 +55,7 @@ private[sbt] object UITask {
   object Reader {
     // Avoid filling the stack trace since it isn't helpful here
     object interrupted extends InterruptedException
-    def terminalReader(parser: Parser[_])(
+    def terminalReader(parser: Parser[?])(
         terminal: Terminal,
         state: State
     ): Reader = new Reader {

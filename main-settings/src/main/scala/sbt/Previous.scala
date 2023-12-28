@@ -42,7 +42,7 @@ object Previous {
   import sjsonnew.BasicJsonProtocol.StringJsonFormat
   private[sbt] type ScopedTaskKey[T] = ScopedKey[Task[T]]
   private type AnyTaskKey = ScopedTaskKey[Any]
-  private type Streams = sbt.std.Streams[ScopedKey[_]]
+  private type Streams = sbt.std.Streams[ScopedKey[?]]
 
   /** The stream where the task value is persisted. */
   private final val StreamName = "previous"
@@ -74,7 +74,7 @@ object Previous {
 
   private[sbt] class Key[T](val task: ScopedKey[Task[T]], val enclosing: AnyTaskKey) {
     override def equals(o: Any): Boolean = o match {
-      case that: Key[_] => this.task == that.task && this.enclosing == that.enclosing
+      case that: Key[?] => this.task == that.task && this.enclosing == that.enclosing
       case _            => false
     }
     override def hashCode(): Int = (task.## * 31) ^ enclosing.##
@@ -166,7 +166,7 @@ object Previous {
       .zip(Global / references)
       .zip(Def.resolvedScoped)
     inputs {
-      case (((prevTask, resolved), refs), inTask: ScopedKey[Task[_]] @unchecked) =>
+      case (((prevTask, resolved), refs), inTask: ScopedKey[Task[?]] @unchecked) =>
         val key = Key(resolved, inTask)
         refs.recordReference(key, format) // always evaluated on project load
         prevTask.map(_.get(key)) // evaluated if this task is evaluated

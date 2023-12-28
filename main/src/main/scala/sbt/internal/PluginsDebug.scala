@@ -20,8 +20,8 @@ import java.net.URI
 
 private[sbt] class PluginsDebug(
     val available: List[AutoPlugin],
-    val nameToKey: Map[String, AttributeKey[_]],
-    val provided: Relation[AutoPlugin, AttributeKey[_]]
+    val nameToKey: Map[String, AttributeKey[?]],
+    val provided: Relation[AutoPlugin, AttributeKey[?]]
 ) {
 
   /**
@@ -216,7 +216,7 @@ private[sbt] object PluginsDebug {
   /** Pre-computes information for debugging plugins. */
   def apply(available: List[AutoPlugin]): PluginsDebug = {
     val keyR = definedKeys(available)
-    val nameToKey: Map[String, AttributeKey[_]] =
+    val nameToKey: Map[String, AttributeKey[?]] =
       keyR._2s.toList.map(key => (key.label, key)).toMap
     new PluginsDebug(available, nameToKey, keyR)
   }
@@ -431,12 +431,12 @@ private[sbt] object PluginsDebug {
    * Provides a [[Relation]] between plugins and the keys they potentially define.
    * Because plugins can define keys in different scopes and keys can be overridden, this is not definitive.
    */
-  def definedKeys(available: List[AutoPlugin]): Relation[AutoPlugin, AttributeKey[_]] = {
-    def extractDefinedKeys(ss: Seq[Setting[_]]): Seq[AttributeKey[_]] =
+  def definedKeys(available: List[AutoPlugin]): Relation[AutoPlugin, AttributeKey[?]] = {
+    def extractDefinedKeys(ss: Seq[Setting[?]]): Seq[AttributeKey[?]] =
       ss.map(_.key.key)
-    def allSettings(p: AutoPlugin): Seq[Setting[_]] =
+    def allSettings(p: AutoPlugin): Seq[Setting[?]] =
       p.projectSettings ++ p.buildSettings ++ p.globalSettings
-    val empty = Relation.empty[AutoPlugin, AttributeKey[_]]
+    val empty = Relation.empty[AutoPlugin, AttributeKey[?]]
     available.foldLeft(empty)((r, p) => r + (p, extractDefinedKeys(allSettings(p))))
   }
 

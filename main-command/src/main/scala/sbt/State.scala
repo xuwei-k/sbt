@@ -179,13 +179,13 @@ trait StateOps extends Any {
   def put[T](key: AttributeKey[T], value: T): State
 
   /** Removes the `key` and any associated value from the custom attributes map.*/
-  def remove(key: AttributeKey[_]): State
+  def remove(key: AttributeKey[?]): State
 
   /** Sets the value associated with `key` in the custom attributes map by transforming the current value.*/
   def update[T](key: AttributeKey[T])(f: Option[T] => T): State
 
   /** Returns true if `key` exists in the custom attributes map, false if it does not exist.*/
-  def has(key: AttributeKey[_]): Boolean
+  def has(key: AttributeKey[?]): Boolean
 
   /** The application base directory, which is not necessarily the current working directory.*/
   def baseDir: File
@@ -362,8 +362,8 @@ object State {
     def get[T](key: AttributeKey[T]) = s.attributes get key
     def put[T](key: AttributeKey[T], value: T) = s.copy(attributes = s.attributes.put(key, value))
     def update[T](key: AttributeKey[T])(f: Option[T] => T): State = put(key, f(get(key)))
-    def has(key: AttributeKey[_]) = s.attributes contains key
-    def remove(key: AttributeKey[_]) = s.copy(attributes = s.attributes remove key)
+    def has(key: AttributeKey[?]) = s.attributes contains key
+    def remove(key: AttributeKey[?]) = s.copy(attributes = s.attributes remove key)
     def log = s.globalLogging.full
     def handleError(t: Throwable): State = handleException(t, s, log)
     def fail = {

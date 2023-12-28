@@ -23,7 +23,7 @@ import org.apache.logging.log4j.core.appender.AsyncAppender
 
 sealed abstract class LogExchange {
   private[sbt] lazy val context: XLoggerContext = init()
-  private[sbt] val stringCodecs: concurrent.Map[String, ShowLines[_]] = concurrent.TrieMap()
+  private[sbt] val stringCodecs: concurrent.Map[String, ShowLines[?]] = concurrent.TrieMap()
   private[sbt] val builtInStringCodecs: Unit = initStringCodecs()
   private[util] val configs = new ConcurrentHashMap[String, LoggerConfig]
   private[util] def addConfig(name: String, config: LoggerConfig): Unit =
@@ -119,7 +119,7 @@ sealed abstract class LogExchange {
   @deprecated("This is a no-op", "1.4.0")
   def getOrElseUpdateJsonCodec[A](tag: String, v: JsonFormat[A]): JsonFormat[A] = v
   @deprecated("The log manager no longer caches jsonCodecs", "1.4.0")
-  def jsonCodecs(): concurrent.Map[String, JsonFormat[_]] = concurrent.TrieMap.empty
+  def jsonCodecs(): concurrent.Map[String, JsonFormat[?]] = concurrent.TrieMap.empty
 
   def stringCodec[A](tag: String): Option[ShowLines[A]] =
     stringCodecs.get(tag) map { _.asInstanceOf[ShowLines[A]] }

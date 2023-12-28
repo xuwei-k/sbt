@@ -13,9 +13,9 @@ import sbt.internal.util.AttributeKey
 
 object Resolve {
   def apply(
-      index: BuildUtil[_],
+      index: BuildUtil[?],
       current: ScopeAxis[Reference],
-      key: AttributeKey[_],
+      key: AttributeKey[?],
       mask: ScopeMask,
   ): Scope => Scope = {
     val rs = (
@@ -40,7 +40,7 @@ object Resolve {
     if (mask.extra) scope
     else scope.copy(extra = Zero)
 
-  def resolveConfig[P](index: BuildUtil[P], key: AttributeKey[_], mask: ScopeMask)(
+  def resolveConfig[P](index: BuildUtil[P], key: AttributeKey[?], mask: ScopeMask)(
       scope: Scope,
   ): Scope =
     if (mask.config)

@@ -40,7 +40,7 @@ object JUnitXmlReportPlugin extends AutoPlugin {
     val testReportsDirectory =
       settingKey[File]("Directory for outputting junit test reports.").withRank(AMinusSetting)
 
-    lazy val testReportSettings: Seq[Setting[_]] = Seq(
+    lazy val testReportSettings: Seq[Setting[?]] = Seq(
       testReportsDirectory := target.value / (prefix(configuration.value.name) + "reports"),
       testListeners += new JUnitXmlTestsListener(
         testReportsDirectory.value,
@@ -53,7 +53,7 @@ object JUnitXmlReportPlugin extends AutoPlugin {
   import autoImport._
 
   @nowarn
-  override lazy val projectSettings: Seq[Setting[_]] =
+  override lazy val projectSettings: Seq[Setting[?]] =
     inConfig(Test)(testReportSettings) ++
       inConfig(IntegrationTest)(testReportSettings)
 }

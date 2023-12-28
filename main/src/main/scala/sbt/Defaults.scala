@@ -150,17 +150,17 @@ object Defaults extends BuildCommon {
     m.get _
   }
 
-  private[sbt] def globalDefaults(ss: Seq[Setting[_]]): Seq[Setting[_]] =
+  private[sbt] def globalDefaults(ss: Seq[Setting[?]]): Seq[Setting[?]] =
     Def.defaultSettings(inScope(GlobalScope)(ss))
 
-  def buildCore: Seq[Setting[_]] = thisBuildCore ++ globalCore
-  def thisBuildCore: Seq[Setting[_]] =
+  def buildCore: Seq[Setting[?]] = thisBuildCore ++ globalCore
+  def thisBuildCore: Seq[Setting[?]] =
     inScope(GlobalScope.copy(project = Select(ThisBuild)))(
       Seq(
         managedDirectory := baseDirectory.value / "lib_managed"
       )
     )
-  private[sbt] lazy val globalCore: Seq[Setting[_]] = globalDefaults(
+  private[sbt] lazy val globalCore: Seq[Setting[?]] = globalDefaults(
     defaultTestTasks(test) ++ defaultTestTasks(testOnly) ++ defaultTestTasks(testQuick) ++ Seq(
       excludeFilter :== HiddenFileFilter,
       fileInputs :== Nil,
@@ -178,7 +178,7 @@ object Defaults extends BuildCommon {
     ) ++ globalIvyCore ++ globalJvmCore ++ Watch.defaults
   ) ++ globalSbtCore
 
-  private[sbt] lazy val globalJvmCore: Seq[Setting[_]] =
+  private[sbt] lazy val globalJvmCore: Seq[Setting[?]] =
     Seq(
       compilerCache := state.value get Keys.stateCompilerCache getOrElse CompilerCache.fresh,
       sourcesInBase :== true,
@@ -229,7 +229,7 @@ object Defaults extends BuildCommon {
       packageTimestamp :== Package.defaultTimestamp,
     ) ++ BuildServerProtocol.globalSettings
 
-  private[sbt] lazy val globalIvyCore: Seq[Setting[_]] =
+  private[sbt] lazy val globalIvyCore: Seq[Setting[?]] =
     Seq(
       internalConfigurationMap :== Configurations.internalMap _,
       credentials :== SysProp.sbtCredentialsEnv.toList,
@@ -274,7 +274,7 @@ object Defaults extends BuildCommon {
     )
 
   /** Core non-plugin settings for sbt builds.  These *must* be on every build or the sbt engine will fail to run at all. */
-  private[sbt] lazy val globalSbtCore: Seq[Setting[_]] = globalDefaults(
+  private[sbt] lazy val globalSbtCore: Seq[Setting[?]] = globalDefaults(
     Seq(
       outputStrategy :== None, // TODO - This might belong elsewhere.
       buildStructure := Project.structure(state.value),
@@ -306,11 +306,11 @@ object Defaults extends BuildCommon {
         finally IO.delete(taskTemporaryDirectory.value)
       },
       // extraLoggers is deprecated
-      SettingKey[ScopedKey[_] => Seq[XAppender]]("extraLoggers") :== { _ =>
+      SettingKey[ScopedKey[?] => Seq[XAppender]]("extraLoggers") :== { _ =>
         Nil
       },
       extraAppenders := {
-        val f = SettingKey[ScopedKey[_] => Seq[XAppender]]("extraLoggers").value
+        val f = SettingKey[ScopedKey[?] => Seq[XAppender]]("extraLoggers").value
         s =>
           f(s).map {
             case a: Appender => a
@@ -400,7 +400,7 @@ object Defaults extends BuildCommon {
       ++ RemoteCache.globalSettings
   )
 
-  private[sbt] lazy val buildLevelJvmSettings: Seq[Setting[_]] = Seq(
+  private[sbt] lazy val buildLevelJvmSettings: Seq[Setting[?]] = Seq(
     exportPipelining := usePipelining.value,
     rootPaths := {
       val app = appConfiguration.value
@@ -517,14 +517,14 @@ object Defaults extends BuildCommon {
   }
 
   // csrCacheDirectory is scoped to ThisBuild to allow customization.
-  private[sbt] lazy val buildLevelIvySettings: Seq[Setting[_]] = Seq(
+  private[sbt] lazy val buildLevelIvySettings: Seq[Setting[?]] = Seq(
     csrCacheDirectory := {
       if (useCoursier.value) LMCoursier.defaultCacheLocation
       else Classpaths.dummyCoursierDirectory(appConfiguration.value)
     },
   )
 
-  def defaultTestTasks(key: Scoped): Seq[Setting[_]] =
+  def defaultTestTasks(key: Scoped): Seq[Setting[?]] =
     inTask(key)(
       Seq(
         tags := Seq(Tags.Test -> 1),
@@ -533,7 +533,7 @@ object Defaults extends BuildCommon {
     )
 
   // TODO: This should be on the new default settings for a project.
-  def projectCore: Seq[Setting[_]] = Seq(
+  def projectCore: Seq[Setting[?]] = Seq(
     name := thisProject.value.id,
     logManager := LogManager.defaults(extraAppenders.value, ConsoleOut.terminalOut),
     onLoadMessage := (onLoadMessage or
@@ -543,7 +543,7 @@ object Defaults extends BuildCommon {
   )
 
   // Appended to JvmPlugin.projectSettings
-  def paths: Seq[Setting[_]] = Seq(
+  def paths: Seq[Setting[?]] = Seq(
     baseDirectory := thisProject.value.base,
     target := baseDirectory.value / "target",
     // Use a different history path for jline3 because the jline2 format is
@@ -643,7 +643,7 @@ object Defaults extends BuildCommon {
   )
   // This exists for binary compatibility and probably never should have been public.
   def addBaseSources: Seq[Def.Setting[Task[Seq[File]]]] = Nil
-  lazy val outputConfigPaths: Seq[Setting[_]] = Seq(
+  lazy val outputConfigPaths: Seq[Setting[?]] = Seq(
     classDirectory := crossTarget.value / (prefix(configuration.value.name) + "classes"),
     backendOutput := {
       val converter = fileConverter.value
@@ -674,7 +674,7 @@ object Defaults extends BuildCommon {
       // Scala 2.10 shades jline in the console so we need to make sure that it loads a compatible
       // jansi version. Because of the shading, console does not work with the thin client for 2.10.x.
       if (scalaVersion.value.startsWith("2.10.")) new ClassLoader(topLoader) {
-        override protected def loadClass(name: String, resolve: Boolean): Class[_] = {
+        override protected def loadClass(name: String, resolve: Boolean): Class[?] = {
           if (name.startsWith("org.fusesource")) throw new ClassNotFoundException(name)
           super.loadClass(name, resolve)
         }
@@ -732,7 +732,7 @@ object Defaults extends BuildCommon {
     ),
   )
   // must be a val: duplication detected by object identity
-  private[this] lazy val compileBaseGlobal: Seq[Setting[_]] = globalDefaults(
+  private[this] lazy val compileBaseGlobal: Seq[Setting[?]] = globalDefaults(
     Seq(
       auxiliaryClassFiles :== Nil,
       incOptions := IncOptions.of(),
@@ -871,10 +871,10 @@ object Defaults extends BuildCommon {
     }
   }
 
-  def defaultCompileSettings: Seq[Setting[_]] =
+  def defaultCompileSettings: Seq[Setting[?]] =
     globalDefaults(enableBinaryCompileAnalysis := true)
 
-  lazy val configTasks: Seq[Setting[_]] = docTaskSettings(doc) ++
+  lazy val configTasks: Seq[Setting[?]] = docTaskSettings(doc) ++
     inTask(compile)(compileInputsSettings) ++
     inTask(compileJava)(
       Seq(
@@ -1034,7 +1034,7 @@ object Defaults extends BuildCommon {
     )
   )
 
-  lazy val projectTasks: Seq[Setting[_]] = Seq(
+  lazy val projectTasks: Seq[Setting[?]] = Seq(
     cleanFiles := cleanFilesTask.value,
     cleanKeepFiles := Vector.empty,
     cleanKeepGlobs ++= historyPath.value.map(_.toGlob).toVector,
@@ -1235,7 +1235,7 @@ object Defaults extends BuildCommon {
       )
     )
   lazy val testTasks
-      : Seq[Setting[_]] = testTaskOptions(test) ++ testTaskOptions(testOnly) ++ testTaskOptions(
+      : Seq[Setting[?]] = testTaskOptions(test) ++ testTaskOptions(testOnly) ++ testTaskOptions(
     testQuick
   ) ++ testDefaults ++ Seq(
     testLoader := ClassLoaders.testTask.value,
@@ -1297,7 +1297,7 @@ object Defaults extends BuildCommon {
    */
   lazy val ConfigZero: Scope = ThisScope.copy(config = Zero)
   lazy val ConfigGlobal: Scope = ConfigZero
-  def testTaskOptions(key: Scoped): Seq[Setting[_]] =
+  def testTaskOptions(key: Scoped): Seq[Setting[?]] =
     inTask(key)(
       Seq(
         testListeners := {
@@ -1425,7 +1425,7 @@ object Defaults extends BuildCommon {
   def succeededFile(dir: File) = dir / "succeeded_tests"
 
   @nowarn
-  def inputTests(key: InputKey[_]): Initialize[InputTask[Unit]] =
+  def inputTests(key: InputKey[?]): Initialize[InputTask[Unit]] =
     inputTests0.mapReferenced(Def.mapScope(_ in key.key))
 
   private[this] lazy val inputTests0: Initialize[InputTask[Unit]] = {
@@ -1662,7 +1662,7 @@ object Defaults extends BuildCommon {
         Nil
     }
 
-  lazy val packageBase: Seq[Setting[_]] = Seq(
+  lazy val packageBase: Seq[Setting[?]] = Seq(
     artifact := Artifact(moduleName.value)
   ) ++ Defaults.globalDefaults(
     Seq(
@@ -1671,7 +1671,7 @@ object Defaults extends BuildCommon {
     )
   )
 
-  lazy val packageConfig: Seq[Setting[_]] =
+  lazy val packageConfig: Seq[Setting[?]] =
     inTask(packageBin)(
       Seq(
         packageOptions := {
@@ -2104,7 +2104,7 @@ object Defaults extends BuildCommon {
     ()
   }
 
-  def docTaskSettings(key: TaskKey[File] = doc): Seq[Setting[_]] =
+  def docTaskSettings(key: TaskKey[File] = doc): Seq[Setting[?]] =
     inTask(key)(
       Seq(
         apiMappings ++= {
@@ -2220,7 +2220,7 @@ object Defaults extends BuildCommon {
 
   def consoleTask: Initialize[Task[Unit]] = consoleTask(fullClasspath, console)
   def consoleQuickTask = consoleTask(externalDependencyClasspath, consoleQuick)
-  def consoleTask(classpath: TaskKey[Classpath], task: TaskKey[_]): Initialize[Task[Unit]] =
+  def consoleTask(classpath: TaskKey[Classpath], task: TaskKey[?]): Initialize[Task[Unit]] =
     Def.task {
       val si = (task / scalaInstance).value
       val s = streams.value
@@ -2415,9 +2415,9 @@ object Defaults extends BuildCommon {
       extra.toArray,
     )
   }
-  def compileInputsSettings: Seq[Setting[_]] =
+  def compileInputsSettings: Seq[Setting[?]] =
     compileInputsSettings(dependencyPicklePath)
-  def compileInputsSettings(classpathTask: TaskKey[VirtualClasspath]): Seq[Setting[_]] = {
+  def compileInputsSettings(classpathTask: TaskKey[VirtualClasspath]): Seq[Setting[?]] = {
     Seq(
       compileOptions := {
         val c = fileConverter.value
@@ -2489,7 +2489,7 @@ object Defaults extends BuildCommon {
 
   private[sbt] def none[A]: Option[A] = (None: Option[A])
   private[sbt] def jnone[A]: Optional[A] = none[A].toOptional
-  def compileAnalysisSettings: Seq[Setting[_]] = Seq(
+  def compileAnalysisSettings: Seq[Setting[?]] = Seq(
     previousCompile := {
       val setup = compileIncSetup.value
       val useBinary: Boolean = enableBinaryCompileAnalysis.value
@@ -2590,36 +2590,36 @@ object Defaults extends BuildCommon {
 
   // 1. runnerSettings is added unscoped via JvmPlugin.
   // 2. In addition it's added scoped to run task.
-  lazy val runnerSettings: Seq[Setting[_]] = Seq(runnerTask, forkOptions := forkOptionsTask.value)
-  private[this] lazy val newRunnerSettings: Seq[Setting[_]] =
+  lazy val runnerSettings: Seq[Setting[?]] = Seq(runnerTask, forkOptions := forkOptionsTask.value)
+  private[this] lazy val newRunnerSettings: Seq[Setting[?]] =
     Seq(runner := ClassLoaders.runner.value, forkOptions := forkOptionsTask.value)
 
-  lazy val baseTasks: Seq[Setting[_]] = projectTasks ++ packageBase
+  lazy val baseTasks: Seq[Setting[?]] = projectTasks ++ packageBase
 
-  lazy val configSettings: Seq[Setting[_]] =
+  lazy val configSettings: Seq[Setting[?]] =
     Classpaths.configSettings ++ configTasks ++ configPaths ++ packageConfig ++
       Classpaths.compilerPluginConfig ++ deprecationSettings ++
       BuildServerProtocol.configSettings
 
-  lazy val compileSettings: Seq[Setting[_]] =
+  lazy val compileSettings: Seq[Setting[?]] =
     configSettings ++ (mainBgRunMainTask +: mainBgRunTask) ++ Classpaths.addUnmanagedLibrary
 
-  lazy val testSettings: Seq[Setting[_]] = configSettings ++ testTasks
+  lazy val testSettings: Seq[Setting[?]] = configSettings ++ testTasks
 
   @nowarn
   @deprecated(
     "Create a separate subproject instead of using IntegrationTest and in addition avoid using itSettings",
     "1.9.0"
   )
-  lazy val itSettings: Seq[Setting[_]] = inConfig(IntegrationTest) {
+  lazy val itSettings: Seq[Setting[?]] = inConfig(IntegrationTest) {
     testSettings
   }
-  lazy val defaultConfigs: Seq[Setting[_]] = inConfig(Compile)(compileSettings) ++
+  lazy val defaultConfigs: Seq[Setting[?]] = inConfig(Compile)(compileSettings) ++
     inConfig(Test)(testSettings) ++
     inConfig(Runtime)(Classpaths.configSettings)
 
   // These are project level settings that MUST be on every project.
-  lazy val coreDefaultSettings: Seq[Setting[_]] =
+  lazy val coreDefaultSettings: Seq[Setting[?]] =
     projectCore ++ disableAggregation ++ Seq(
       // Missing but core settings
       baseDirectory := thisProject.value.base,
@@ -2633,7 +2633,7 @@ object Defaults extends BuildCommon {
       publishM2 / skip := (publish / skip).value
     )
   // build.sbt is treated a Scala source of metabuild, so to enable deprecation flag on build.sbt we set the option here.
-  lazy val deprecationSettings: Seq[Setting[_]] =
+  lazy val deprecationSettings: Seq[Setting[?]] =
     inConfig(Compile)(
       Seq(
         scalacOptions := {
@@ -2691,7 +2691,7 @@ object Classpaths {
     concatSettings(a: Initialize[Seq[T]], b) // forward to widened variant
 
   // Included as part of JvmPlugin#projectSettings.
-  lazy val configSettings: Seq[Setting[_]] = classpaths ++ Seq(
+  lazy val configSettings: Seq[Setting[?]] = classpaths ++ Seq(
     products := makeProducts.value,
     pickleProducts := makePickleProducts.value,
     productDirectories := classDirectory.value :: Nil,
@@ -2702,7 +2702,7 @@ object Classpaths {
       update.value
     )
   )
-  private[this] def classpaths: Seq[Setting[_]] =
+  private[this] def classpaths: Seq[Setting[?]] =
     Seq(
       externalDependencyClasspath := concat(unmanagedClasspath, managedClasspath).value,
       dependencyClasspath := concat(internalDependencyClasspath, externalDependencyClasspath).value,
@@ -2842,7 +2842,7 @@ object Classpaths {
   @nowarn
   def forallIn[T](
       key: Scoped.ScopingSetting[SettingKey[T]], // should be just SettingKey[T] (mea culpa)
-      pkgTasks: Seq[TaskKey[_]],
+      pkgTasks: Seq[TaskKey[?]],
   ): Initialize[Seq[T]] =
     pkgTasks.map(pkg => key in pkg.scope in pkg).join
 
@@ -2860,7 +2860,7 @@ object Classpaths {
   private lazy val packagedDefaultArtifacts = packaged(defaultArtifactTasks)
   private lazy val emptyArtifacts = Def.task(Map.empty[Artifact, File])
 
-  val jvmPublishSettings: Seq[Setting[_]] = Seq(
+  val jvmPublishSettings: Seq[Setting[?]] = Seq(
     artifacts := artifactDefs(defaultArtifactTasks).value,
     packagedArtifacts := Def
       .ifS(publishSbtPluginMavenStyle)(mavenArtifactsOfSbtPlugin)(packagedDefaultArtifacts)
@@ -2923,7 +2923,7 @@ object Classpaths {
     pomFile
   }
 
-  val ivyPublishSettings: Seq[Setting[_]] = publishGlobalDefaults ++ Seq(
+  val ivyPublishSettings: Seq[Setting[?]] = publishGlobalDefaults ++ Seq(
     artifacts :== Nil,
     packagedArtifacts :== Map.empty,
     crossTarget := target.value,
@@ -3012,7 +3012,7 @@ object Classpaths {
       )
     )
 
-  val ivyBaseSettings: Seq[Setting[_]] = baseGlobalDefaults ++ sbtClassifiersTasks ++ Seq(
+  val ivyBaseSettings: Seq[Setting[?]] = baseGlobalDefaults ++ sbtClassifiersTasks ++ Seq(
     conflictWarning := conflictWarning.value.copy(label = Reference.display(thisProjectRef.value)),
     unmanagedBase := baseDirectory.value / "lib",
     normalizedName := Project.normalizeModuleID(name.value),
@@ -3340,7 +3340,7 @@ object Classpaths {
     IvyXml.generateIvyXmlSettings() ++
     LMCoursier.publicationsSetting(Seq(Compile, Test).map(c => c -> CConfiguration(c.name)))
 
-  val jvmBaseSettings: Seq[Setting[_]] = Seq(
+  val jvmBaseSettings: Seq[Setting[?]] = Seq(
     libraryDependencies ++= autoLibraryDependency(
       autoScalaLibrary.value && scalaHome.value.isEmpty && managedScalaInstance.value,
       sbtPlugin.value,
@@ -3636,7 +3636,7 @@ object Classpaths {
   @deprecated("Use variant without delivery key", "1.1.1")
   def publishTask(
       config: TaskKey[PublishConfiguration],
-      deliverKey: TaskKey[_],
+      deliverKey: TaskKey[?],
   ): Initialize[Task[Unit]] =
     publishTask(config)
 
@@ -3816,7 +3816,7 @@ object Classpaths {
           val extracted = (Project extract st)
           val sk = (projRef / Zero / Zero / libraryDependencies).scopedKey
           val empty = extracted.structure.data.set(sk.scope, sk.key, Nil)
-          val settings = extracted.structure.settings filter { s: Setting[_] =>
+          val settings = extracted.structure.settings filter { s: Setting[?] =>
             (s.key.key == libraryDependencies.key) &&
             (s.key.scope.project == Select(projRef))
           }
@@ -4137,7 +4137,7 @@ object Classpaths {
     else
       Nil
 
-  def addUnmanagedLibrary: Seq[Setting[_]] =
+  def addUnmanagedLibrary: Seq[Setting[?]] =
     Seq((Compile / unmanagedJars) ++= unmanagedScalaLibrary.value)
 
   def unmanagedScalaLibrary: Initialize[Task[Seq[File]]] = Def.taskDyn {
@@ -4556,7 +4556,7 @@ trait BuildExtra extends BuildCommon with DefExtra {
       config: Configuration,
       mainClass: String,
       baseArguments: String*
-  ): Vector[Setting[_]] = {
+  ): Vector[Setting[?]] = {
     // TODO: Re-write to avoid InputTask.apply which is deprecated
     // I tried "Def.spaceDelimited().parsed" (after importing Def.parserToInput)
     // but it broke actions/run-task
@@ -4589,7 +4589,7 @@ trait BuildExtra extends BuildCommon with DefExtra {
       config: Configuration,
       mainClass: String,
       arguments: String*
-  ): Vector[Setting[_]] =
+  ): Vector[Setting[?]] =
     Vector(
       scoped := initScoped(
         scoped.scopedKey,
@@ -4604,7 +4604,7 @@ trait BuildExtra extends BuildCommon with DefExtra {
         .value
     ) ++ inTask(scoped)((config / forkOptions) := forkOptionsTask.value)
 
-  def initScoped[T](sk: ScopedKey[_], i: Initialize[T]): Initialize[T] =
+  def initScoped[T](sk: ScopedKey[?], i: Initialize[T]): Initialize[T] =
     initScope(fillTaskAxis(sk.scope, sk.key), i)
   def initScope[T](s: Scope, i: Initialize[T]): Initialize[T] =
     i mapReferenced Project.mapScope(Scope.replaceThis(s))
@@ -4613,12 +4613,12 @@ trait BuildExtra extends BuildCommon with DefExtra {
    * Disables post-compilation hook for determining tests for tab-completion (such as for 'test-only').
    * This is useful for reducing test:compile time when not running test.
    */
-  def noTestCompletion(config: Configuration = Test): Setting[_] =
+  def noTestCompletion(config: Configuration = Test): Setting[?] =
     inConfig(config)(Seq(definedTests := detectTests.value)).head
 
-  def filterKeys(ss: Seq[Setting[_]], transitive: Boolean = false)(
-      f: ScopedKey[_] => Boolean
-  ): Seq[Setting[_]] =
+  def filterKeys(ss: Seq[Setting[?]], transitive: Boolean = false)(
+      f: ScopedKey[?] => Boolean
+  ): Seq[Setting[?]] =
     ss filter (s => f(s.key) && (!transitive || s.dependencies.forall(f)))
 }
 
@@ -4670,10 +4670,10 @@ trait BuildCommon {
   }
 
   // these are intended for use in in put tasks for creating parsers
-  def getFromContext[T](task: TaskKey[T], context: ScopedKey[_], s: State): Option[T] =
+  def getFromContext[T](task: TaskKey[T], context: ScopedKey[?], s: State): Option[T] =
     SessionVar.get(SessionVar.resolveContext(task.scopedKey, context.scope, s), s)
 
-  def loadFromContext[T](task: TaskKey[T], context: ScopedKey[_], s: State)(
+  def loadFromContext[T](task: TaskKey[T], context: ScopedKey[?], s: State)(
       implicit f: JsonFormat[T]
   ): Option[T] =
     SessionVar.load(SessionVar.resolveContext(task.scopedKey, context.scope, s), s)

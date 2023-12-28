@@ -158,7 +158,7 @@ object InputTask {
       value: I,
       task: Task[T]
   ): Task[T] = {
-    val seen = new java.util.IdentityHashMap[Task[_], Task[_]]
+    val seen = new java.util.IdentityHashMap[Task[?], Task[?]]
     lazy val f: Task ~> Task = new (Task ~> Task) {
       def apply[A](t: Task[A]): Task[A] = {
         val t0 = seen.get(t)

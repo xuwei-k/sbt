@@ -22,7 +22,7 @@ object Transform {
     def apply[T](k: K[T]): Option[V[T]] = map.get(k)
   }
 
-  final case class DummyTaskMap(mappings: List[TaskAndValue[_]]) {
+  final case class DummyTaskMap(mappings: List[TaskAndValue[?]]) {
     def ::[T](tav: (Task[T], T)): DummyTaskMap =
       DummyTaskMap(new TaskAndValue(tav._1, tav._2) :: mappings)
   }
@@ -47,7 +47,7 @@ object Transform {
       case Pure(eval, _)       => uniform(Nil)(_ => Right(eval()))
       case m: Mapped[t, k]     => toNode[t, k](m.in)(right ∙ m.f)(m.alist)
       case m: FlatMapped[t, k] => toNode[t, k](m.in)(left ∙ m.f)(m.alist)
-      case s: Selected[_, t]   => val m = s.asFlatMapped; toNode(m.in)(left ∙ m.f)(m.alist)
+      case s: Selected[?, t]   => val m = s.asFlatMapped; toNode(m.in)(left ∙ m.f)(m.alist)
       case DependsOn(in, deps) => uniform(existToAny(deps))(const(Left(in)) compose all)
       case Join(in, f)         => uniform(in)(f)
     }

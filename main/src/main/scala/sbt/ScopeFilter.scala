@@ -20,7 +20,7 @@ object ScopeFilter {
   type AxisFilter[T] = Base[ScopeAxis[T]]
   type ProjectFilter = AxisFilter[Reference]
   type ConfigurationFilter = AxisFilter[ConfigKey]
-  type TaskFilter = AxisFilter[AttributeKey[_]]
+  type TaskFilter = AxisFilter[AttributeKey[?]]
 
   /**
    * Construct a Scope filter from a sequence of individual scopes.
@@ -94,7 +94,7 @@ object ScopeFilter {
     type ScopeFilter = Base[Scope]
 
     /** Selects Scopes with a Zero task axis. */
-    def inZeroTask: TaskFilter = zeroAxis[AttributeKey[_]]
+    def inZeroTask: TaskFilter = zeroAxis[AttributeKey[?]]
 
     @deprecated("Use inZeroTask", "1.0.0")
     def inGlobalTask: TaskFilter = inZeroTask
@@ -116,7 +116,7 @@ object ScopeFilter {
       selectAxis(const { case _: ProjectRef => true; case _ => false })
 
     /** Accepts all values for the task axis except Zero. */
-    def inAnyTask: TaskFilter = selectAny[AttributeKey[_]]
+    def inAnyTask: TaskFilter = selectAny[AttributeKey[?]]
 
     /** Accepts all values for the configuration axis except Zero. */
     def inAnyConfiguration: ConfigurationFilter = selectAny[ConfigKey]
@@ -162,7 +162,7 @@ object ScopeFilter {
     /** Selects Scopes that have a task axis with one of the provided values.*/
     def inTasks(tasks: Scoped*): TaskFilter = {
       val ts = tasks.map(_.key).toSet
-      selectAxis[AttributeKey[_]](const(ts))
+      selectAxis[AttributeKey[?]](const(ts))
     }
 
     /** Selects Scopes that have a task axis with one of the provided values.*/

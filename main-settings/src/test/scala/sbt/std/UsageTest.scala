@@ -35,7 +35,7 @@ object Assign {
   val ak = taskKey[Int]("a")
   val bk = taskKey[Seq[Int]]("b")
   val ck = settingKey[File]("c")
-  val sk = taskKey[Set[_]]("s")
+  val sk = taskKey[Set[?]]("s")
 
   val ik = inputKey[Int]("i")
   val isk = inputKey[String]("is")

@@ -17,7 +17,7 @@ import java.io.File
  * the values of Project vals, and the import statements for all defined vals/defs.
  */
 private[sbt] final class LoadedSbtFile(
-    val settings: Seq[Setting[_]],
+    val settings: Seq[Setting[?]],
     val projects: Seq[Project],
     val importedDefs: Seq[String],
     val manipulations: Seq[Project => Project],

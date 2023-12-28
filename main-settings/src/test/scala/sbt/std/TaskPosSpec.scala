@@ -129,7 +129,7 @@ class TaskPosSpec {
     import sbt._, Def._
     val foo = taskKey[String]("")
     Def.task[String] {
-      def inner(s: KeyedInitialize[_]) = println(s)
+      def inner(s: KeyedInitialize[?]) = println(s)
       inner(foo)
       ""
     }

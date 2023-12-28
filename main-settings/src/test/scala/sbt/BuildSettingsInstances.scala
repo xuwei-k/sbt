@@ -65,7 +65,7 @@ object BuildSettingsInstances {
     )
   }
 
-  implicit def arbAttrKey[A: Manifest]: Arbitrary[AttributeKey[_]] =
+  implicit def arbAttrKey[A: Manifest]: Arbitrary[AttributeKey[?]] =
     Arbitrary(Gen.identifier map (AttributeKey[A](_)))
 
   implicit val arbAttributeMap: Arbitrary[AttributeMap] = Arbitrary {
@@ -87,7 +87,7 @@ object BuildSettingsInstances {
     for {
       r <- arbitrary[ScopeAxis[Reference]]
       c <- arbitrary[ScopeAxis[ConfigKey]]
-      t <- arbitrary[ScopeAxis[AttributeKey[_]]]
+      t <- arbitrary[ScopeAxis[AttributeKey[?]]]
       e <- arbitrary[ScopeAxis[AttributeMap]]
     } yield Scope(r, c, t, e)
   )

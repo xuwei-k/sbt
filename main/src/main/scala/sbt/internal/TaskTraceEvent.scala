@@ -30,7 +30,7 @@ private[sbt] final class TaskTraceEvent
   private[this] val console = ConsoleOut.systemOut
 
   override def initial(): Unit = ()
-  override def afterReady(task: Task[_]): Unit = ()
+  override def afterReady(task: Task[?]): Unit = ()
   override def afterCompleted[T](task: Task[T], result: Result[T]): Unit = ()
   override def afterAllCompleted(results: RMap[Task, Result]): Unit = ()
   override def stop(): Unit = ()

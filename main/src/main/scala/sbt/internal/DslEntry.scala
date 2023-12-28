@@ -24,15 +24,15 @@ sealed trait DslEntry {
 object DslEntry {
   implicit def fromSettingsDef(inc: SettingsDefinition): DslEntry =
     DslSetting(inc)
-  implicit def fromSettingsDef(inc: Seq[Setting[_]]): DslEntry =
+  implicit def fromSettingsDef(inc: Seq[Setting[?]]): DslEntry =
     DslSetting(inc)
 
   /** Represents a DSL entry which adds settings to the current project. */
   sealed trait ProjectSettings extends DslEntry {
-    def toSettings: Seq[Setting[_]]
+    def toSettings: Seq[Setting[?]]
   }
   object ProjectSettings {
-    def unapply(e: DslEntry): Option[Seq[Setting[_]]] =
+    def unapply(e: DslEntry): Option[Seq[Setting[?]]] =
       e match {
         case e: ProjectSettings => Some(e.toSettings)
         case _                  => None

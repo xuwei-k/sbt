@@ -28,7 +28,7 @@ sealed trait MultiInTask[K[L[x]]] {
 sealed trait SingleInTask[S] {
   def flatMap[T](f: S => Task[T]): Task[T]
   def map[T](f: S => T): Task[T]
-  def dependsOn(tasks: Task[_]*): Task[S]
+  def dependsOn(tasks: Task[?]*): Task[S]
   def andFinally(fin: => Unit): Task[S]
   def doFinally(t: Task[Unit]): Task[S]
 
@@ -96,14 +96,14 @@ sealed trait ProcessPipe {
 }
 
 trait TaskExtra0 {
-  final implicit def joinAnyTasks(in: Seq[Task[_]]): JoinTask[Any, Seq] =
+  final implicit def joinAnyTasks(in: Seq[Task[?]]): JoinTask[Any, Seq] =
     joinTasks0[Any](existToAny(in))
   private[sbt] def joinTasks0[S](in: Seq[Task[S]]): JoinTask[S, Seq] = new JoinTask[S, Seq] {
     def join: Task[Seq[S]] =
       Task[Seq[S]](Info(), new Join(in, (s: Seq[Result[S]]) => Right(TaskExtra.all(s))))
     def reduced(f: (S, S) => S): Task[S] = TaskExtra.reduced(in.toIndexedSeq, f)
   }
-  private[sbt] def existToAny(in: Seq[Task[_]]): Seq[Task[Any]] = in.asInstanceOf[Seq[Task[Any]]]
+  private[sbt] def existToAny(in: Seq[Task[?]]): Seq[Task[Any]] = in.asInstanceOf[Seq[Task[Any]]]
 }
 
 trait TaskExtra extends TaskExtra0 {
@@ -161,7 +161,7 @@ trait TaskExtra extends TaskExtra0 {
     def flatMapR[T](f: Result[S] => Task[T]): Task[T] =
       Task(newInfo, new FlatMapped[T, K](in, f, ml))
     def mapR[T](f: Result[S] => T): Task[T] = Task(newInfo, new Mapped[T, K](in, f, ml))
-    def dependsOn(tasks: Task[_]*): Task[S] = Task(newInfo, new DependsOn(in, tasks))
+    def dependsOn(tasks: Task[?]*): Task[S] = Task(newInfo, new DependsOn(in, tasks))
 
     def flatMap[T](f: S => Task[T]): Task[T] = flatMapR(f compose successM)
     def flatFailure[T](f: Incomplete => Task[T]): Task[T] = flatMapR(f compose failM)
@@ -190,8 +190,8 @@ trait TaskExtra extends TaskExtra0 {
   }
 
   final implicit def pipeToProcess[Key](
-      t: Task[_]
-  )(implicit streams: Task[TaskStreams[Key]], key: Task[_] => Key): ProcessPipe =
+      t: Task[?]
+  )(implicit streams: Task[TaskStreams[Key]], key: Task[?] => Key): ProcessPipe =
     new ProcessPipe {
       def #|(p: ProcessBuilder): Task[Int] = pipe0(None, p)
       def pipe(sid: String)(p: ProcessBuilder): Task[Int] = pipe0(Some(sid), p)
@@ -206,8 +206,8 @@ trait TaskExtra extends TaskExtra0 {
     }
 
   final implicit def binaryPipeTask[Key](
-      in: Task[_]
-  )(implicit streams: Task[TaskStreams[Key]], key: Task[_] => Key): BinaryPipe =
+      in: Task[?]
+  )(implicit streams: Task[TaskStreams[Key]], key: Task[?] => Key): BinaryPipe =
     new BinaryPipe {
       def binary[T](f: BufferedInputStream => T): Task[T] = pipe0(None, f)
       def binary[T](sid: String)(f: BufferedInputStream => T): Task[T] = pipe0(Some(sid), f)
@@ -223,8 +223,8 @@ trait TaskExtra extends TaskExtra0 {
       private def toFile(f: File) = (in: InputStream) => IO.transfer(in, f)
     }
   final implicit def textPipeTask[Key](
-      in: Task[_]
-  )(implicit streams: Task[TaskStreams[Key]], key: Task[_] => Key): TextPipe = new TextPipe {
+      in: Task[?]
+  )(implicit streams: Task[TaskStreams[Key]], key: Task[?] => Key): TextPipe = new TextPipe {
     def text[T](f: BufferedReader => T): Task[T] = pipe0(None, f)
     def text[T](sid: String)(f: BufferedReader => T): Task[T] = pipe0(Some(sid), f)
 
@@ -234,8 +234,8 @@ trait TaskExtra extends TaskExtra0 {
       }
   }
   final implicit def linesTask[Key](
-      in: Task[_]
-  )(implicit streams: Task[TaskStreams[Key]], key: Task[_] => Key): TaskLines = new TaskLines {
+      in: Task[?]
+  )(implicit streams: Task[TaskStreams[Key]], key: Task[?] => Key): TaskLines = new TaskLines {
     def lines: Task[List[String]] = lines0(None)
     def lines(sid: String): Task[List[String]] = lines0(Some(sid))
 
@@ -244,14 +244,14 @@ trait TaskExtra extends TaskExtra0 {
         IO.readLines(s.readText(key(in), sid))
       }
   }
-  implicit def processToTask(p: ProcessBuilder)(implicit streams: Task[TaskStreams[_]]): Task[Int] =
+  implicit def processToTask(p: ProcessBuilder)(implicit streams: Task[TaskStreams[?]]): Task[Int] =
     streams map { s =>
       val pio = TaskExtra.processIO(s)
       (p run pio).exitValue()
     }
 }
 object TaskExtra extends TaskExtra {
-  def processIO(s: TaskStreams[_]): ProcessIO = {
+  def processIO(s: TaskStreams[?]): ProcessIO = {
     def transfer(id: String) = (in: InputStream) => BasicIO.transferFully(in, s.binary(id))
     new ProcessIO(_.close(), transfer(s.outID), transfer(s.errorID))
   }
@@ -297,6 +297,6 @@ object TaskExtra extends TaskExtra {
 
   // The "taskDefinitionKey" is used, at least, by the ".previous" functionality.
   // But apparently it *cannot* survive a task map/flatMap/etc. See actions/depends-on.
-  private[sbt] def newInfo[A](info: Info[_]): Info[A] =
+  private[sbt] def newInfo[A](info: Info[?]): Info[A] =
     Info[A](AttributeMap(info.attributes.entries.filter(_.key.label != "taskDefinitionKey")))
 }

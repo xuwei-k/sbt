@@ -14,14 +14,14 @@ trait RMap[K[_], V[_]] {
   def apply[T](k: K[T]): V[T]
   def get[T](k: K[T]): Option[V[T]]
   def contains[T](k: K[T]): Boolean
-  def toSeq: Seq[(K[_], V[_])]
+  def toSeq: Seq[(K[?], V[?])]
 
-  def toTypedSeq: Seq[TPair[_]] = toSeq.map {
+  def toTypedSeq: Seq[TPair[?]] = toSeq.map {
     case (k: K[t], v) => TPair[t](k, v.asInstanceOf[V[t]])
   }
 
-  def keys: Iterable[K[_]]
-  def values: Iterable[V[_]]
+  def keys: Iterable[K[?]]
+  def values: Iterable[V[?]]
   def isEmpty: Boolean
 
   sealed case class TPair[T](key: K[T], value: V[T])
@@ -43,7 +43,7 @@ trait PMap[K[_], V[_]] extends (K ~> V) with RMap[K, V] {
 }
 
 object PMap {
-  implicit def toFunction[K[_], V[_]](map: PMap[K, V]): K[_] => V[_] = k => map(k)
+  implicit def toFunction[K[_], V[_]](map: PMap[K, V]): K[?] => V[?] = k => map(k)
   def empty[K[_], V[_]]: PMap[K, V] = new DelegatingPMap[K, V](new mutable.HashMap)
 }
 
@@ -56,10 +56,10 @@ object IMap {
    */
   def empty[K[_], V[_]]: IMap[K, V] = new IMap0[K, V](Map.empty)
 
-  private[sbt] def fromJMap[K[_], V[_]](map: java.util.Map[K[_], V[_]]): IMap[K, V] =
+  private[sbt] def fromJMap[K[_], V[_]](map: java.util.Map[K[?], V[?]]): IMap[K, V] =
     new IMap0[K, V](new WrappedMap(map))
 
-  private[sbt] class IMap0[K[_], V[_]](val backing: Map[K[_], V[_]])
+  private[sbt] class IMap0[K[_], V[_]](val backing: Map[K[?], V[?]])
       extends AbstractRMap[K, V]
       with IMap[K, V] {
     def get[T](k: K[T]): Option[V[T]] = (backing get k).asInstanceOf[Option[V[T]]]
@@ -73,8 +73,8 @@ object IMap {
       new IMap0[K, V2](Map(backing.iterator.map { case (k, v) => k -> f(v) }.toArray: _*))
 
     def mapSeparate[VL[_], VR[_]](f: V ~> λ[T => Either[VL[T], VR[T]]]) = {
-      val left = new java.util.concurrent.ConcurrentHashMap[K[_], VL[_]]
-      val right = new java.util.concurrent.ConcurrentHashMap[K[_], VR[_]]
+      val left = new java.util.concurrent.ConcurrentHashMap[K[?], VL[?]]
+      val right = new java.util.concurrent.ConcurrentHashMap[K[?], VR[?]]
       Par(backing.toVector).foreach {
         case (k, v) =>
           f(v) match {
@@ -104,7 +104,7 @@ abstract class AbstractRMap[K[_], V[_]] extends RMap[K, V] {
  * Option and List keys are not suitable, for example,
  *  because None &lt;:&lt; Option[String] and None &lt;: Option[Int].
  */
-class DelegatingPMap[K[_], V[_]](backing: mutable.Map[K[_], V[_]])
+class DelegatingPMap[K[_], V[_]](backing: mutable.Map[K[?], V[?]])
     extends AbstractRMap[K, V]
     with PMap[K, V] {
   def get[T](k: K[T]): Option[V[T]] = cast[T](backing.get(k))
@@ -123,8 +123,8 @@ class DelegatingPMap[K[_], V[_]](backing: mutable.Map[K[_], V[_]])
   def values = backing.values
   def isEmpty = backing.isEmpty
 
-  private[this] def cast[T](v: V[_]): V[T] = v.asInstanceOf[V[T]]
-  private[this] def cast[T](o: Option[V[_]]): Option[V[T]] = o map cast[T]
+  private[this] def cast[T](v: V[?]): V[T] = v.asInstanceOf[V[T]]
+  private[this] def cast[T](o: Option[V[?]]): Option[V[T]] = o map cast[T]
 
   override def toString = backing.toString
 }

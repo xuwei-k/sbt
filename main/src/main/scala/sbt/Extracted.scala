@@ -22,7 +22,7 @@ final case class Extracted(
     structure: BuildStructure,
     session: SessionSettings,
     currentRef: ProjectRef
-)(implicit val showKey: Show[ScopedKey[_]]) {
+)(implicit val showKey: Show[ScopedKey[?]]) {
   def rootProject = structure.rootProject
   lazy val currentUnit = structure units currentRef.build
   lazy val currentProject = currentUnit defined currentRef.project
@@ -117,13 +117,13 @@ final case class Extracted(
   private[this] def resolve[K <: Scoped.ScopingSetting[K] with Scoped](key: K): K =
     key in Scope.resolveScope(GlobalScope, currentRef.build, rootProject)(key.scope)
 
-  private def getOrError[T](scope: Scope, key: AttributeKey[_], value: Option[T])(
-      implicit display: Show[ScopedKey[_]]
+  private def getOrError[T](scope: Scope, key: AttributeKey[?], value: Option[T])(
+      implicit display: Show[ScopedKey[?]]
   ): T =
     value getOrElse sys.error(display.show(ScopedKey(scope, key)) + " is undefined.")
 
   private def getOrError[T](scope: Scope, key: AttributeKey[T])(
-      implicit display: Show[ScopedKey[_]]
+      implicit display: Show[ScopedKey[?]]
   ): T =
     getOrError(scope, key, structure.data.get(scope, key))(display)
 
@@ -131,24 +131,24 @@ final case class Extracted(
     "This discards session settings. Migrate to appendWithSession or appendWithoutSession.",
     "1.2.0"
   )
-  def append(settings: Seq[Setting[_]], state: State): State =
+  def append(settings: Seq[Setting[?]], state: State): State =
     appendWithoutSession(settings, state)
 
   /** Appends the given settings to all the build state settings, including session settings. */
-  def appendWithSession(settings: Seq[Setting[_]], state: State): State =
+  def appendWithSession(settings: Seq[Setting[?]], state: State): State =
     appendImpl(settings, state, session.mergeSettings)
 
   /**
    * Appends the given settings to the original build state settings, discarding any settings
    * appended to the session in the process.
    */
-  def appendWithoutSession(settings: Seq[Setting[_]], state: State): State =
+  def appendWithoutSession(settings: Seq[Setting[?]], state: State): State =
     appendImpl(settings, state, session.original)
 
   private[this] def appendImpl(
-      settings: Seq[Setting[_]],
+      settings: Seq[Setting[?]],
       state: State,
-      sessionSettings: Seq[Setting[_]],
+      sessionSettings: Seq[Setting[?]],
   ): State = {
     val appendSettings =
       Load.transformSettings(Load.projectScope(currentRef), currentRef.build, rootProject, settings)

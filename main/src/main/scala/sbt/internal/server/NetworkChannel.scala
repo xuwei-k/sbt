@@ -435,7 +435,7 @@ final class NetworkChannel(
               .map(c => cp.query + c)
           }
           val (items, cachedMainClassNames, cachedTestNames) = {
-            val scopedKeyParser: Parser[Seq[Def.ScopedKey[_]]] =
+            val scopedKeyParser: Parser[Seq[Def.ScopedKey[?]]] =
               Act.aggregatedKeyParser(sstate) <~ Parsers.any.*
             Parser.parse(cp.query, scopedKeyParser) match {
               case Right(keys) =>
@@ -685,7 +685,7 @@ final class NetworkChannel(
      * probably long enough to catch each burst but short enough to not introduce
      * noticeable latency.
      */
-    private[this] val flushFuture = new AtomicReference[java.util.concurrent.Future[_]]
+    private[this] val flushFuture = new AtomicReference[java.util.concurrent.Future[?]]
     override def close(): Unit = {
       forceFlush()
     }

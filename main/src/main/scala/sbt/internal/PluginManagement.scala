@@ -38,7 +38,7 @@ final case class PluginManagement(
   def addOverrides(cp: Classpath): PluginManagement =
     addOverrides(extractOverrides(cp))
 
-  def inject: Seq[Setting[_]] = Seq(
+  def inject: Seq[Setting[?]] = Seq(
     Keys.dependencyOverrides ++= overrides.toVector
   )
 

@@ -22,7 +22,7 @@ abstract class EvaluateSettings[ScopeType] {
   import init._
 
   protected def executor: Executor
-  protected def compiledSettings: Seq[Compiled[_]]
+  protected def compiledSettings: Seq[Compiled[?]]
 
   import EvaluationState.{ Value => EvaluationState, _ }
 
@@ -54,12 +54,12 @@ abstract class EvaluateSettings[ScopeType] {
       strictConstant(allScopes.asInstanceOf[A1$]) // can't convince scalac that StaticScopes => T == Set[Scope]
   }
 
-  private[this] lazy val roots: Seq[INode[_]] = compiledSettings flatMap { cs =>
+  private[this] lazy val roots: Seq[INode[?]] = compiledSettings flatMap { cs =>
     (cs.settings map { s =>
       val t = transform(s.init)
       static(s.key) = t
       t
-    }): Seq[INode[_]]
+    }): Seq[INode[?]]
   }
 
   private[this] val running = new AtomicInteger
@@ -85,9 +85,9 @@ abstract class EvaluateSettings[ScopeType] {
 
   private[this] val getValue = λ[INode ~> Id](_.get)
 
-  private[this] def submitEvaluate(node: INode[_]) = submit(node.evaluate())
+  private[this] def submitEvaluate(node: INode[?]) = submit(node.evaluate())
 
-  private[this] def submitCallComplete[T](node: BindNode[_, T], value: T) =
+  private[this] def submitCallComplete[T](node: BindNode[?, T], value: T) =
     submit(node.callComplete(value))
 
   private[this] def submit(work: => Unit): Unit = {
@@ -111,9 +111,9 @@ abstract class EvaluateSettings[ScopeType] {
   private[this] sealed abstract class INode[T] {
     private[this] var state: EvaluationState = New
     private[this] var value: T = _
-    private[this] val blocking = new collection.mutable.ListBuffer[INode[_]]
+    private[this] val blocking = new collection.mutable.ListBuffer[INode[?]]
     private[this] var blockedOn: Int = 0
-    private[this] val calledBy = new collection.mutable.ListBuffer[BindNode[_, T]]
+    private[this] val calledBy = new collection.mutable.ListBuffer[BindNode[?, T]]
 
     override def toString =
       getClass.getName + " (state=" + state + ",blockedOn=" + blockedOn + ",calledBy=" + calledBy.size + ",blocking=" + blocking.size + "): " +
@@ -130,7 +130,7 @@ abstract class EvaluateSettings[ScopeType] {
       value
     }
 
-    final def doneOrBlock(from: INode[_]): Boolean = synchronized {
+    final def doneOrBlock(from: INode[?]): Boolean = synchronized {
       val ready = state == Evaluated
       if (!ready) {
         blocking += from
@@ -170,7 +170,7 @@ abstract class EvaluateSettings[ScopeType] {
 
     final def evaluate(): Unit = synchronized { evaluate0() }
 
-    protected final def makeCall(source: BindNode[_, T], target: INode[T]): Unit = {
+    protected final def makeCall(source: BindNode[?, T], target: INode[T]): Unit = {
       assert(state == Ready, "Invalid state for call to makeCall: " + toString)
       state = Calling
       target.call(source)
@@ -192,7 +192,7 @@ abstract class EvaluateSettings[ScopeType] {
       calledBy.clear()
     }
 
-    final def call(by: BindNode[_, T]): Unit = synchronized {
+    final def call(by: BindNode[?, T]): Unit = synchronized {
       registerIfNew()
       state match {
         case Evaluated => submitCallComplete(by, value)
@@ -202,7 +202,7 @@ abstract class EvaluateSettings[ScopeType] {
       }
     }
 
-    protected def dependsOn: Seq[INode[_]]
+    protected def dependsOn: Seq[INode[?]]
     protected def evaluate0(): Unit
   }
 

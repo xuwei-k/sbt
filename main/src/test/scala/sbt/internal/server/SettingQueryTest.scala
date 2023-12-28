@@ -53,7 +53,7 @@ object SettingQueryTest extends verify.BasicTestSuite {
   }
 
   lazy val buildStructure: BuildStructure = {
-    val projectSettings: Seq[Setting[_]] = Seq(scalaVersion := "2.12.1")
+    val projectSettings: Seq[Setting[?]] = Seq(scalaVersion := "2.12.1")
 
     val appConfig: AppConfiguration = new AppConfiguration {
       def baseDirectory(): File = baseFile
@@ -101,8 +101,8 @@ object SettingQueryTest extends verify.BasicTestSuite {
 
         def loader(): ClassLoader = noopLoader
 
-        def entryPoint(): Class[_] = ???
-        def mainClass(): Class[_ <: AppMain] = ???
+        def entryPoint(): Class[?] = ???
+        def mainClass(): Class[? <: AppMain] = ???
         def newMain(): AppMain = ???
 
         def mainClasspath(): Array[File] = Array()
@@ -165,15 +165,15 @@ object SettingQueryTest extends verify.BasicTestSuite {
 
     val units: Map[URI, LoadedBuildUnit] = loadedBuild.units
 
-    val settings: Seq[Setting[_]] = finalTransforms(
+    val settings: Seq[Setting[?]] = finalTransforms(
       buildConfigurations(loadedBuild, getRootProject(units), config.injectSettings)
     )
     val delegates: Scope => Seq[Scope] = defaultDelegates(loadedBuild)
     val scopeLocal: ScopeLocal = EvaluateTask.injectStreams
-    val display: Show[ScopedKey[_]] = Project showLoadingKey loadedBuild
+    val display: Show[ScopedKey[?]] = Project showLoadingKey loadedBuild
 
     val (cMap, data) = Def.makeWithCompiledMap(settings)(delegates, scopeLocal, display)
-    val extra: KeyIndex => BuildUtil[_] = index => BuildUtil(baseUri, units, index, data)
+    val extra: KeyIndex => BuildUtil[?] = index => BuildUtil(baseUri, units, index, data)
 
     val index: StructureIndex = structureIndex(data, settings, extra, units)
     val streams: State => Streams = mkStreams(units, baseUri, data)

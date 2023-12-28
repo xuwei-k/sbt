@@ -81,7 +81,7 @@ private[sbt] object EvaluateConfigurations {
       eval: Eval,
       src: File,
       imports: Seq[String]
-  ): LazyClassLoaded[Seq[Setting[_]]] =
+  ): LazyClassLoaded[Seq[Setting[?]]] =
     evaluateConfiguration(eval, src, IO.readLines(src), imports, 0)
 
   /**
@@ -120,7 +120,7 @@ private[sbt] object EvaluateConfigurations {
       lines: Seq[String],
       imports: Seq[String],
       offset: Int
-  ): LazyClassLoaded[Seq[Setting[_]]] = {
+  ): LazyClassLoaded[Seq[Setting[?]]] = {
     val l = evaluateSbtFile(eval, file, lines, imports, offset)
     loader => l(loader).settings
   }
@@ -273,7 +273,7 @@ private[sbt] object EvaluateConfigurations {
       imports: Seq[(String, Int)],
       expression: String,
       range: LineRange
-  ): LazyClassLoaded[Seq[Setting[_]]] =
+  ): LazyClassLoaded[Seq[Setting[?]]] =
     evaluateDslEntry(eval, name, imports, expression, range).result andThen {
       case DslEntry.ProjectSettings(values) => values
       case _                                => Nil
@@ -306,9 +306,9 @@ private[sbt] object EvaluateConfigurations {
   private[this] def extractedValTypes: Seq[String] =
     Seq(
       classOf[CompositeProject],
-      classOf[InputKey[_]],
-      classOf[TaskKey[_]],
-      classOf[SettingKey[_]]
+      classOf[InputKey[?]],
+      classOf[TaskKey[?]],
+      classOf[SettingKey[?]]
     ).map(_.getName)
 
   private[this] def evaluateDefinitions(
@@ -330,21 +330,21 @@ private[sbt] object EvaluateConfigurations {
 }
 
 object Index {
-  def taskToKeyMap(data: Settings[Scope]): Map[Task[_], ScopedKey[Task[_]]] = {
+  def taskToKeyMap(data: Settings[Scope]): Map[Task[?], ScopedKey[Task[?]]] = {
 
     val pairs = data.scopes flatMap (
         scope =>
           data.data(scope).entries collect {
-            case AttributeEntry(key, value: Task[_]) =>
-              (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]]))
+            case AttributeEntry(key, value: Task[?]) =>
+              (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[?]]]))
           }
       )
 
-    pairs.toMap[Task[_], ScopedKey[Task[_]]]
+    pairs.toMap[Task[?], ScopedKey[Task[?]]]
   }
 
-  def allKeys(settings: Seq[Setting[_]]): Set[ScopedKey[_]] = {
-    val result = new java.util.HashSet[ScopedKey[_]]
+  def allKeys(settings: Seq[Setting[?]]): Set[ScopedKey[?]] = {
+    val result = new java.util.HashSet[ScopedKey[?]]
     settings.foreach { s =>
       if (!s.key.key.isLocal && result.add(s.key)) {
         s.dependencies.foreach(k => if (!k.key.isLocal) result.add(s.key))
@@ -353,15 +353,15 @@ object Index {
     result.asScala.toSet
   }
 
-  def attributeKeys(settings: Settings[Scope]): Set[AttributeKey[_]] =
-    settings.data.values.flatMap(_.keys).toSet[AttributeKey[_]]
+  def attributeKeys(settings: Settings[Scope]): Set[AttributeKey[?]] =
+    settings.data.values.flatMap(_.keys).toSet[AttributeKey[?]]
 
-  def stringToKeyMap(settings: Set[AttributeKey[_]]): Map[String, AttributeKey[_]] =
+  def stringToKeyMap(settings: Set[AttributeKey[?]]): Map[String, AttributeKey[?]] =
     stringToKeyMap0(settings)(_.label)
 
   private[this] def stringToKeyMap0(
-      settings: Set[AttributeKey[_]]
-  )(label: AttributeKey[_] => String): Map[String, AttributeKey[_]] = {
+      settings: Set[AttributeKey[?]]
+  )(label: AttributeKey[?] => String): Map[String, AttributeKey[?]] = {
     val multiMap = settings.groupBy(label)
     val duplicates = multiMap.iterator
       .collect { case (k, xs) if xs.size > 1 => (k, xs.map(_.manifest)) }
@@ -377,14 +377,14 @@ object Index {
       )
   }
 
-  private[this] type TriggerMap = collection.mutable.HashMap[Task[_], Seq[Task[_]]]
+  private[this] type TriggerMap = collection.mutable.HashMap[Task[?], Seq[Task[?]]]
 
   def triggers(ss: Settings[Scope]): Triggers[Task] = {
     val runBefore = new TriggerMap
     val triggeredBy = new TriggerMap
     ss.data.values foreach (
       _.entries foreach {
-        case AttributeEntry(_, value: Task[_]) =>
+        case AttributeEntry(_, value: Task[?]) =>
           val as = value.info.attributes
           update(runBefore, value, as get Keys.runBefore)
           update(triggeredBy, value, as get Keys.triggeredBy)
@@ -395,7 +395,7 @@ object Index {
     new Triggers[Task](runBefore, triggeredBy, map => { onComplete(); map })
   }
 
-  private[this] def update(map: TriggerMap, base: Task[_], tasksOpt: Option[Seq[Task[_]]]): Unit =
+  private[this] def update(map: TriggerMap, base: Task[?], tasksOpt: Option[Seq[Task[?]]]): Unit =
     for (tasks <- tasksOpt; task <- tasks)
       map(task) = base +: map.getOrElse(task, Nil)
 }

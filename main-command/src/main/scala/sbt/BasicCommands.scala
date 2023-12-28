@@ -277,8 +277,8 @@ object BasicCommands {
   lazy val otherCommandParser: State => Parser[String] =
     (s: State) => token(OptSpace ~> combinedLax(s, NotSpaceClass ~ any.*))
 
-  def combinedLax(s: State, any: Parser[_]): Parser[String] =
-    matched((s.combinedParser: Parser[_]) | token(any, hide = const(true)))
+  def combinedLax(s: State, any: Parser[?]): Parser[String] =
+    matched((s.combinedParser: Parser[?]) | token(any, hide = const(true)))
 
   def ifLast: Command =
     Command(IfLast, Help.more(IfLast, IfLastDetailed))(otherCommandParser)(
@@ -514,10 +514,10 @@ object BasicCommands {
   def removeAlias(s: State, name: String): State =
     s.copy(definedCommands = s.definedCommands.filter(c => !isAliasNamed(name, c)))
 
-  def removeTagged(s: State, tag: AttributeKey[_]): State =
+  def removeTagged(s: State, tag: AttributeKey[?]): State =
     s.copy(definedCommands = removeTagged(s.definedCommands, tag))
 
-  def removeTagged(as: Seq[Command], tag: AttributeKey[_]): Seq[Command] =
+  def removeTagged(as: Seq[Command], tag: AttributeKey[?]): Seq[Command] =
     as.filter(c => !(c.tags contains tag))
 
   def isAliasNamed(name: String, c: Command): Boolean = isNamed(name, getAlias(c))

@@ -63,7 +63,7 @@ private[internal] trait DeprecatedContinuous {
 
 @nowarn
 private[sbt] object DeprecatedContinuous {
-  private[sbt] val taskDefinitions: Seq[Def.Setting[_]] = Seq(
+  private[sbt] val taskDefinitions: Seq[Def.Setting[?]] = Seq(
     sbt.Keys.watchTransitiveSources := sbt.Defaults.watchTransitiveSourcesTask.value,
     sbt.Keys.watch := sbt.Defaults.watchSetting.value,
     sbt.nio.Keys.watchTasks := Continuous.continuousTask.evaluated,

@@ -44,7 +44,7 @@ final case class FlatMapped[T, K[L[x]]](in: K[Task], f: K[Result] => Task[T], al
 }
 
 /** A computation `in` that requires other tasks `deps` to be evaluated first.*/
-final case class DependsOn[T](in: Task[T], deps: Seq[Task[_]]) extends Action[T] {
+final case class DependsOn[T](in: Task[T], deps: Seq[Task[?]]) extends Action[T] {
   private[sbt] def mapTask(g: Task ~> Task) = DependsOn[T](g(in), deps.map(t => g(t)))
 }
 

@@ -36,7 +36,7 @@ sealed trait AttributeKey[T] {
    * will delegate to the values associated with these keys.
    * The delegation proceeds in order the keys are returned here.
    */
-  def extend: Seq[AttributeKey[_]]
+  def extend: Seq[AttributeKey[?]]
 
   /**
    * Specifies whether this key is a local, anonymous key (`true`) or not (`false`).
@@ -82,14 +82,14 @@ object AttributeKey {
   def apply[T: Manifest: OptJsonWriter](
       name: String,
       description: String,
-      extend: Seq[AttributeKey[_]]
+      extend: Seq[AttributeKey[?]]
   ): AttributeKey[T] =
     apply(name, description, extend, Int.MaxValue)
 
   def apply[T: Manifest: OptJsonWriter](
       name: String,
       description: String,
-      extend: Seq[AttributeKey[_]],
+      extend: Seq[AttributeKey[?]],
       rank: Int
   ): AttributeKey[T] =
     make(name, Some(description), extend, rank)
@@ -100,7 +100,7 @@ object AttributeKey {
   private[this] def make[T](
       name: String,
       description0: Option[String],
-      extend0: Seq[AttributeKey[_]],
+      extend0: Seq[AttributeKey[?]],
       rank0: Int
   )(implicit mf: Manifest[T], ojw: OptJsonWriter[T]): AttributeKey[T] =
     new SharedAttributeKey[T] {
@@ -171,16 +171,16 @@ trait AttributeMap {
   def put[T](k: AttributeKey[T], value: T): AttributeMap
 
   /** All keys with defined mappings.  There may be multiple keys with the same `label`, but different types. */
-  def keys: Iterable[AttributeKey[_]]
+  def keys: Iterable[AttributeKey[?]]
 
   /** Adds the mappings in `o` to this map, with mappings in `o` taking precedence over existing mappings.*/
-  def ++(o: Iterable[AttributeEntry[_]]): AttributeMap
+  def ++(o: Iterable[AttributeEntry[?]]): AttributeMap
 
   /** Combines the mappings in `o` with the mappings in this map, with mappings in `o` taking precedence over existing mappings.*/
   def ++(o: AttributeMap): AttributeMap
 
   /** All mappings in this map.  The [[AttributeEntry]] type preserves the typesafety of mappings, although the specific types are unknown.*/
-  def entries: Iterable[AttributeEntry[_]]
+  def entries: Iterable[AttributeEntry[?]]
 
   /** `true` if there are no mappings in this map, `false` if there are. */
   def isEmpty: Boolean
@@ -198,16 +198,16 @@ object AttributeMap {
   val empty: AttributeMap = new BasicAttributeMap(Map.empty)
 
   /** Constructs an [[AttributeMap]] containing the given `entries`. */
-  def apply(entries: Iterable[AttributeEntry[_]]): AttributeMap = empty ++ entries
+  def apply(entries: Iterable[AttributeEntry[?]]): AttributeMap = empty ++ entries
 
   /** Constructs an [[AttributeMap]] containing the given `entries`.*/
-  def apply(entries: AttributeEntry[_]*): AttributeMap = empty ++ entries
+  def apply(entries: AttributeEntry[?]*): AttributeMap = empty ++ entries
 
   /** Presents an `AttributeMap` as a natural transformation. */
   implicit def toNatTrans(map: AttributeMap): AttributeKey ~> Id = λ[AttributeKey ~> Id](map(_))
 }
 
-private class BasicAttributeMap(private val backing: Map[AttributeKey[_], Any])
+private class BasicAttributeMap(private val backing: Map[AttributeKey[?], Any])
     extends AttributeMap {
 
   def isEmpty: Boolean = backing.isEmpty
@@ -219,9 +219,9 @@ private class BasicAttributeMap(private val backing: Map[AttributeKey[_], Any])
   def put[T](k: AttributeKey[T], value: T): AttributeMap =
     new BasicAttributeMap(backing.updated(k, value: Any))
 
-  def keys: Iterable[AttributeKey[_]] = backing.keys
+  def keys: Iterable[AttributeKey[?]] = backing.keys
 
-  def ++(o: Iterable[AttributeEntry[_]]): AttributeMap =
+  def ++(o: Iterable[AttributeEntry[?]]): AttributeMap =
     new BasicAttributeMap(o.foldLeft(backing)((b, e) => b.updated(e.key, e.value: Any)))
 
   def ++(o: AttributeMap): AttributeMap = o match {
@@ -230,7 +230,7 @@ private class BasicAttributeMap(private val backing: Map[AttributeKey[_], Any])
     case _ => o ++ this
   }
 
-  def entries: Iterable[AttributeEntry[_]] =
+  def entries: Iterable[AttributeEntry[?]] =
     backing.collect {
       case (k: AttributeKey[kt], v) => AttributeEntry(k, v.asInstanceOf[kt])
     }

@@ -42,13 +42,13 @@ object Inspect {
     token(Space ~> (default | tree | actual | uses | definitions)) ?? Details(false)
   }
 
-  def allKeyParser(s: State): Parser[AttributeKey[_]] = {
+  def allKeyParser(s: State): Parser[AttributeKey[?]] = {
     val keyMap = Project.structure(s).index.keyMap
     token(Space ~> (ID !!! "Expected key" examples keyMap.keySet)) flatMap { key =>
       Act.getKey(keyMap, key, idFun)
     }
   }
-  val spacedKeyParser: State => Parser[ScopedKey[_]] = (s: State) =>
+  val spacedKeyParser: State => Parser[ScopedKey[?]] = (s: State) =>
     Act.requireSession(s, token(Space) ~> Act.scopedKeyParser(s))
 
   def keyHandler(s: State): Mode => Parser[() => String] = {
@@ -84,7 +84,7 @@ object Inspect {
     })
   }
 
-  def keyOutput(s: State, option: Mode, sk: Def.ScopedKey[_]): String = {
+  def keyOutput(s: State, option: Mode, sk: Def.ScopedKey[?]): String = {
     val extracted = Project.extract(s)
     import extracted._
     option match {

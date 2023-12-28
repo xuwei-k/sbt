@@ -18,7 +18,7 @@ import sbt.SlashSyntax0._
 import sbt.Def._
 
 object LintUnused {
-  lazy val lintSettings: Seq[Setting[_]] = Seq(
+  lazy val lintSettings: Seq[Setting[?]] = Seq(
     lintIncludeFilter := {
       val includes = includeLintKeys.value.map(_.scopedKey.key.label)
       keyName => includes(keyName)
@@ -87,7 +87,7 @@ object LintUnused {
   }
 
   def lintResultLines(
-      result: Seq[(ScopedKey[_], String, Vector[SourcePosition])]
+      result: Seq[(ScopedKey[?], String, Vector[SourcePosition])]
   ): Vector[String] = {
     import scala.collection.mutable.ListBuffer
     val buffer = ListBuffer.empty[String]
@@ -121,14 +121,14 @@ object LintUnused {
       state: State,
       includeKeys: String => Boolean,
       excludeKeys: String => Boolean
-  ): Seq[(ScopedKey[_], String, Vector[SourcePosition])] = {
+  ): Seq[(ScopedKey[?], String, Vector[SourcePosition])] = {
     val extracted = Project.extract(state)
     val structure = extracted.structure
     val display = Def.showShortKey(None) // extracted.showKey
     val comp = structure.compiledMap
     val cMap = Def.flattenLocals(comp)
-    val used: Set[ScopedKey[_]] = cMap.values.flatMap(_.dependencies).toSet
-    val unused: Seq[ScopedKey[_]] = cMap.keys.filter(!used.contains(_)).toSeq
+    val used: Set[ScopedKey[?]] = cMap.values.flatMap(_.dependencies).toSet
+    val unused: Seq[ScopedKey[?]] = cMap.keys.filter(!used.contains(_)).toSeq
     val withDefinedAts: Seq[UnusedKey] = unused map { u =>
       val definingScope = structure.data.definingScope(u.scope, u.key)
       val definingScoped = definingScope match {
@@ -167,12 +167,12 @@ object LintUnused {
   }
 
   private[this] case class UnusedKey(
-      scoped: ScopedKey[_],
+      scoped: ScopedKey[?],
       positions: Vector[SourcePosition],
-      data: Option[ScopedKeyData[_]]
+      data: Option[ScopedKeyData[?]]
   )
 
-  private def definedAtString(settings: Vector[Setting[_]]): Vector[SourcePosition] = {
+  private def definedAtString(settings: Vector[Setting[?]]): Vector[SourcePosition] = {
     settings flatMap { setting =>
       setting.pos match {
         case NoPosition => Vector.empty

@@ -271,13 +271,13 @@ object EvaluateTask {
             progress.afterCommand(cmd, result)
           override def initial(): Unit = progress.initial()
           override def afterRegistered(
-              task: Task[_],
-              allDeps: Iterable[Task[_]],
-              pendingDeps: Iterable[Task[_]]
+              task: Task[?],
+              allDeps: Iterable[Task[?]],
+              pendingDeps: Iterable[Task[?]]
           ): Unit =
             progress.afterRegistered(task, allDeps, pendingDeps)
-          override def afterReady(task: Task[_]): Unit = progress.afterReady(task)
-          override def beforeWork(task: Task[_]): Unit = progress.beforeWork(task)
+          override def afterReady(task: Task[?]): Unit = progress.afterReady(task)
+          override def beforeWork(task: Task[?]): Unit = progress.beforeWork(task)
           override def afterWork[A](task: Task[A], result: Either[Task[A], Result[A]]): Unit =
             progress.afterWork(task, result)
           override def afterCompleted[A](task: Task[A], result: Result[A]): Unit =
@@ -328,7 +328,7 @@ object EvaluateTask {
   ): T =
     (extracted.currentRef / key).get(structure.data).getOrElse(default)
 
-  def injectSettings: Seq[Setting[_]] = Seq(
+  def injectSettings: Seq[Setting[?]] = Seq(
     Global / state ::= dummyState,
     Global / streamsManager ::= Def.dummyStreamsManager,
     Global / executionRoots ::= dummyRoots,
@@ -388,14 +388,14 @@ object EvaluateTask {
     }
   }
 
-  def logIncResult(result: Result[_], state: State, streams: Streams) = result match {
+  def logIncResult(result: Result[?], state: State, streams: Streams) = result match {
     case Inc(i) => logIncomplete(i, state, streams); case _ => ()
   }
 
   def logIncomplete(result: Incomplete, state: State, streams: Streams): Unit = {
     val all = Incomplete linearize result
     val keyed =
-      all collect { case Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) => (key, msg, ex) }
+      all collect { case Incomplete(Some(key: ScopedKey[?]), _, msg, _, ex) => (key, msg, ex) }
 
     import ExceptionCategory._
     for ((key, msg, Some(ex)) <- keyed) {
@@ -420,10 +420,10 @@ object EvaluateTask {
   private[this] def contextDisplay(state: State, highlight: Boolean) =
     Project.showContextKey(state, if (highlight) Some(RED) else None)
 
-  def suppressedMessage(key: ScopedKey[_])(implicit display: Show[ScopedKey[_]]): String =
+  def suppressedMessage(key: ScopedKey[?])(implicit display: Show[ScopedKey[?]]): String =
     "Stack trace suppressed.  Run 'last %s' for the full log.".format(display.show(key))
 
-  def getStreams(key: ScopedKey[_], streams: Streams): TaskStreams =
+  def getStreams(key: ScopedKey[?], streams: Streams): TaskStreams =
     streams(ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key))
 
   def withStreams[T](structure: BuildStructure, state: State)(f: Streams => T): T = {
@@ -450,7 +450,7 @@ object EvaluateTask {
   def nodeView[HL <: HList](
       state: State,
       streams: Streams,
-      roots: Seq[ScopedKey[_]],
+      roots: Seq[ScopedKey[?]],
       dummies: DummyTaskMap = DummyTaskMap(Nil)
   ): NodeView[Task] =
     Transform(
@@ -482,15 +482,15 @@ object EvaluateTask {
     log.debug(
       s"Running task... Cancel: ${config.cancelStrategy}, check cycles: ${config.checkCycles}, forcegc: ${config.forceGarbageCollection}"
     )
-    def tagMap(t: Task[_]): Tags.TagMap =
+    def tagMap(t: Task[?]): Tags.TagMap =
       t.info.get(tagsKey).getOrElse(Map.empty)
     val tags =
-      tagged[Task[_]](tagMap, Tags.predicate(config.restrictions))
+      tagged[Task[?]](tagMap, Tags.predicate(config.restrictions))
     val (service, shutdownThreads) =
-      cancellableCompletionService[Task[_], Completed](
+      cancellableCompletionService[Task[?], Completed](
         tags,
         (s: String) => log.warn(s),
-        (t: Task[_]) => tagMap(t).contains(Tags.Sentinel)
+        (t: Task[?]) => tagMap(t).contains(Tags.Sentinel)
       )
 
     def shutdownImpl(force: Boolean): Unit = {
@@ -506,7 +506,7 @@ object EvaluateTask {
     def shutdown(): Unit = shutdownImpl(false)
     // propagate the defining key for reporting the origin
     def overwriteNode(i: Incomplete): Boolean = i.node match {
-      case Some(t: Task[_]) => transformNode(t).isEmpty
+      case Some(t: Task[?]) => transformNode(t).isEmpty
       case _                => true
     }
     def run() = {
@@ -576,11 +576,11 @@ object EvaluateTask {
       Incomplete.transformBU(i)(convertCyclicInc andThen taskToKey andThen liftAnonymous)
     }
   def taskToKey: Incomplete => Incomplete = {
-    case in @ Incomplete(Some(node: Task[_]), _, _, _, _) => in.copy(node = transformNode(node))
+    case in @ Incomplete(Some(node: Task[?]), _, _, _, _) => in.copy(node = transformNode(node))
     case i                                                => i
   }
 
-  type AnyCyclic = Execute[({ type A[_] <: AnyRef })#A]#CyclicException[_]
+  type AnyCyclic = Execute[({ type A[_] <: AnyRef })#A]#CyclicException[?]
 
   def convertCyclicInc: Incomplete => Incomplete = {
     case in @ Incomplete(
@@ -588,7 +588,7 @@ object EvaluateTask {
           _,
           _,
           _,
-          Some(c: Execute[({ type A[_] <: AnyRef })#A @unchecked]#CyclicException[_])
+          Some(c: Execute[({ type A[_] <: AnyRef })#A @unchecked]#CyclicException[?])
         ) =>
       in.copy(directCause = Some(new RuntimeException(convertCyclic(c))))
     case i => i
@@ -596,7 +596,7 @@ object EvaluateTask {
 
   def convertCyclic(c: AnyCyclic): String =
     (c.caller, c.target) match {
-      case (caller: Task[_], target: Task[_]) =>
+      case (caller: Task[?], target: Task[?]) =>
         c.toString + (if (caller eq target) "(task: " + name(caller) + ")"
                       else "(caller: " + name(caller) + ", target: " + name(target) + ")")
       case _ => c.toString
@@ -630,7 +630,7 @@ object EvaluateTask {
     }
 
   // if the return type Seq[Setting[_]] is not explicitly given, scalac hangs
-  val injectStreams: ScopedKey[_] => Seq[Setting[_]] = scoped =>
+  val injectStreams: ScopedKey[?] => Seq[Setting[?]] = scoped =>
     if (scoped.key == streams.key) {
       Seq(scoped.scope / streams := {
         (streamsManager map { mgr =>

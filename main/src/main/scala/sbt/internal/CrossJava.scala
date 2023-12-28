@@ -241,7 +241,7 @@ private[sbt] object CrossJava {
           )
       }
 
-      val filterKeys: Set[AttributeKey[_]] = Set(javaHome).map(_.key)
+      val filterKeys: Set[AttributeKey[?]] = Set(javaHome).map(_.key)
 
       val projectsContains: Reference => Boolean = projects.map(_._1).toSet[Reference].contains(_)
 
@@ -352,7 +352,7 @@ private[sbt] object CrossJava {
     }
   }
 
-  private val JavaCapturedSession = AttributeKey[Seq[Setting[_]]]("javaCrossCapturedSession")
+  private val JavaCapturedSession = AttributeKey[Seq[Setting[?]]]("javaCrossCapturedSession")
 
   private def captureCurrentSession(state: State, extracted: Extracted): State = {
     state.put(JavaCapturedSession, extracted.session.rawAppend)
@@ -366,7 +366,7 @@ private[sbt] object CrossJava {
     def javaHomes: Vector[(String, File)]
   }
 
-  def versionOrder(left: (_, File), right: (_, File)): Boolean =
+  def versionOrder(left: (?, File), right: (?, File)): Boolean =
     versionOrder(left._2.getName, right._2.getName)
 
   // Sort version strings, considering 1.8.0 < 1.8.0_45 < 1.8.0_212

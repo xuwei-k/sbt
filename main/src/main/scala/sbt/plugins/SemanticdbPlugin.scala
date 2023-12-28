@@ -23,14 +23,14 @@ object SemanticdbPlugin extends AutoPlugin {
   override def requires = JvmPlugin
   override def trigger = allRequirements
 
-  override lazy val globalSettings: Seq[Def.Setting[_]] = Seq(
+  override lazy val globalSettings: Seq[Def.Setting[?]] = Seq(
     semanticdbEnabled := SysProp.semanticdb,
     semanticdbIncludeInJar := false,
     semanticdbOptions := List(),
     semanticdbVersion := "4.7.8"
   )
 
-  override lazy val projectSettings: Seq[Def.Setting[_]] = Seq(
+  override lazy val projectSettings: Seq[Def.Setting[?]] = Seq(
     semanticdbCompilerPlugin := {
       val v = semanticdbVersion.value
       ("org.scalameta" % "semanticdb-scalac" % v).cross(CrossVersion.full)
@@ -53,7 +53,7 @@ object SemanticdbPlugin extends AutoPlugin {
     inConfig(Compile)(configurationSettings) ++
     inConfig(Test)(configurationSettings)
 
-  lazy val configurationSettings: Seq[Def.Setting[_]] = List(
+  lazy val configurationSettings: Seq[Def.Setting[?]] = List(
     semanticdbTargetRoot := {
       val in = semanticdbIncludeInJar.value
       if (in) classDirectory.value
@@ -85,7 +85,7 @@ object SemanticdbPlugin extends AutoPlugin {
   )
 
   @deprecated("use configurationSettings only", "1.5.0")
-  lazy val testSettings: Seq[Def.Setting[_]] = List()
+  lazy val testSettings: Seq[Def.Setting[?]] = List()
 
   def targetRootOptions(scalaVersion: String, targetRoot: File): Seq[String] = {
     if (ScalaInstance.isDotty(scalaVersion)) {

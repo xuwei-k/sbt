@@ -20,9 +20,9 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
   import AbstractTaskExecuteProgress.Timer
 
   private[this] val showScopedKey = Def.showShortKey(None)
-  private[this] val anonOwners = new ConcurrentHashMap[Task[_], Task[_]]
-  private[this] val calledBy = new ConcurrentHashMap[Task[_], Task[_]]
-  private[this] val timings = new ConcurrentHashMap[Task[_], Timer]
+  private[this] val anonOwners = new ConcurrentHashMap[Task[?], Task[?]]
+  private[this] val calledBy = new ConcurrentHashMap[Task[?], Task[?]]
+  private[this] val timings = new ConcurrentHashMap[Task[?], Timer]
   private[sbt] def timingsByName: mutable.Map[String, AtomicLong] = {
     val result = new ConcurrentHashMap[String, AtomicLong]
     timings.forEach { (task, timing) =>
@@ -35,18 +35,18 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
     result.asScala
   }
   private[sbt] def anyTimings = !timings.isEmpty
-  def currentTimings: Iterator[(Task[_], Timer)] = timings.asScala.iterator
+  def currentTimings: Iterator[(Task[?], Timer)] = timings.asScala.iterator
 
-  private[internal] def exceededThreshold(task: Task[_], threshold: FiniteDuration): Boolean =
+  private[internal] def exceededThreshold(task: Task[?], threshold: FiniteDuration): Boolean =
     timings.get(task) match {
       case null => false
       case t    => t.durationMicros > threshold.toMicros
     }
   private[internal] def timings(
-      tasks: java.util.Set[Task[_]],
+      tasks: java.util.Set[Task[?]],
       thresholdMicros: Long
-  ): Vector[(Task[_], Long)] = {
-    val result = new VectorBuilder[(Task[_], Long)]
+  ): Vector[(Task[?], Long)] = {
+    val result = new VectorBuilder[(Task[?], Long)]
     val now = System.nanoTime
     tasks.forEach { t =>
       timings.get(t) match {
@@ -61,7 +61,7 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
     result.result()
   }
   def activeTasks(now: Long) = {
-    val result = new VectorBuilder[(Task[_], FiniteDuration)]
+    val result = new VectorBuilder[(Task[?], FiniteDuration)]
     timings.forEach { (task, timing) =>
       if (timing.isActive) result += task -> (now - timing.startNanos).nanos
     }
@@ -69,9 +69,9 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
   }
 
   override def afterRegistered(
-      task: Task[_],
-      allDeps: Iterable[Task[_]],
-      pendingDeps: Iterable[Task[_]]
+      task: Task[?],
+      allDeps: Iterable[Task[?]],
+      pendingDeps: Iterable[Task[?]]
   ): Unit = {
     // we need this to infer anonymous task names
     pendingDeps foreach { t =>
@@ -81,7 +81,7 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
     }
   }
 
-  override def beforeWork(task: Task[_]): Unit = {
+  override def beforeWork(task: Task[?]): Unit = {
     timings.put(task, new Timer)
     ()
   }
@@ -101,19 +101,19 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress[
     }
   }
 
-  private[this] val taskNameCache = new ConcurrentHashMap[Task[_], String]
-  protected def taskName(t: Task[_]): String = taskNameCache.get(t) match {
+  private[this] val taskNameCache = new ConcurrentHashMap[Task[?], String]
+  protected def taskName(t: Task[?]): String = taskNameCache.get(t) match {
     case null =>
       val name = taskName0(t)
       taskNameCache.putIfAbsent(t, name)
       name
     case name => name
   }
-  private[this] def taskName0(t: Task[_]): String = {
-    def definedName(node: Task[_]): Option[String] =
+  private[this] def taskName0(t: Task[?]): String = {
+    def definedName(node: Task[?]): Option[String] =
       node.info.name orElse TaskName.transformNode(node).map(showScopedKey.show)
-    def inferredName(t: Task[_]): Option[String] = nameDelegate(t) map taskName
-    def nameDelegate(t: Task[_]): Option[Task[_]] =
+    def inferredName(t: Task[?]): Option[String] = nameDelegate(t) map taskName
+    def nameDelegate(t: Task[?]): Option[Task[?]] =
       Option(anonOwners.get(t)) orElse Option(calledBy.get(t))
     definedName(t) orElse inferredName(t) getOrElse TaskName.anonymousName(t)
   }

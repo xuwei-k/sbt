@@ -123,7 +123,7 @@ private[sbt] object TemplateCommandUtil {
       interfaceClassName: String,
       methodName: String,
       loader: ClassLoader
-  )(argTypes: Class[_]*)(args: AnyRef*): AnyRef = {
+  )(argTypes: Class[?]*)(args: AnyRef*): AnyRef = {
     val interfaceClass = getInterfaceClass(interfaceClassName, loader)
     val interface = interfaceClass.getDeclaredConstructor().newInstance().asInstanceOf[AnyRef]
     val method = interfaceClass.getMethod(methodName, argTypes: _*)

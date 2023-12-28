@@ -31,11 +31,11 @@ private[sbt] class TaskProgress(
     with AutoCloseable {
   private[this] val lastTaskCount = new AtomicInteger(0)
   private[this] val reportLoop = new AtomicReference[AutoCloseable]
-  private[this] val active = new ConcurrentHashMap[Task[_], AutoCloseable]
+  private[this] val active = new ConcurrentHashMap[Task[?], AutoCloseable]
   private[this] val nextReport = new AtomicReference(Deadline.now)
   private[this] val scheduler =
     Executors.newSingleThreadScheduledExecutor(r => new Thread(r, "sbt-progress-report-scheduler"))
-  private[this] val pending = new java.util.Vector[java.util.concurrent.Future[_]]
+  private[this] val pending = new java.util.Vector[java.util.concurrent.Future[?]]
   private[this] val closed = new AtomicBoolean(false)
   private def schedule[R](duration: FiniteDuration, recurring: Boolean)(f: => R): AutoCloseable =
     if (!closed.get) {
@@ -89,7 +89,7 @@ private[sbt] class TaskProgress(
     }
     Util.ignoreResult(pending.add(executor.submit(runnable)))
   }
-  override def beforeWork(task: Task[_]): Unit =
+  override def beforeWork(task: Task[?]): Unit =
     if (!closed.get) {
       super.beforeWork(task)
       reportLoop.get match {
@@ -107,7 +107,7 @@ private[sbt] class TaskProgress(
       logger.debug(s"called beforeWork for ${taskName(task)} after task progress was closed")
     }
 
-  override def afterReady(task: Task[_]): Unit =
+  override def afterReady(task: Task[?]): Unit =
     if (!closed.get) {
       try {
         Util.ignoreResult(executor.submit((() => {
@@ -165,7 +165,7 @@ private[sbt] class TaskProgress(
     val ltc = lastTaskCount.get
     if (currentTasks.nonEmpty || ltc != 0) {
       val currentTasksCount = currentTasks.size
-      def event(tasks: Vector[(Task[_], Long)]): ProgressEvent = {
+      def event(tasks: Vector[(Task[?], Long)]): ProgressEvent = {
         if (tasks.nonEmpty) nextReport.set(Deadline.now + sleepDuration)
         val toWrite = tasks.sortBy(_._2)
         val distinct = new java.util.LinkedHashMap[String, ProgressItem]
@@ -189,7 +189,7 @@ private[sbt] class TaskProgress(
     }
   }
 
-  private[this] def getShortName(task: Task[_]): String = {
+  private[this] def getShortName(task: Task[?]): String = {
     val name = taskName(task)
     name.lastIndexOf('/') match {
       case -1 => name
@@ -201,9 +201,9 @@ private[sbt] class TaskProgress(
 
   }
   private[this] def filter(
-      tasks: Vector[(Task[_], Long)]
-  ): (Vector[(Task[_], Long)], Boolean) = {
-    tasks.foldLeft((Vector.empty[(Task[_], Long)], false)) {
+      tasks: Vector[(Task[?], Long)]
+  ): (Vector[(Task[?], Long)], Boolean) = {
+    tasks.foldLeft((Vector.empty[(Task[?], Long)], false)) {
       case ((tasks, skip), pair @ (t, _)) =>
         val shortName = getShortName(t)
         val newSkip = skip || skipReportTasks.contains(shortName)

@@ -97,13 +97,13 @@ trait UpperStateOps extends Any {
   def unsafeRunAggregated[A](key: TaskKey[A]): State
 
   /** Appends the given settings to all the build state settings, including session settings. */
-  def appendWithSession(settings: Seq[Setting[_]]): State
+  def appendWithSession(settings: Seq[Setting[?]]): State
 
   /**
    * Appends the given settings to the original build state settings, discarding any settings
    * appended to the session in the process.
    */
-  def appendWithoutSession(settings: Seq[Setting[_]], state: State): State
+  def appendWithoutSession(settings: Seq[Setting[?]], state: State): State
 
   def respondEvent[A: JsonFormat](event: A): Unit
   def respondError(code: Long, message: String): Unit
@@ -142,10 +142,10 @@ object UpperStateOps {
     def unsafeRunAggregated[A](key: TaskKey[A]): State =
       extract.runAggregated(key, s)
 
-    def appendWithSession(settings: Seq[Setting[_]]): State =
+    def appendWithSession(settings: Seq[Setting[?]]): State =
       extract.appendWithSession(settings, s)
 
-    def appendWithoutSession(settings: Seq[Setting[_]], state: State): State =
+    def appendWithoutSession(settings: Seq[Setting[?]], state: State): State =
       extract.appendWithoutSession(settings, s)
 
     def respondEvent[A: JsonFormat](event: A): Unit = {

@@ -21,7 +21,7 @@ final case class Scope(nestIndex: Int, idAtIndex: Int = 0)
 //  That would be a general pain.)
 case class SettingsExample() extends Init[Scope] {
   // Provides a way of showing a Scope+AttributeKey[_]
-  val showFullKey: Show[ScopedKey[_]] = Show[ScopedKey[_]]((key: ScopedKey[_]) => {
+  val showFullKey: Show[ScopedKey[?]] = Show[ScopedKey[?]]((key: ScopedKey[?]) => {
     s"${key.scope.nestIndex}(${key.scope.idAtIndex})/${key.key.label}"
   })
 
@@ -56,7 +56,7 @@ case class SettingsUsage(val settingsExample: SettingsExample) {
   val b4 = ScopedKey(Scope(4), b)
 
   // Define some settings
-  val mySettings: Seq[Setting[_]] = Seq(
+  val mySettings: Seq[Setting[?]] = Seq(
     setting(a3, value(3)),
     setting(b4, map(a4)(_ * 3)),
     update(a5)(_ + 1)

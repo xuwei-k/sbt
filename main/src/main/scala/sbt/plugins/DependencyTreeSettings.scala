@@ -63,7 +63,7 @@ object DependencyTreeSettings {
    * MiniDependencyTreePlugin includes these settings for Compile and Test scopes
    * to provide dependencyTree task.
    */
-  lazy val baseBasicReportingSettings: Seq[Def.Setting[_]] =
+  lazy val baseBasicReportingSettings: Seq[Def.Setting[?]] =
     Seq(
       dependencyTreeCrossProjectId := CrossVersion(scalaVersion.value, scalaBinaryVersion.value)(
         projectID.value
@@ -92,7 +92,7 @@ object DependencyTreeSettings {
   /**
    * This is the maximum strength settings for DependencyTreePlugin.
    */
-  lazy val baseFullReportingSettings: Seq[Def.Setting[_]] =
+  lazy val baseFullReportingSettings: Seq[Def.Setting[?]] =
     Seq(
       // browse
       dependencyBrowseGraphTarget := { target.value / "browse-dependency-graph" },
@@ -161,12 +161,12 @@ object DependencyTreeSettings {
       dependencyLicenseInfo -> rendering.LicenseInfo.render _
     )
 
-  def renderingTaskSettings(key: TaskKey[Unit], renderer: ModuleGraph => String): Seq[Setting[_]] =
+  def renderingTaskSettings(key: TaskKey[Unit], renderer: ModuleGraph => String): Seq[Setting[?]] =
     renderingTaskSettings(key) :+ {
       key / asString := renderer(dependencyTreeModuleGraph0.value)
     }
 
-  def renderingTaskSettings(key: TaskKey[Unit]): Seq[Setting[_]] =
+  def renderingTaskSettings(key: TaskKey[Unit]): Seq[Setting[?]] =
     Seq(
       key := {
         val s = streams.value

@@ -18,10 +18,10 @@ object MiniDependencyTreePlugin extends AutoPlugin {
 
   import autoImport._
   override def trigger: PluginTrigger = AllRequirements
-  override def globalSettings: Seq[Def.Setting[_]] = Seq(
+  override def globalSettings: Seq[Def.Setting[?]] = Seq(
     dependencyTreeIncludeScalaLibrary := false
   )
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     DependencyTreeSettings.coreSettings ++
       inConfig(Compile)(DependencyTreeSettings.baseBasicReportingSettings) ++
       inConfig(Test)(DependencyTreeSettings.baseBasicReportingSettings)

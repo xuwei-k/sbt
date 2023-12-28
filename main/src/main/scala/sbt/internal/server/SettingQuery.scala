@@ -45,14 +45,14 @@ object SettingQuery {
   def resolveProject(parsed: ParsedExplicitAxis[ResolvedReference]): Option[ResolvedReference] =
     parsed match {
       case ParsedExplicitGlobal       => None
-      case pv: ParsedExplicitValue[_] => Some(pv.value)
+      case pv: ParsedExplicitValue[?] => Some(pv.value)
     }
 
   def scopedKeyFull(
       index: KeyIndex,
       currentBuild: URI,
       defaultConfigs: Option[ResolvedReference] => Seq[String],
-      keyMap: Map[String, AttributeKey[_]]
+      keyMap: Map[String, AttributeKey[?]]
   ): Parser[Seq[Parser[ParsedKey]]] = {
     for {
       rawProject <- projectRef(index, currentBuild)
@@ -66,7 +66,7 @@ object SettingQuery {
       index: KeyIndex,
       currentBuild: URI,
       defaultConfigs: Option[ResolvedReference] => Seq[String],
-      keyMap: Map[String, AttributeKey[_]],
+      keyMap: Map[String, AttributeKey[?]],
       data: Settings[Scope]
   ): Parser[ParsedKey] =
     scopedKeyFull(index, currentBuild, defaultConfigs, keyMap) flatMap { choices =>
@@ -77,12 +77,12 @@ object SettingQuery {
       index: KeyIndex,
       currentBuild: URI,
       defaultConfigs: Option[ResolvedReference] => Seq[String],
-      keyMap: Map[String, AttributeKey[_]],
+      keyMap: Map[String, AttributeKey[?]],
       data: Settings[Scope]
-  ): Parser[ScopedKey[_]] =
+  ): Parser[ScopedKey[?]] =
     scopedKeySelected(index, currentBuild, defaultConfigs, keyMap, data).map(_.key)
 
-  def scopedKeyParser(structure: BuildStructure): Parser[ScopedKey[_]] =
+  def scopedKeyParser(structure: BuildStructure): Parser[ScopedKey[?]] =
     scopedKey(
       structure.index.keyIndex,
       structure.root,
@@ -96,8 +96,8 @@ object SettingQuery {
       .get(key.scope, key.key)
       .toRight(s"Key ${Def displayFull key} not found")
       .flatMap {
-        case _: Task[_] => Left(s"Key ${Def displayFull key} is a task, can only query settings")
-        case _: InputTask[_] =>
+        case _: Task[?] => Left(s"Key ${Def displayFull key} is a task, can only query settings")
+        case _: InputTask[?] =>
           Left(s"Key ${Def displayFull key} is an input task, can only query settings")
         case x => Right(x)
       }

@@ -20,7 +20,7 @@ object DependencyTreePlugin extends AutoPlugin {
   val configurations = Vector(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
 
   // MiniDependencyTreePlugin provides baseBasicReportingSettings for Compile and Test
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings: Seq[Def.Setting[?]] =
     ((configurations diff Vector(Compile, Test)) flatMap { config =>
       inConfig(config)(DependencyTreeSettings.baseBasicReportingSettings)
     }) ++

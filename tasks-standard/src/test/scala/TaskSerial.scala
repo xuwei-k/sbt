@@ -53,7 +53,7 @@ object TaskSerial extends Properties("task serial") {
 
   def checkArbitrary(
       size: Int,
-      restrictions: ConcurrentRestrictions[Task[_]],
+      restrictions: ConcurrentRestrictions[Task[?]],
       shouldSucceed: Boolean
   ) = {
     val latch = task { new CountDownLatch(size) }
@@ -71,8 +71,8 @@ object TaskSerial extends Properties("task serial") {
     "Some tasks were unschedulable: verify this is an actual failure by extending the timeout to several seconds."
   def scheduledMsg = "All tasks were unexpectedly scheduled."
 
-  def tagged(f: TagMap => Boolean) = tagged0[Task[_]](_.tags, f)
-  def evalRestricted[T](t: Task[T])(restrictions: ConcurrentRestrictions[Task[_]]): T =
+  def tagged(f: TagMap => Boolean) = tagged0[Task[?]](_.tags, f)
+  def evalRestricted[T](t: Task[T])(restrictions: ConcurrentRestrictions[Task[?]]): T =
     tryRun[T](t, checkCycles, restrictions)
 }
 
@@ -80,10 +80,10 @@ object TaskTest {
   def run[T](
       root: Task[T],
       checkCycles: Boolean,
-      restrictions: ConcurrentRestrictions[Task[_]]
+      restrictions: ConcurrentRestrictions[Task[?]]
   ): Result[T] = {
     val (service, shutdown) =
-      completionService[Task[_], Completed](restrictions, (x: String) => System.err.println(x))
+      completionService[Task[?], Completed](restrictions, (x: String) => System.err.println(x))
 
     val x = new Execute[Task](
       Execute.config(checkCycles),
@@ -99,7 +99,7 @@ object TaskTest {
   def tryRun[T](
       root: Task[T],
       checkCycles: Boolean,
-      restrictions: ConcurrentRestrictions[Task[_]]
+      restrictions: ConcurrentRestrictions[Task[?]]
   ): T =
     run(root, checkCycles, restrictions) match {
       case Value(v) => v

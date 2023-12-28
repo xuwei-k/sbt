@@ -610,7 +610,7 @@ object Watch {
       defaultOnTriggerMessage(count, path, commands)
   }.label("Watch.clearScreenOnTrigger")
 
-  private[sbt] def defaults: Seq[Def.Setting[_]] = Seq(
+  private[sbt] def defaults: Seq[Def.Setting[?]] = Seq(
     sbt.Keys.watchAntiEntropy :== Watch.defaultAntiEntropy,
     watchAntiEntropyRetentionPeriod :== Watch.defaultAntiEntropyRetentionPeriod,
     watchLogLevel :== Level.Info,

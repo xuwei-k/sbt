@@ -101,7 +101,7 @@ object SlashSyntaxSpec extends Properties("SlashSyntax") with SlashSyntax {
 
   property("Reference? / ConfigKey? / AttributeKey? / key == key in ThisScope.copy(..)") = {
     forAll {
-      (r: ScopeAxis[Reference], c: ScopeAxis[ConfigKey], t: ScopeAxis[AttributeKey[_]], k: Key) =>
+      (r: ScopeAxis[Reference], c: ScopeAxis[ConfigKey], t: ScopeAxis[AttributeKey[?]], k: Key) =>
         expectValue(k in ThisScope.copy(project = r, config = c, task = t))(r / c / t / k)
     }
   }

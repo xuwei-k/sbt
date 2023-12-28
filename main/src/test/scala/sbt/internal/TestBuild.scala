@@ -61,7 +61,7 @@ abstract class TestBuild {
       current: ProjectRef,
       data: Settings[Scope],
       keyIndex: KeyIndex,
-      keyMap: Map[String, AttributeKey[_]]
+      keyMap: Map[String, AttributeKey[?]]
   ) {
     override def toString =
       env.toString + "\n" + "current: " + current + "\nSettings:\n\t" + showData + keyMap.keys
@@ -85,7 +85,7 @@ abstract class TestBuild {
       )
     }
 
-    lazy val allAttributeKeys: Set[AttributeKey[_]] = {
+    lazy val allAttributeKeys: Set[AttributeKey[?]] = {
       val x = data.data.values.flatMap(_.keys).toSet
       if (x.isEmpty) {
         sys.error("allAttributeKeys is empty")
@@ -100,16 +100,16 @@ abstract class TestBuild {
       val taskAxesMappings =
         for ((scope, keys) <- data.data.toIterable; key <- keys.keys)
           yield (ScopedKey(scope.copy(task = Zero), key), scope.task): (
-              ScopedKey[_],
-              ScopeAxis[AttributeKey[_]]
+              ScopedKey[?],
+              ScopeAxis[AttributeKey[?]]
           )
 
       val taskAxes = Relation.empty ++ taskAxesMappings
-      val zero = new HashSet[ScopedKey[_]]
-      val single = new HashSet[ScopedKey[_]]
-      val multi = new HashSet[ScopedKey[_]]
+      val zero = new HashSet[ScopedKey[?]]
+      val single = new HashSet[ScopedKey[?]]
+      val multi = new HashSet[ScopedKey[?]]
       for ((skey, tasks) <- taskAxes.forwardMap) {
-        def makeKey(task: ScopeAxis[AttributeKey[_]]) =
+        def makeKey(task: ScopeAxis[AttributeKey[?]]) =
           ScopedKey(skey.scope.copy(task = task), skey.key)
         val hasGlobal = tasks(Zero)
         if (hasGlobal)
@@ -141,7 +141,7 @@ abstract class TestBuild {
     def rootProject(uri: URI): String = buildMap(uri).root.id
     def inheritConfig(ref: ResolvedReference, config: ConfigKey) =
       projectFor(ref).confMap(config.name).extendsConfigs map toConfigKey
-    def inheritTask(task: AttributeKey[_]) = taskMap.get(task) match {
+    def inheritTask(task: AttributeKey[?]) = taskMap.get(task) match {
       case None    => Vector()
       case Some(t) => t.delegates.toVector map getKey
     }
@@ -164,7 +164,7 @@ abstract class TestBuild {
         c <- Zero +: p.configurations.map(c => Select(ConfigKey(c.name)))
       } yield Scope(project = ref, config = c, task = t, extra = Zero)
   }
-  def getKey: Taskk => AttributeKey[_] = _.key
+  def getKey: Taskk => AttributeKey[?] = _.key
   def toConfigKey: Configuration => ConfigKey = c => ConfigKey(c.name)
   case class Build(uri: URI, projects: Seq[Proj]) {
     override def toString = "Build " + uri.toString + " :\n    " + projects.mkString("\n    ")
@@ -219,7 +219,7 @@ abstract class TestBuild {
     Gen.frequency1((1, gen map Select.apply), (1, Gen.constant(Zero)))
   def oneOrGlobal[T](gen: Seq[T]): Gen[ScopeAxis[T]] = orGlobal(oneOf(gen))
 
-  def makeParser(structure: Structure): Parser[ScopedKey[_]] = {
+  def makeParser(structure: Structure): Parser[ScopedKey[?]] = {
     import structure._
     def confs(uri: URI) =
       env.buildMap.get(uri).toList.flatMap { _.root.configurations.map(_.name) }
@@ -231,7 +231,7 @@ abstract class TestBuild {
     Act.scopedKey(keyIndex, current, defaultConfs, keyMap, data)
   }
 
-  def structure(env: Env, settings: Seq[Setting[_]], current: ProjectRef): Structure = {
+  def structure(env: Env, settings: Seq[Setting[?]], current: ProjectRef): Structure = {
     val display = Def.showRelativeKey2(current)
     if (settings.isEmpty) {
       try {
@@ -244,7 +244,7 @@ abstract class TestBuild {
     }
     val data = Def.makeWithCompiledMap(settings)(env.delegates, const(Nil), display)._2
     val keys = data.allKeys((s, key) => ScopedKey(s, key))
-    val keyMap = keys.map(k => (k.key.label, k.key)).toMap[String, AttributeKey[_]]
+    val keyMap = keys.map(k => (k.key.label, k.key)).toMap[String, AttributeKey[?]]
     val projectsMap = env.builds.map(b => (b.uri, b.projects.map(_.id).toSet)).toMap
     val confs = for {
       b <- env.builds

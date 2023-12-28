@@ -45,7 +45,7 @@ object IvyConsole {
       val extracted = Project.extract(session, structure)
       import extracted._
 
-      val depSettings: Seq[Setting[_]] = Seq(
+      val depSettings: Seq[Setting[?]] = Seq(
         libraryDependencies ++= managed.reverse,
         resolvers ++= repos.reverse.toVector,
         Compile / unmanagedJars ++= Attributed blankSeq unmanaged.reverse,

@@ -21,9 +21,9 @@ trait AList[K[L[x]]] {
   def traverse[M[_], N[_], P[_]](value: K[M], f: M ~> (N ∙ P)#l)(
       implicit np: Applicative[N]
   ): N[K[P]]
-  def foldr[M[_], A](value: K[M], f: (M[_], A) => A, init: A): A
+  def foldr[M[_], A](value: K[M], f: (M[?], A) => A, init: A): A
 
-  def toList[M[_]](value: K[M]): List[M[_]] = foldr[M, List[M[_]]](value, _ :: _, Nil)
+  def toList[M[_]](value: K[M]): List[M[?]] = foldr[M, List[M[?]]](value, _ :: _, Nil)
 
   def apply[M[_], C](value: K[M], f: K[Id] => C)(implicit a: Applicative[M]): M[C] =
     a.map(f, traverse[M, M, Id](value, idK[M])(a))
@@ -35,7 +35,7 @@ object AList {
   /** AList for Unit, which represents a sequence that is always empty.*/
   val empty: Empty = new Empty {
     def transform[M[_], N[_]](in: Unit, f: M ~> N) = ()
-    def foldr[M[_], T](in: Unit, f: (M[_], T) => T, init: T) = init
+    def foldr[M[_], T](in: Unit, f: (M[?], T) => T, init: T) = init
     override def apply[M[_], C](in: Unit, f: Unit => C)(implicit app: Applicative[M]): M[C] =
       app.pure(f(()))
     def traverse[M[_], N[_], P[_]](in: Unit, f: M ~> (N ∙ P)#l)(
@@ -48,7 +48,7 @@ object AList {
   /** AList for a homogeneous sequence. */
   def seq[T]: SeqList[T] = new SeqList[T] {
     def transform[M[_], N[_]](s: List[M[T]], f: M ~> N) = s.map(f.fn[T])
-    def foldr[M[_], A](s: List[M[T]], f: (M[_], A) => A, init: A): A =
+    def foldr[M[_], A](s: List[M[T]], f: (M[?], A) => A, init: A): A =
       s.reverse.foldLeft(init)((t, m) => f(m, t))
 
     override def apply[M[_], C](s: List[M[T]], f: List[T] => C)(
@@ -72,7 +72,7 @@ object AList {
   /** AList for the arbitrary arity data structure KList. */
   def klist[KL[M[_]] <: KList.Aux[M, KL]]: AList[KL] = new AList[KL] {
     def transform[M[_], N[_]](k: KL[M], f: M ~> N) = k.transform(f)
-    def foldr[M[_], T](k: KL[M], f: (M[_], T) => T, init: T): T = k.foldr(f, init)
+    def foldr[M[_], T](k: KL[M], f: (M[?], T) => T, init: T): T = k.foldr(f, init)
     override def apply[M[_], C](k: KL[M], f: KL[Id] => C)(implicit app: Applicative[M]): M[C] =
       k.apply(f)(app)
     def traverse[M[_], N[_], P[_]](k: KL[M], f: M ~> (N ∙ P)#l)(
@@ -86,7 +86,7 @@ object AList {
   /** AList for a single value. */
   def single[A]: Single[A] = new Single[A] {
     def transform[M[_], N[_]](a: M[A], f: M ~> N) = f(a)
-    def foldr[M[_], T](a: M[A], f: (M[_], T) => T, init: T): T = f(a, init)
+    def foldr[M[_], T](a: M[A], f: (M[?], T) => T, init: T): T = f(a, init)
     def traverse[M[_], N[_], P[_]](a: M[A], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
     ): N[P[A]] = f(a)
@@ -111,7 +111,7 @@ object AList {
       base.traverse[(M ∙ B)#l, N, (P ∙ B)#l](value, g)(np)
     }
 
-    def foldr[M[_], A](value: Split[M], f: (M[_], A) => A, init: A): A =
+    def foldr[M[_], A](value: Split[M], f: (M[?], A) => A, init: A): A =
       base.foldr[(M ∙ B)#l, A](value, f, init)
   }
 
@@ -121,7 +121,7 @@ object AList {
   def tuple2[A, B]: T2List[A, B] = new T2List[A, B] {
     type T2[M[_]] = (M[A], M[B])
     def transform[M[_], N[_]](t: T2[M], f: M ~> N): T2[N] = (f(t._1), f(t._2))
-    def foldr[M[_], T](t: T2[M], f: (M[_], T) => T, init: T): T = f(t._1, f(t._2, init))
+    def foldr[M[_], T](t: T2[M], f: (M[?], T) => T, init: T): T = f(t._1, f(t._2, init))
     def traverse[M[_], N[_], P[_]](t: T2[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
     ): N[T2[P]] = {
@@ -135,7 +135,7 @@ object AList {
   def tuple3[A, B, C]: T3List[A, B, C] = new T3List[A, B, C] {
     type T3[M[_]] = (M[A], M[B], M[C])
     def transform[M[_], N[_]](t: T3[M], f: M ~> N) = (f(t._1), f(t._2), f(t._3))
-    def foldr[M[_], T](t: T3[M], f: (M[_], T) => T, init: T): T = f(t._1, f(t._2, f(t._3, init)))
+    def foldr[M[_], T](t: T3[M], f: (M[?], T) => T, init: T): T = f(t._1, f(t._2, f(t._3, init)))
     def traverse[M[_], N[_], P[_]](t: T3[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
     ): N[T3[P]] = {
@@ -149,7 +149,7 @@ object AList {
   def tuple4[A, B, C, D]: T4List[A, B, C, D] = new T4List[A, B, C, D] {
     type T4[M[_]] = (M[A], M[B], M[C], M[D])
     def transform[M[_], N[_]](t: T4[M], f: M ~> N) = (f(t._1), f(t._2), f(t._3), f(t._4))
-    def foldr[M[_], T](t: T4[M], f: (M[_], T) => T, init: T): T =
+    def foldr[M[_], T](t: T4[M], f: (M[?], T) => T, init: T): T =
       f(t._1, f(t._2, f(t._3, f(t._4, init))))
     def traverse[M[_], N[_], P[_]](t: T4[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
@@ -164,7 +164,7 @@ object AList {
   def tuple5[A, B, C, D, E]: T5List[A, B, C, D, E] = new T5List[A, B, C, D, E] {
     type T5[M[_]] = (M[A], M[B], M[C], M[D], M[E])
     def transform[M[_], N[_]](t: T5[M], f: M ~> N) = (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5))
-    def foldr[M[_], T](t: T5[M], f: (M[_], T) => T, init: T): T =
+    def foldr[M[_], T](t: T5[M], f: (M[?], T) => T, init: T): T =
       f(t._1, f(t._2, f(t._3, f(t._4, f(t._5, init)))))
     def traverse[M[_], N[_], P[_]](t: T5[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
@@ -180,7 +180,7 @@ object AList {
     type T6[M[_]] = (M[A], M[B], M[C], M[D], M[E], M[F])
     def transform[M[_], N[_]](t: T6[M], f: M ~> N) =
       (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5), f(t._6))
-    def foldr[M[_], T](t: T6[M], f: (M[_], T) => T, init: T): T =
+    def foldr[M[_], T](t: T6[M], f: (M[?], T) => T, init: T): T =
       f(t._1, f(t._2, f(t._3, f(t._4, f(t._5, f(t._6, init))))))
     def traverse[M[_], N[_], P[_]](t: T6[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
@@ -204,7 +204,7 @@ object AList {
     type T7[M[_]] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G])
     def transform[M[_], N[_]](t: T7[M], f: M ~> N) =
       (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5), f(t._6), f(t._7))
-    def foldr[M[_], T](t: T7[M], f: (M[_], T) => T, init: T): T =
+    def foldr[M[_], T](t: T7[M], f: (M[?], T) => T, init: T): T =
       f(t._1, f(t._2, f(t._3, f(t._4, f(t._5, f(t._6, f(t._7, init)))))))
     def traverse[M[_], N[_], P[_]](t: T7[M], f: M ~> (N ∙ P)#l)(
         implicit np: Applicative[N]
@@ -232,7 +232,7 @@ object AList {
       type T8[M[_]] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H])
       def transform[M[_], N[_]](t: T8[M], f: M ~> N) =
         (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5), f(t._6), f(t._7), f(t._8))
-      def foldr[M[_], T](t: T8[M], f: (M[_], T) => T, init: T): T =
+      def foldr[M[_], T](t: T8[M], f: (M[?], T) => T, init: T): T =
         f(t._1, f(t._2, f(t._3, f(t._4, f(t._5, f(t._6, f(t._7, f(t._8, init))))))))
       def traverse[M[_], N[_], P[_]](t: T8[M], f: M ~> (N ∙ P)#l)(
           implicit np: Applicative[N]
@@ -263,7 +263,7 @@ object AList {
       type T9[M[_]] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H], M[I])
       def transform[M[_], N[_]](t: T9[M], f: M ~> N) =
         (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5), f(t._6), f(t._7), f(t._8), f(t._9))
-      def foldr[M[_], T](t: T9[M], f: (M[_], T) => T, init: T): T =
+      def foldr[M[_], T](t: T9[M], f: (M[?], T) => T, init: T): T =
         f(t._1, f(t._2, f(t._3, f(t._4, f(t._5, f(t._6, f(t._7, f(t._8, f(t._9, init)))))))))
       def traverse[M[_], N[_], P[_]](t: T9[M], f: M ~> (N ∙ P)#l)(
           implicit np: Applicative[N]
@@ -297,7 +297,7 @@ object AList {
       type T10[M[_]] = (M[A], M[B], M[C], M[D], M[E], M[F], M[G], M[H], M[I], M[J])
       def transform[M[_], N[_]](t: T10[M], f: M ~> N) =
         (f(t._1), f(t._2), f(t._3), f(t._4), f(t._5), f(t._6), f(t._7), f(t._8), f(t._9), f(t._10))
-      def foldr[M[_], T](t: T10[M], f: (M[_], T) => T, init: T): T =
+      def foldr[M[_], T](t: T10[M], f: (M[?], T) => T, init: T): T =
         f(
           t._1,
           f(t._2, f(t._3, f(t._4, f(t._5, f(t._6, f(t._7, f(t._8, f(t._9, f(t._10, init)))))))))
@@ -350,7 +350,7 @@ object AList {
           f(t._10),
           f(t._11)
         )
-      def foldr[M[_], T](t: T11[M], f: (M[_], T) => T, init: T): T =
+      def foldr[M[_], T](t: T11[M], f: (M[?], T) => T, init: T): T =
         f(
           t._1,
           f(

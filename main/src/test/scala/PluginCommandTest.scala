@@ -88,7 +88,7 @@ object FakeState {
     val base = new File("").getAbsoluteFile
     val testProject = Project("test-project", base).setAutoPlugins(plugins)
 
-    val settings: Seq[Def.Setting[_]] = Nil
+    val settings: Seq[Def.Setting[?]] = Nil
 
     val currentProject = Map(testProject.base.toURI -> testProject.id)
     val currentEval: () => sbt.compiler.Eval = () => Load.mkEval(Nil, base, Nil)
@@ -100,7 +100,7 @@ object FakeState {
 
     val (cMap, data: Settings[Scope]) =
       Def.makeWithCompiledMap(settings)(delegates, scopeLocal, Def.showFullKey)
-    val extra: KeyIndex => BuildUtil[_] = (keyIndex) =>
+    val extra: KeyIndex => BuildUtil[?] = (keyIndex) =>
       BuildUtil(base.toURI, Map.empty, keyIndex, data)
     val structureIndex: StructureIndex =
       Load.structureIndex(data, settings, extra, Map.empty)

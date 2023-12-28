@@ -20,7 +20,7 @@ object Giter8TemplatePlugin extends AutoPlugin {
   override def requires = CorePlugin
   override def trigger = allRequirements
 
-  override lazy val globalSettings: Seq[Setting[_]] =
+  override lazy val globalSettings: Seq[Setting[?]] =
     Seq(
       templateResolverInfos +=
         TemplateResolverInfo(

@@ -61,7 +61,7 @@ object Keys {
   val showTiming = settingKey[Boolean]("If true, the command success message includes the completion time.").withRank(CSetting)
   val timingFormat = settingKey[java.text.DateFormat]("The format used for displaying the completion time.").withRank(CSetting)
   @deprecated("", "1.4.0")
-  val extraLoggers = settingKey[ScopedKey[_] => Seq[XAppender]]("A function that provides additional loggers for a given setting.").withRank(DSetting)
+  val extraLoggers = settingKey[ScopedKey[?] => Seq[XAppender]]("A function that provides additional loggers for a given setting.").withRank(DSetting)
   val extraAppenders = settingKey[AppenderSupplier]("A function that provides additional loggers for a given setting.").withRank(DSetting)
   val useLog4J = settingKey[Boolean]("Toggles whether or not to use log4j for sbt internal loggers.").withRank(Invisible)
   val logManager = settingKey[LogManager]("The log manager, which creates Loggers for different contexts.").withRank(DSetting)
@@ -593,7 +593,7 @@ object Keys {
   val settingsData = std.FullInstance.settingsData
   val streams = taskKey[TaskStreams]("Provides streams for logging and persisting data.").withRank(DTask)
   val taskDefinitionKey = Def.taskDefinitionKey
-  val (executionRoots, dummyRoots) = Def.dummy[Seq[ScopedKey[_]]]("executionRoots", "The list of root tasks for this task execution.  Roots are the top-level tasks that were directly requested to be run.")
+  val (executionRoots, dummyRoots) = Def.dummy[Seq[ScopedKey[?]]]("executionRoots", "The list of root tasks for this task execution.  Roots are the top-level tasks that were directly requested to be run.")
   val state = Def.stateKey
   val streamsManager = Def.streamsManagerKey
   // wrapper to work around SI-2915
@@ -619,8 +619,8 @@ object Keys {
   val lintUnused = inputKey[Unit]("Check for keys unused by other settings and tasks.")
   val lintIncludeFilter = settingKey[String => Boolean]("Filters key names that should be included in the lint check.")
   val lintExcludeFilter = settingKey[String => Boolean]("Filters key names that should be excluded in the lint check.")
-  val excludeLintKeys = settingKey[Set[Def.KeyedInitialize[_]]]("Keys excluded from lintUnused task")
-  val includeLintKeys = settingKey[Set[Def.KeyedInitialize[_]]]("Task keys that are included into lintUnused task")
+  val excludeLintKeys = settingKey[Set[Def.KeyedInitialize[?]]]("Keys excluded from lintUnused task")
+  val includeLintKeys = settingKey[Set[Def.KeyedInitialize[?]]]("Task keys that are included into lintUnused task")
   val lintUnusedKeysOnLoad = settingKey[Boolean]("Toggles whether or not to check for unused keys during startup")
 
   val useScalaReplJLine = settingKey[Boolean]("Toggles whether or not to use sbt's forked jline in the scala repl. Enabling this flag may break the thin client in the scala console.").withRank(KeyRanks.Invisible)
@@ -641,8 +641,8 @@ object Keys {
   val triggeredBy = Def.triggeredBy
   val runBefore = Def.runBefore
 
-  type Streams = std.Streams[ScopedKey[_]]
-  type TaskStreams = std.TaskStreams[ScopedKey[_]]
+  type Streams = std.Streams[ScopedKey[?]]
+  type TaskStreams = std.TaskStreams[ScopedKey[?]]
 }
 
 // format: on

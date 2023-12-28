@@ -37,7 +37,7 @@ object SlashSyntaxTest extends sbt.SlashSyntax {
 
   val uTest = "com.lihaoyi" %% "utest" % "0.5.3"
 
-  Seq[Setting[_]](
+  Seq[Setting[?]](
     Global / cancelable := true,
     ThisBuild / scalaVersion := "2.12.3",
     console / scalacOptions += "-deprecation",

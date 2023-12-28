@@ -20,7 +20,7 @@ import std.TaskExtra.{ task => mktask, _ }
 /** An abstraction on top of Settings for build configuration and task definition. */
 sealed trait Scoped extends Equals {
   def scope: Scope
-  val key: AttributeKey[_]
+  val key: AttributeKey[?]
 
   override def equals(that: Any) =
     (this eq that.asInstanceOf[AnyRef]) || (that match {
@@ -119,7 +119,7 @@ sealed abstract class SettingKey[T]
   final def withRank(rank: Int): SettingKey[T] =
     SettingKey(AttributeKey.copyWithRank(key, rank))
 
-  def canEqual(that: Any): Boolean = that.isInstanceOf[SettingKey[_]]
+  def canEqual(that: Any): Boolean = that.isInstanceOf[SettingKey[?]]
 }
 
 /**
@@ -187,7 +187,7 @@ sealed abstract class TaskKey[T]
   final def withRank(rank: Int): TaskKey[T] =
     TaskKey(AttributeKey.copyWithRank(key, rank))
 
-  def canEqual(that: Any): Boolean = that.isInstanceOf[TaskKey[_]]
+  def canEqual(that: Any): Boolean = that.isInstanceOf[TaskKey[?]]
 }
 
 /**
@@ -222,7 +222,7 @@ sealed trait InputKey[T]
   final def withRank(rank: Int): InputKey[T] =
     InputKey(AttributeKey.copyWithRank(key, rank))
 
-  def canEqual(that: Any): Boolean = that.isInstanceOf[InputKey[_]]
+  def canEqual(that: Any): Boolean = that.isInstanceOf[InputKey[?]]
 }
 
 /** Methods and types related to constructing settings, including keys, scopes, and initializations. */
@@ -277,7 +277,7 @@ object Scoped {
     def in(
         p: ScopeAxis[Reference],
         c: ScopeAxis[ConfigKey],
-        t: ScopeAxis[AttributeKey[_]]
+        t: ScopeAxis[AttributeKey[?]]
     ): ResultType = in(Scope(p, c, t, This))
   }
 
@@ -419,7 +419,7 @@ object Scoped {
 
     private[this] def nonLocal(
         tasks: Seq[AnyInitTask],
-        key: AttributeKey[Seq[Task[_]]]
+        key: AttributeKey[Seq[Task[?]]]
     ): Initialize[Task[S]] =
       Initialize.joinAny[Task](tasks).zipWith(i)((ts, i) => i.copy(info = i.info.set(key, ts)))
   }
@@ -639,7 +639,7 @@ object Scoped {
 
   // format: on
 
-  private[sbt] def extendScoped(s1: Scoped, ss: Seq[Scoped]): Seq[AttributeKey[_]] =
+  private[sbt] def extendScoped(s1: Scoped, ss: Seq[Scoped]): Seq[AttributeKey[?]] =
     s1.key +: ss.map(_.key)
 }
 

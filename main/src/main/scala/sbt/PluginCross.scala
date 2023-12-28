@@ -37,7 +37,7 @@ private[sbt] object PluginCross {
       }
     }
 
-    def crossExclude(s: Def.Setting[_]): Boolean =
+    def crossExclude(s: Def.Setting[?]): Boolean =
       s.key match {
         case ScopedKey(Scope(_, _, pluginCrossBuild.key, _), sbtVersion.key) => true
         case _                                                               => false

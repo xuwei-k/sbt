@@ -168,7 +168,7 @@ object Cross {
           Seq(s"$SwitchCommand $verbose $version!", aggCommand)
         }
       case Right((keys, taskArgs)) =>
-        def project(key: ScopedKey[_]): Option[ProjectRef] = key.scope.project.toOption match {
+        def project(key: ScopedKey[?]): Option[ProjectRef] = key.scope.project.toOption match {
           case Some(p: ProjectRef) => Some(p)
           case _                   => None
         }
@@ -222,7 +222,7 @@ object Cross {
     restoreCapturedSession(state, Project.extract(state))
   }
 
-  private val CapturedSession = AttributeKey[Seq[Setting[_]]]("crossCapturedSession")
+  private val CapturedSession = AttributeKey[Seq[Setting[?]]]("crossCapturedSession")
 
   private def captureCurrentSession(state: State, extracted: Extracted): State = {
     state.put(CapturedSession, extracted.session.rawAppend)
@@ -427,7 +427,7 @@ object Cross {
         }
     }
 
-    val filterKeys: Set[AttributeKey[_]] = Set(scalaVersion, scalaHome, scalaInstance).map(_.key)
+    val filterKeys: Set[AttributeKey[?]] = Set(scalaVersion, scalaHome, scalaInstance).map(_.key)
 
     val projectsContains: Reference => Boolean = projects.map(_._1).toSet.contains
 

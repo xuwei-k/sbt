@@ -461,7 +461,7 @@ object BuiltinCommands {
       command: String,
       preamble: String,
       cutoff: Int,
-      keep: AttributeKey[_] => Boolean
+      keep: AttributeKey[?] => Boolean
   ): Command =
     Command(command, settingsBrief(command), settingsDetailed(command))(showSettingParser(keep)) {
       case (s: State, (verbosity: Int, selected: Option[String])) =>
@@ -474,10 +474,10 @@ object BuiltinCommands {
         s
     }
   def showSettingParser(
-      keepKeys: AttributeKey[_] => Boolean
+      keepKeys: AttributeKey[?] => Boolean
   )(s: State): Parser[(Int, Option[String])] =
     verbosityParser ~ selectedParser(s, keepKeys).?
-  def selectedParser(s: State, keepKeys: AttributeKey[_] => Boolean): Parser[String] =
+  def selectedParser(s: State, keepKeys: AttributeKey[?] => Boolean): Parser[String] =
     singleArgument(allTaskAndSettingKeys(s).withFilter(keepKeys).map(_.label).toSet)
   def verbosityParser: Parser[Int] =
     success(1) | ((Space ~ "-") ~> (
@@ -485,15 +485,15 @@ object BuiltinCommands {
         ("V" ^^^ Int.MaxValue)
     ))
 
-  def taskDetail(keys: Seq[AttributeKey[_]], firstOnly: Boolean): Seq[(String, String)] =
+  def taskDetail(keys: Seq[AttributeKey[?]], firstOnly: Boolean): Seq[(String, String)] =
     sortByLabel(withDescription(keys)) flatMap { t =>
       taskStrings(t, firstOnly)
     }
 
-  def taskDetail(keys: Seq[AttributeKey[_]]): Seq[(String, String)] =
+  def taskDetail(keys: Seq[AttributeKey[?]]): Seq[(String, String)] =
     taskDetail(keys, false)
 
-  def allTaskAndSettingKeys(s: State): Seq[AttributeKey[_]] = {
+  def allTaskAndSettingKeys(s: State): Seq[AttributeKey[?]] = {
     val extracted = Project.extract(s)
     import extracted._
     val index = structure.index
@@ -512,21 +512,21 @@ object BuiltinCommands {
       .distinct
   }
 
-  def sortByLabel(keys: Seq[AttributeKey[_]]): Seq[AttributeKey[_]] = keys.sortBy(_.label)
-  def sortByRank(keys: Seq[AttributeKey[_]]): Seq[AttributeKey[_]] = keys.sortBy(_.rank)
-  def withDescription(keys: Seq[AttributeKey[_]]): Seq[AttributeKey[_]] =
+  def sortByLabel(keys: Seq[AttributeKey[?]]): Seq[AttributeKey[?]] = keys.sortBy(_.label)
+  def sortByRank(keys: Seq[AttributeKey[?]]): Seq[AttributeKey[?]] = keys.sortBy(_.rank)
+  def withDescription(keys: Seq[AttributeKey[?]]): Seq[AttributeKey[?]] =
     keys.filter(_.description.isDefined)
   def isTask(
-      mf: Manifest[_]
-  )(implicit taskMF: Manifest[Task[_]], inputMF: Manifest[InputTask[_]]): Boolean =
+      mf: Manifest[?]
+  )(implicit taskMF: Manifest[Task[?]], inputMF: Manifest[InputTask[?]]): Boolean =
     mf.runtimeClass == taskMF.runtimeClass || mf.runtimeClass == inputMF.runtimeClass
-  def topNRanked(n: Int) = (keys: Seq[AttributeKey[_]]) => sortByRank(keys).take(n)
+  def topNRanked(n: Int) = (keys: Seq[AttributeKey[?]]) => sortByRank(keys).take(n)
   def highPass(rankCutoff: Int) =
-    (keys: Seq[AttributeKey[_]]) => sortByRank(keys).takeWhile(_.rank <= rankCutoff)
+    (keys: Seq[AttributeKey[?]]) => sortByRank(keys).takeWhile(_.rank <= rankCutoff)
 
   def tasksHelp(
       s: State,
-      filter: Seq[AttributeKey[_]] => Seq[AttributeKey[_]],
+      filter: Seq[AttributeKey[?]] => Seq[AttributeKey[?]],
       arg: Option[String]
   ): String = {
     val commandAndDescription = taskDetail(filter(allTaskAndSettingKeys(s)), true)
@@ -536,12 +536,12 @@ object BuiltinCommands {
     }
   }
 
-  def taskStrings(key: AttributeKey[_], firstOnly: Boolean): Option[(String, String)] =
+  def taskStrings(key: AttributeKey[?], firstOnly: Boolean): Option[(String, String)] =
     key.description map { d =>
       if (firstOnly) (key.label, d.split("\r?\n")(0)) else (key.label, d)
     }
 
-  def taskStrings(key: AttributeKey[_]): Option[(String, String)] = taskStrings(key, false)
+  def taskStrings(key: AttributeKey[?]): Option[(String, String)] = taskStrings(key, false)
 
   def defaults = Command.command(DefaultsCommand) { s =>
     s.copy(definedCommands = DefaultCommands)
@@ -619,14 +619,14 @@ object BuiltinCommands {
   def setThis(
       s: State,
       extracted: Extracted,
-      settings: Seq[Def.Setting[_]],
+      settings: Seq[Def.Setting[?]],
       arg: String
   ): SetResult =
     setThis(extracted, settings, arg)
 
   def setThis(
       extracted: Extracted,
-      settings: Seq[Def.Setting[_]],
+      settings: Seq[Def.Setting[?]],
       arg: String
   ): SetResult =
     SettingCompletions.setThis(extracted, settings, arg)
@@ -669,7 +669,7 @@ object BuiltinCommands {
       }
     }
 
-  def extractLast(s: State): (BuildStructure, Select[ProjectRef], Show[Def.ScopedKey[_]]) = {
+  def extractLast(s: State): (BuildStructure, Select[ProjectRef], Show[Def.ScopedKey[?]]) = {
     val ext = Project.extract(s)
     (ext.structure, Select(ext.currentRef), ext.showKey)
   }

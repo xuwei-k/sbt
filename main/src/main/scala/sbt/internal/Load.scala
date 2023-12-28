@@ -127,7 +127,7 @@ private[sbt] object Load {
       case _: NoSuchMethodError => None
     }
 
-  def injectGlobal(state: State): Seq[Setting[_]] =
+  def injectGlobal(state: State): Seq[Setting[?]] =
     ((GlobalScope / appConfiguration) :== state.configuration) +:
       LogManager.settingsLogger(state) +:
       EvaluateTask.injectSettings
@@ -150,7 +150,7 @@ private[sbt] object Load {
       files: Seq[File],
       config: LoadBuildConfiguration
   ): LoadBuildConfiguration = {
-    val compiled: ClassLoader => Seq[Setting[_]] =
+    val compiled: ClassLoader => Seq[Setting[?]] =
       if (files.isEmpty || base == globalBase) const(Nil)
       else buildGlobalSettings(globalBase, files, config)
     config.copy(injectSettings = config.injectSettings.copy(projectLoaded = compiled))
@@ -160,7 +160,7 @@ private[sbt] object Load {
       base: File,
       files: Seq[File],
       config: LoadBuildConfiguration
-  ): ClassLoader => Seq[Setting[_]] = {
+  ): ClassLoader => Seq[Setting[?]] = {
     val eval = mkEval(data(config.globalPluginClasspath), base, defaultEvalOptions)
 
     val imports =
@@ -286,9 +286,9 @@ private[sbt] object Load {
   // 2. the defining key is stored on constructed tasks: used for error reporting among other things
   // 3. resolvedScoped is replaced with the defining key as a value
   // Note: this must be idempotent.
-  def finalTransforms(ss: Seq[Setting[_]]): Seq[Setting[_]] = {
-    def mapSpecial(to: ScopedKey[_]) = λ[ScopedKey ~> ScopedKey](
-      (key: ScopedKey[_]) =>
+  def finalTransforms(ss: Seq[Setting[?]]): Seq[Setting[?]] = {
+    def mapSpecial(to: ScopedKey[?]) = λ[ScopedKey ~> ScopedKey](
+      (key: ScopedKey[?]) =>
         if (key.key == streams.key) {
           ScopedKey(Scope.fillTaskAxis(Scope.replaceThis(to.scope)(key.scope), to.key), key.key)
         } else key
@@ -300,8 +300,8 @@ private[sbt] object Load {
           case ik: InputTask[t] => ik.mapTask(tk => setDefinitionKey(tk, key)).asInstanceOf[T]
           case _                => value
         }
-    def setResolved(defining: ScopedKey[_]) = λ[ScopedKey ~> Option](
-      (key: ScopedKey[_]) =>
+    def setResolved(defining: ScopedKey[?]) = λ[ScopedKey ~> Option](
+      (key: ScopedKey[?]) =>
         key.key match {
           case resolvedScoped.key => Some(defining.asInstanceOf[A1$])
           case _                  => None
@@ -312,13 +312,13 @@ private[sbt] object Load {
     )
   }
 
-  def setDefinitionKey[T](tk: Task[T], key: ScopedKey[_]): Task[T] =
+  def setDefinitionKey[T](tk: Task[T], key: ScopedKey[?]): Task[T] =
     if (isDummy(tk)) tk else Task(tk.info.set(Keys.taskDefinitionKey, key), tk.work)
 
   def structureIndex(
       data: Settings[Scope],
-      settings: Seq[Setting[_]],
-      extra: KeyIndex => BuildUtil[_],
+      settings: Seq[Setting[?]],
+      extra: KeyIndex => BuildUtil[?],
       projects: Map[URI, LoadedBuildUnit]
   ): StructureIndex = {
     val keys = Index.allKeys(settings)
@@ -339,8 +339,8 @@ private[sbt] object Load {
   }
 
   // Reevaluates settings after modifying them.  Does not recompile or reload any build components.
-  def reapply(newSettings: Seq[Setting[_]], structure: BuildStructure)(
-      implicit display: Show[ScopedKey[_]]
+  def reapply(newSettings: Seq[Setting[?]], structure: BuildStructure)(
+      implicit display: Show[ScopedKey[?]]
   ): BuildStructure = {
     val transformed = finalTransforms(newSettings)
     val (cMap, newData) =
@@ -363,10 +363,10 @@ private[sbt] object Load {
 
   @deprecated("No longer used. For binary compatibility", "1.2.1")
   def reapply(
-      newSettings: Seq[Setting[_]],
+      newSettings: Seq[Setting[?]],
       structure: BuildStructure,
       log: Logger
-  )(implicit display: Show[ScopedKey[_]]): BuildStructure = {
+  )(implicit display: Show[ScopedKey[?]]): BuildStructure = {
     reapply(newSettings, structure)
   }
 
@@ -374,7 +374,7 @@ private[sbt] object Load {
       loaded: LoadedBuild,
       rootProject: URI => String,
       injectSettings: InjectSettings
-  ): Seq[Setting[_]] = {
+  ): Seq[Setting[?]] = {
     (((GlobalScope / loadedBuild) :== loaded) +:
       transformProjectOnly(loaded.root, rootProject, injectSettings.global)) ++
       inScope(GlobalScope)(loaded.autos.globalSettings) ++
@@ -384,10 +384,10 @@ private[sbt] object Load {
           val projectSettings = build.defined flatMap {
             case (id, project) =>
               val ref = ProjectRef(uri, id)
-              val defineConfig: Seq[Setting[_]] =
+              val defineConfig: Seq[Setting[?]] =
                 for (c <- project.configurations)
                   yield ((ref / ConfigKey(c.name) / configuration) :== c)
-              val builtin: Seq[Setting[_]] =
+              val builtin: Seq[Setting[?]] =
                 (thisProject :== project) +: (thisProjectRef :== ref) +: defineConfig
               val settings = builtin ++ project.settings ++ injectSettings.project
               // map This to thisScope, Select(p) to mapRef(uri, rootProject, p)
@@ -404,16 +404,16 @@ private[sbt] object Load {
   def transformProjectOnly(
       uri: URI,
       rootProject: URI => String,
-      settings: Seq[Setting[_]]
-  ): Seq[Setting[_]] =
+      settings: Seq[Setting[?]]
+  ): Seq[Setting[?]] =
     Project.transform(Scope.resolveProject(uri, rootProject), settings)
 
   def transformSettings(
       thisScope: Scope,
       uri: URI,
       rootProject: URI => String,
-      settings: Seq[Setting[_]]
-  ): Seq[Setting[_]] = {
+      settings: Seq[Setting[?]]
+  ): Seq[Setting[?]] = {
     val transformed = Project.transform(Scope.resolveScope(thisScope, uri, rootProject), settings)
     Settings.inject(transformed)
   }
@@ -539,7 +539,7 @@ private[sbt] object Load {
     (partBuildUnit, externals)
   }
 
-  def buildSettings(unit: BuildUnit): Seq[Setting[_]] = {
+  def buildSettings(unit: BuildUnit): Seq[Setting[?]] = {
     val buildScope = GlobalScope.copy(project = Select(BuildRef(unit.uri)))
     val resolve = Scope.resolveBuildScope(buildScope, unit.uri)
     Project.transform(resolve, unit.definitions.builds.flatMap(_.settings))
@@ -1051,7 +1051,7 @@ private[sbt] object Load {
         def autoPluginSettings(f: AutoPlugins) =
           projectPlugins.withFilter(f.include).flatMap(_.projectSettings)
         // Grab all the settings we already loaded from sbt files
-        def settings(files: Seq[File]): Seq[Setting[_]] = {
+        def settings(files: Seq[File]): Seq[Setting[?]] = {
           if (files.nonEmpty)
             log.info(
               s"${files.map(_.getName).mkString(s"loading settings for project ${p.id} from ", ",", " ...")}"
@@ -1063,14 +1063,14 @@ private[sbt] object Load {
           } yield setting
         }
         // Expand the AddSettings instance into a real Seq[Setting[_]] we'll use on the project
-        def expandSettings(auto: AddSettings): Seq[Setting[_]] = auto match {
+        def expandSettings(auto: AddSettings): Seq[Setting[?]] = auto match {
           case BuildScalaFiles     => p.settings
           case User                => globalUserSettings.cachedProjectLoaded(loadedPlugins.loader)
           case sf: SbtFiles        => settings(sf.files.map(f => IO.resolve(p.base, f)))
           case sf: DefaultSbtFiles => settings(sbtFiles.filter(sf.include))
           case p: AutoPlugins      => autoPluginSettings(p)
           case q: Sequence =>
-            q.sequence.foldLeft(Seq.empty[Setting[_]]) { (b, add) =>
+            q.sequence.foldLeft(Seq.empty[Setting[?]]) { (b, add) =>
               b ++ expandSettings(add)
             }
         }
@@ -1168,7 +1168,7 @@ private[sbt] object Load {
 
   /** These are the settings defined when loading a project "meta" build. */
   @nowarn
-  val autoPluginSettings: Seq[Setting[_]] = inScope(GlobalScope in LocalRootProject)(
+  val autoPluginSettings: Seq[Setting[?]] = inScope(GlobalScope in LocalRootProject)(
     Seq(
       sbtPlugin :== true,
       isMetaBuild :== true,
@@ -1371,17 +1371,17 @@ private[sbt] object Load {
   def referenced[PR <: ProjectReference](definitions: Seq[ProjectDefinition[PR]]): Seq[PR] =
     definitions flatMap { _.referenced }
 
-  final class EvaluatedConfigurations(val eval: Eval, val settings: Seq[Setting[_]])
+  final class EvaluatedConfigurations(val eval: Eval, val settings: Seq[Setting[?]])
 
   final case class InjectSettings(
-      global: Seq[Setting[_]],
-      project: Seq[Setting[_]],
-      projectLoaded: ClassLoader => Seq[Setting[_]]
+      global: Seq[Setting[?]],
+      project: Seq[Setting[?]],
+      projectLoaded: ClassLoader => Seq[Setting[?]]
   ) {
     import java.net.URLClassLoader
-    private val cache: mutable.Map[String, Seq[Setting[_]]] = mutable.Map.empty
+    private val cache: mutable.Map[String, Seq[Setting[?]]] = mutable.Map.empty
     // Cache based on the underlying URL values of the classloader
-    def cachedProjectLoaded(cl: ClassLoader): Seq[Setting[_]] =
+    def cachedProjectLoaded(cl: ClassLoader): Seq[Setting[?]] =
       cl match {
         case cl: URLClassLoader =>
           cache.getOrElseUpdate(classLoaderToHash(Some(cl)), projectLoaded(cl))

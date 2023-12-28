@@ -106,7 +106,7 @@ object SettingsTest extends Properties("settings") {
     val a: ScopedKey[Int] = ScopedKey(Scope(0), AttributeKey[Int]("a"))
     val b: ScopedKey[Int] = ScopedKey(Scope(0), AttributeKey[Int]("b"))
     val prop1 = {
-      val settings: Seq[Setting[_]] = Seq(
+      val settings: Seq[Setting[?]] = Seq(
         setting(a, value(3)),
         setting(b, value(6)),
         derive(setting(b, a)),
@@ -144,7 +144,7 @@ object SettingsTest extends Properties("settings") {
         val globalDerivedKey = ScopedKey(Scope(0), derivedKey)
         // Each project defines an initial value, but the update is defined in globalKey.
         // However, the derived Settings that come from this should be scoped in each project.
-        val settings: Seq[Setting[_]] =
+        val settings: Seq[Setting[?]] =
           derive(setting(globalDerivedKey, settingsExample.map(globalKey)(_ + 1))) +: projectKeys
             .map(pk => setting(pk, value(0)))
         val ev = evaluate(settings)
@@ -199,7 +199,7 @@ object SettingsTest extends Properties("settings") {
       (value == expected)
   }
 
-  def evaluate(settings: Seq[Setting[_]]): Settings[Scope] =
+  def evaluate(settings: Seq[Setting[?]]): Settings[Scope] =
     try {
       makeWithCompiledMap(settings)(delegates, scopeLocal, showFullKey)._2
     } catch {

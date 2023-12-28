@@ -20,10 +20,10 @@ object KeyTest extends Properties("AttributeKey") {
     compare(AttributeKey[Int]("test"), AttributeKey[Double]("test"), false) &&
     compare(AttributeKey[java.lang.Integer]("test"), AttributeKey[Int]("test"), false) &&
     compare(AttributeKey[Map[Int, String]]("test"), AttributeKey[Map[Int, String]]("test"), true) &&
-    compare(AttributeKey[Map[Int, String]]("test"), AttributeKey[Map[Int, _]]("test"), false)
+    compare(AttributeKey[Map[Int, String]]("test"), AttributeKey[Map[Int, ?]]("test"), false)
   }
 
-  def compare(a: AttributeKey[_], b: AttributeKey[_], same: Boolean) =
+  def compare(a: AttributeKey[?], b: AttributeKey[?], same: Boolean) =
     ("a.label: " + a.label) |:
       ("a.manifest: " + a.manifest) |:
       ("b.label: " + b.label) |:
@@ -31,7 +31,7 @@ object KeyTest extends Properties("AttributeKey") {
       ("expected equal? " + same) |:
       compare0(a, b, same)
 
-  def compare0(a: AttributeKey[_], b: AttributeKey[_], same: Boolean) =
+  def compare0(a: AttributeKey[?], b: AttributeKey[?], same: Boolean) =
     if (same) {
       ("equality" |: (a == b)) &&
       ("hash" |: (a.hashCode == b.hashCode))
