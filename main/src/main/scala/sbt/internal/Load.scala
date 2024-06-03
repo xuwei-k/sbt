@@ -255,6 +255,7 @@ private[sbt] object Load {
       // When settings.size is 100000, Def.make takes around 10s.
       if (settings.size > 10000) {
         log.info(s"resolving key references (${settings.size} settings) ...")
+        IO.write(new java.io.File("keys.txt"), settings.mkString("\n"))
       }
       Def.makeWithCompiledMap(settings)(
         delegates,
@@ -949,20 +950,20 @@ private[sbt] object Load {
       // Continue loading if we find any more.
       newProjects match {
         case Seq(next, rest @ _*) =>
-          log.debug(s"[Loading] Loading project ${next.id} @ ${next.base}")
+          log.info(s"[Loading] Loading project ${next.id} @ ${next.base}")
           discoverAndLoad(next, rest)
         case Nil if makeOrDiscoverRoot =>
-          log.debug(s"[Loading] Scanning directory $buildBase")
+          log.info(s"[Loading] Scanning directory $buildBase")
           val DiscoveredProjects(rootOpt, discovered, files, extraFiles, generated) = discover(
             buildBase
           )
           val discoveredIdsStr = discovered.map(_.id).mkString(",")
           val (root, expand, moreProjects, otherProjects) = rootOpt match {
             case Some(root) =>
-              log.debug(s"[Loading] Found root project ${root.id} w/ remaining $discoveredIdsStr")
+              log.info(s"[Loading] Found root project ${root.id} w/ remaining $discoveredIdsStr")
               (root, true, discovered, LoadedProjects(Nil, Nil))
             case None =>
-              log.debug(s"[Loading] Found non-root projects $discoveredIdsStr")
+              log.info(s"[Loading] Found non-root projects $discoveredIdsStr")
               // Here we do something interesting... We need to create an aggregate root project
               val otherProjects = load(discovered, acc, Nil)
               val root = {
@@ -986,7 +987,7 @@ private[sbt] object Load {
           load(newProjects, newAcc, newGenerated)
         case Nil =>
           val projectIds = acc.map(_.id).mkString("(", ", ", ")")
-          log.debug(s"[Loading] Done in $buildBase, returning: $projectIds")
+          log.info(s"[Loading] Done in $buildBase, returning: $projectIds")
           LoadedProjects(acc, generatedConfigClassFiles)
       }
     }
@@ -1408,7 +1409,7 @@ private[sbt] object Load {
     val elapsed = System.nanoTime - start
     timedIndentation -= 1
     val prefix = " " * 2 * timedIndentation
-    log.debug(s"$prefix$label took ${elapsed / 1e6}ms")
+    log.info(s"$prefix$label took ${elapsed / 1e6}ms")
     result
   }
 }

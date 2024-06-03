@@ -16,8 +16,6 @@ ThisBuild / version := {
 }
 ThisBuild / version2_13 := "2.0.0-SNAPSHOT"
 ThisBuild / versionScheme := Some("early-semver")
-ThisBuild / scalafmtOnCompile := !(Global / insideCI).value
-ThisBuild / Test / scalafmtOnCompile := !(Global / insideCI).value
 ThisBuild / turbo := true
 ThisBuild / usePipelining := false // !(Global / insideCI).value
 ThisBuild / organization := "org.scala-sbt"
@@ -89,16 +87,6 @@ def commonBaseSettings: Seq[Setting[_]] = Def.settings(
     )
   },
    */
-  Compile / javafmtOnCompile := Def
-    .taskDyn(if ((scalafmtOnCompile).value) Compile / javafmt else Def.task(()))
-    .value,
-  Test / javafmtOnCompile := Def
-    .taskDyn(if ((Test / scalafmtOnCompile).value) Test / javafmt else Def.task(()))
-    .value,
-  Compile / unmanagedSources / inputFileStamps :=
-    (Compile / unmanagedSources / inputFileStamps).dependsOn(Compile / javafmtOnCompile).value,
-  Test / unmanagedSources / inputFileStamps :=
-    (Test / unmanagedSources / inputFileStamps).dependsOn(Test / javafmtOnCompile).value,
   crossScalaVersions := List(scala212, scala213),
   Test / publishArtifact := false,
   run / fork := true,
