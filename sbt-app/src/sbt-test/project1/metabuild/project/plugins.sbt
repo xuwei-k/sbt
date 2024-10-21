@@ -1,0 +1,1 @@
+scalacOptions += "-Xfatal-warnings"

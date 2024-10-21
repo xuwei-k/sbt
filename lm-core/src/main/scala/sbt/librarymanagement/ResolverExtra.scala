@@ -110,13 +110,10 @@ private[librarymanagement] abstract class ResolverFunctions {
     "https://oss.sonatype.org/service/local/repositories/releases/content/"
   val JavaNet2RepositoryName = "java.net Maven2 Repository"
   val JavaNet2RepositoryRoot = javanet2RepositoryRoot(useSecureResolvers)
-  val JCenterRepositoryName = "jcenter"
-  val JCenterRepositoryRoot = "https://jcenter.bintray.com/"
   val DefaultMavenRepositoryRoot = "https://repo1.maven.org/maven2/"
   val DefaultMavenRepository =
     MavenRepository("public", centralRepositoryRoot(useSecureResolvers))
   val JavaNet2Repository = MavenRepository(JavaNet2RepositoryName, JavaNet2RepositoryRoot)
-  val JCenterRepository = MavenRepository(JCenterRepositoryName, JCenterRepositoryRoot)
 
   def mavenCentral: Resolver = DefaultMavenRepository
   def defaults: Vector[Resolver] = Vector(mavenCentral)
@@ -180,7 +177,6 @@ private[librarymanagement] abstract class ResolverFunctions {
     url(s"bintray-$owner-$repo", new URI(s"https://dl.bintray.com/$owner/$repo/").toURL)(
       Resolver.ivyStylePatterns
     )
-  def jcenterRepo = JCenterRepository
 
   val ApacheMavenSnapshotsRepo = MavenRepository(
     "apache-snapshots",
@@ -218,7 +214,6 @@ private[librarymanagement] abstract class ResolverFunctions {
   ): Vector[Resolver] =
     Vector(Resolver.defaultLocal) ++
       userResolvers ++
-      single(JCenterRepository, jcenter) ++
       single(DefaultMavenRepository, mavenCentral)
 
   /**
@@ -234,16 +229,12 @@ private[librarymanagement] abstract class ResolverFunctions {
     appResolvers.partition(_ == Resolver.defaultLocal) match {
       case (locals, xs) =>
         locals ++
-          (xs.partition(_ == JCenterRepository) match {
+          (xs.partition(_ == DefaultMavenRepository) match {
             case (_, xs) =>
-              single(JCenterRepository, jcenter) ++
-                (xs.partition(_ == DefaultMavenRepository) match {
-                  case (_, xs) =>
-                    single(
-                      DefaultMavenRepository,
-                      mavenCentral
-                    ) ++ xs // TODO - Do we need to filter out duplicates?
-                })
+              single(
+                DefaultMavenRepository,
+                mavenCentral
+              ) ++ xs // TODO - Do we need to filter out duplicates?
           })
     }
 

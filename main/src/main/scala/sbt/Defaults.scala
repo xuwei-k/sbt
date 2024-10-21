@@ -3248,7 +3248,6 @@ object Classpaths {
         publishTo :== None,
         resolvers :== Vector.empty,
         includePluginResolvers :== false,
-        useJCenter :== false,
         retrievePattern :== Resolver.defaultRetrievePattern,
         transitiveClassifiers :== Seq(SourceClassifier, DocClassifier),
         sourceArtifactTypes :== Artifact.DefaultSourceTypes.toVector,
@@ -3314,18 +3313,17 @@ object Classpaths {
       externalResolvers.?.value,
       resolvers.value,
       appResolvers.value,
-      useJCenter.value
     ) match {
       case (Some(delegated), Seq(), _, _) => delegated
       case (_, rs, Some(ars), _)          => ars ++ rs
-      case (_, rs, _, uj) => Resolver.combineDefaultResolvers(rs.toVector, uj, mavenCentral = true)
+      case (_, rs, _, _) =>
+        Resolver.combineDefaultResolvers(rs.toVector, jcenter = false, mavenCentral = true)
     }),
     appResolvers := {
       val ac = appConfiguration.value
-      val uj = useJCenter.value
       appRepositories(ac) map { ars =>
         val useMavenCentral = ars contains Resolver.DefaultMavenRepository
-        Resolver.reorganizeAppResolvers(ars, uj, useMavenCentral)
+        Resolver.reorganizeAppResolvers(ars, jcenter = false, useMavenCentral)
       }
     },
     bootResolvers := {
@@ -3670,7 +3668,7 @@ object Classpaths {
           scalaHome.value.isDefined || scalaModuleInfo.value.isEmpty || !managedScalaInstance.value
         )
           Nil
-        else if (!isScala3M123 || extResolvers.contains(Resolver.JCenterRepository)) {
+        else if (!isScala3M123) {
           ScalaArtifacts.toolDependencies(sbtOrg, version) ++
             ScalaArtifacts.docToolDependencies(sbtOrg, version)
         } else ScalaArtifacts.toolDependencies(sbtOrg, version)

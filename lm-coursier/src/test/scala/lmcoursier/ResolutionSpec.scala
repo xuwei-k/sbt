@@ -6,11 +6,7 @@ import sbt.internal.librarymanagement.cross.CrossVersionUtil
 import sbt.internal.util.ConsoleLogger
 import sbt.librarymanagement._
 import sbt.librarymanagement.Configurations.Component
-import sbt.librarymanagement.Resolver.{
-  DefaultMavenRepository,
-  JCenterRepository,
-  JavaNet2Repository
-}
+import sbt.librarymanagement.Resolver.{ DefaultMavenRepository, JavaNet2Repository }
 import sbt.librarymanagement.{ Resolver, UnresolvedWarningConfiguration, UpdateConfiguration }
 import sbt.librarymanagement.syntax._
 
@@ -47,7 +43,6 @@ final class ResolutionSpec extends AnyPropSpec with Matchers {
   def resolvers = Vector(
     DefaultMavenRepository,
     JavaNet2Repository,
-    JCenterRepository,
     Resolver.sbtPluginRepo("releases")
   )
 

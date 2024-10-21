@@ -299,7 +299,6 @@ trait Import {
   type InlineConfiguration = sbt.librarymanagement.ModuleDescriptorConfiguration
   val IvyScala = sbt.librarymanagement.ScalaModuleInfo
   type IvyScala = sbt.librarymanagement.ScalaModuleInfo
-  val JCenterRepository = sbt.librarymanagement.Resolver.JCenterRepository
   val JavaNet2Repository = sbt.librarymanagement.Resolver.JavaNet2Repository
   import sbt.librarymanagement.{ InclExclRule, DependencyBuilders }
   given Conversion[String, InclExclRule] = InclExclRule.stringToExclusionRule

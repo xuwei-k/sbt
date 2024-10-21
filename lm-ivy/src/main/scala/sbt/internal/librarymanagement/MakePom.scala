@@ -480,8 +480,6 @@ class MakePom(val log: Logger) {
     val mavenRepositories =
       repositories.flatMap {
         // TODO - Would it be ok if bintray were in the pom?   We should avoid it for now.
-        case m: CustomRemoteMavenResolver if m.repo.root == JCenterRepository.root         => Nil
-        case m: IBiblioResolver if m.isM2compatible && m.getRoot == JCenterRepository.root => Nil
         case m: CustomRemoteMavenResolver if m.repo.root != DefaultMavenRepository.root =>
           MavenRepository(m.repo.name, m.repo.root) :: Nil
         case m: IBiblioResolver if m.isM2compatible && m.getRoot != DefaultMavenRepository.root =>
