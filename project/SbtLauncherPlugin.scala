@@ -1,5 +1,5 @@
-import sbt.Keys._
-import sbt._
+import sbt.Keys.*
+import sbt.*
 import sbt.io.CopyOptions
 
 object SbtLauncherPlugin extends AutoPlugin {
@@ -11,7 +11,7 @@ object SbtLauncherPlugin extends AutoPlugin {
     val rawSbtLaunchJar =
       taskKey[File]("The released version of the sbt-launcher we use to bundle this application.")
   }
-  import autoImport._
+  import autoImport.*
 
   override def projectConfigurations: Seq[Configuration] = Seq(SbtLaunchConfiguration)
   override def projectSettings: Seq[Setting[_]] = Seq(

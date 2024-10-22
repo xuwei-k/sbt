@@ -9,14 +9,14 @@ package sbt
 
 import java.net.URI
 
-import sbt.Def._
+import sbt.Def.*
 import sbt.internal.TestBuild
-import sbt.internal.TestBuild._
+import sbt.internal.TestBuild.*
 import sbt.internal.util.AttributeKey
 import sbt.internal.util.complete.DefaultParsers
 import sbt.librarymanagement.Configuration
-import hedgehog._
-import hedgehog.runner._
+import hedgehog.*
+import hedgehog.runner.*
 
 object ParserSpec extends Properties {
   override def tests: List[Test] =

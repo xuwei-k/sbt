@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement.formats
 
-import sjsonnew._
-import xsbti._
+import sjsonnew.*
+import xsbti.*
 import sbt.util.Logger.Null
 
 /**

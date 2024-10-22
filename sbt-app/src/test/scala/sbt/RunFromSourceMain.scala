@@ -55,7 +55,7 @@ object RunFromSourceMain {
       sys.error(
         s"Must specify working directory, scala version and sbt version and classpath as the first three arguments"
       )
-    case Array(wd, scalaVersion, sbtVersion, classpath, args @ _*) =>
+    case Array(wd, scalaVersion, sbtVersion, classpath, args*) =>
       System.setProperty("jna.nosys", "true")
       if (args.exists(_.startsWith("<"))) System.setProperty("sbt.io.virtual", "false")
       val context = LoggerContext()

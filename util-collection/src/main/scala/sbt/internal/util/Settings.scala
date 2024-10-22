@@ -16,8 +16,8 @@ sealed trait Settings[ScopeType]:
   def data: Map[ScopeType, AttributeMap]
   def keys(scope: ScopeType): Set[AttributeKey[_]]
   def scopes: Set[ScopeType]
-  def definingScope(scope: ScopeType, key: AttributeKey[_]): Option[ScopeType]
-  def allKeys[A](f: (ScopeType, AttributeKey[_]) => A): Seq[A]
+  def definingScope(scope: ScopeType, key: AttributeKey[?]): Option[ScopeType]
+  def allKeys[A](f: (ScopeType, AttributeKey[?]) => A): Seq[A]
   def get[A](scope: ScopeType, key: AttributeKey[A]): Option[A]
   def getDirect[A](scope: ScopeType, key: AttributeKey[A]): Option[A]
   def set[A](scope: ScopeType, key: AttributeKey[A], value: A): Settings[ScopeType]
@@ -31,7 +31,7 @@ private final class Settings0[ScopeType](
   def scopes: Set[ScopeType] = data.keySet
   def keys(scope: ScopeType) = data(scope).keys.toSet
 
-  def allKeys[A](f: (ScopeType, AttributeKey[_]) => A): Seq[A] =
+  def allKeys[A](f: (ScopeType, AttributeKey[?]) => A): Seq[A] =
     data.flatMap { case (scope, map) =>
       map.keys.map(k => f(scope, k))
     }.toSeq
@@ -41,7 +41,7 @@ private final class Settings0[ScopeType](
       getDirect(sc, key)
     }.headOption
 
-  def definingScope(scope: ScopeType, key: AttributeKey[_]): Option[ScopeType] =
+  def definingScope(scope: ScopeType, key: AttributeKey[?]): Option[ScopeType] =
     delegates(scope).find { sc =>
       getDirect(sc, key).isDefined
     }
@@ -77,7 +77,7 @@ trait Init[ScopeType]:
   type ValidatedRef[A] = Either[Undefined, ScopedKey[A]]
   type ValidatedInit[A] = Either[Seq[Undefined], Initialize[A]]
   type ValidateRef = [a] => ScopedKey[a] => ValidatedRef[a]
-  type ScopeLocal = ScopedKey[_] => Seq[Setting[_]]
+  type ScopeLocal = ScopedKey[?] => Seq[Setting[_]]
   type MapConstant = [a] => ScopedKey[a] => Option[a]
 
   private[sbt] abstract class ValidateKeyRef {
@@ -141,7 +141,7 @@ trait Init[ScopeType]:
       s: Setting[A1],
       allowDynamic: Boolean = false,
       filter: ScopeType => Boolean = const(true),
-      trigger: AttributeKey[_] => Boolean = const(true),
+      trigger: AttributeKey[?] => Boolean = const(true),
       default: Boolean = false
   ): Setting[A1] =
     deriveAllowed(s, allowDynamic) foreach sys.error
@@ -150,7 +150,7 @@ trait Init[ScopeType]:
     else d
 
   def deriveAllowed[T](s: Setting[T], allowDynamic: Boolean): Option[String] = s.init match {
-    case _: Bind[_, _] if !allowDynamic => Some("Cannot derive from dynamic dependencies.")
+    case _: Bind[?, ?] if !allowDynamic => Some("Cannot derive from dynamic dependencies.")
     case _                              => None
   }
 
@@ -181,7 +181,7 @@ trait Init[ScopeType]:
     val result = new java.util.LinkedHashSet[Setting[_]]
     val others = new java.util.ArrayList[Setting[_]]
     ss.foreach {
-      case u: DefaultSetting[_] => result.add(u)
+      case u: DefaultSetting[?] => result.add(u)
       case r                    => others.add(r)
     }
     result.addAll(others)
@@ -277,7 +277,7 @@ trait Init[ScopeType]:
       delegates: ScopeType => Seq[ScopeType],
       display: Show[ScopedKey[_]]
   ): ScopedMap = {
-    def refMap(ref: Setting[_], isFirst: Boolean) = new ValidateKeyRef {
+    def refMap(ref: Setting[?], isFirst: Boolean) = new ValidateKeyRef {
       def apply[T](k: ScopedKey[T], selfRefOk: Boolean) =
         delegateForKey(sMap, k, delegates(k.scope), ref, selfRefOk || !isFirst)
     }
@@ -288,7 +288,7 @@ trait Init[ScopeType]:
     Par(backing).foreach { case (key, settings) =>
       val valid = new java.util.ArrayList[Setting[_]]
       val undefs = new java.util.ArrayList[Undefined]
-      def validate(s: Setting[_], first: Boolean): Unit = {
+      def validate(s: Setting[?], first: Boolean): Unit = {
         s.validateKeyReferenced(refMap(s, first)) match {
           case Right(v) => valid.add(v); ()
           case Left(us) => us.foreach(u => undefs.add(u))
@@ -315,7 +315,7 @@ trait Init[ScopeType]:
       sMap: ScopedMap,
       k: ScopedKey[A1],
       scopes: Seq[ScopeType],
-      ref: Setting[_],
+      ref: Setting[?],
       selfRefOk: Boolean
   ): Either[Undefined, ScopedKey[A1]] =
     val skeys = scopes.iterator.map(x => ScopedKey(x, k.key))
@@ -360,13 +360,13 @@ trait Init[ScopeType]:
       u.referencedKey
     ) + " from " + refString + sourceString + derivedString + guessedString
 
-  private def parenPosString(s: Setting[_]): String =
+  private def parenPosString(s: Setting[?]): String =
     s.positionString match { case None => ""; case Some(s) => " (" + s + ")" }
 
   def guessIntendedScope(
       validKeys: Seq[ScopedKey[_]],
       delegates: ScopeType => Seq[ScopeType],
-      key: ScopedKey[_]
+      key: ScopedKey[?]
   ): Option[ScopedKey[_]] =
     val distances = validKeys.flatMap { validKey =>
       refinedDistance(delegates, validKey, key).map(dist => (dist, validKey))
@@ -375,8 +375,8 @@ trait Init[ScopeType]:
 
   def refinedDistance(
       delegates: ScopeType => Seq[ScopeType],
-      a: ScopedKey[_],
-      b: ScopedKey[_]
+      a: ScopedKey[?],
+      b: ScopedKey[?]
   ): Option[Int] =
     if a.key != b.key || a == b then None
     else {
@@ -413,7 +413,7 @@ trait Init[ScopeType]:
     override def toString = showFullKey.show(key)
   end Compiled
 
-  final class Flattened(val key: ScopedKey[_], val dependencies: Iterable[ScopedKey[_]])
+  final class Flattened(val key: ScopedKey[?], val dependencies: Iterable[ScopedKey[_]])
 
   def flattenLocals(compiled: CompiledMap): Map[ScopedKey[_], Flattened] = {
     val locals = compiled flatMap { case (key, comp) =>
@@ -428,7 +428,7 @@ trait Init[ScopeType]:
     )
     def flatten(
         cmap: Map[ScopedKey[_], Flattened],
-        key: ScopedKey[_],
+        key: ScopedKey[?],
         deps: Iterable[ScopedKey[_]]
     ): Flattened =
       new Flattened(
@@ -516,14 +516,14 @@ trait Init[ScopeType]:
   ): Seq[Setting[_]] = {
     import collection.mutable
 
-    final class Derived(val setting: DerivedSetting[_]) {
+    final class Derived(val setting: DerivedSetting[?]) {
       val dependencies = setting.dependencies.map(_.key)
       def triggeredBy = dependencies.filter(setting.trigger)
       val inScopes = new mutable.HashSet[ScopeType]
       val outputs = new mutable.ListBuffer[Setting[_]]
     }
 
-    final class Deriveds(val key: AttributeKey[_], val settings: mutable.ListBuffer[Derived]) {
+    final class Deriveds(val key: AttributeKey[?], val settings: mutable.ListBuffer[Derived]) {
       def dependencies = settings.flatMap(_.dependencies)
       // This is mainly for use in the cyclic reference error message
       override def toString =
@@ -533,7 +533,7 @@ trait Init[ScopeType]:
     // separate `derived` settings from normal settings (`defs`)
     val (derived, rawDefs) =
       Util.separate[Setting[_], Derived, Setting[_]](init) {
-        case d: DerivedSetting[_] => Left(new Derived(d)); case s => Right(s)
+        case d: DerivedSetting[?] => Left(new Derived(d)); case s => Right(s)
       }
     val defs = addLocal(rawDefs)(scopeLocal)
 
@@ -561,7 +561,7 @@ trait Init[ScopeType]:
     addDefs(defs)
 
     // true iff the scoped key is in `defined`, taking delegation into account
-    def isDefined(key: AttributeKey[_], scope: ScopeType) =
+    def isDefined(key: AttributeKey[?], scope: ScopeType) =
       delegates(scope).exists(s => defined.contains(ScopedKey(s, key)))
 
     // true iff all dependencies of derived setting `d` have a value (potentially via delegation) in `scope`
@@ -578,7 +578,7 @@ trait Init[ScopeType]:
     //   2. it applies to outputScope (as determined by its `filter`)
     //   3. all of its dependencies are defined for outputScope (allowing for delegation)
     // This needs to handle local settings because a derived setting wouldn't be injected if it's local setting didn't exist yet.
-    val deriveFor = (sk: ScopedKey[_]) => {
+    val deriveFor = (sk: ScopedKey[?]) => {
       val derivedForKey: List[Derived] = derivedBy.get(sk.key).toList.flatten
       val scope = sk.scope
       def localAndDerived(d: Derived): Seq[Setting[_]] = {
@@ -615,7 +615,7 @@ trait Init[ScopeType]:
     // settings that were derived.
     val allDefs = addLocal(init)(scopeLocal)
     allDefs.flatMap {
-      case d: DerivedSetting[_] => (derivedToStruct get d map (_.outputs)).toSeq.flatten
+      case d: DerivedSetting[?] => (derivedToStruct get d map (_.outputs)).toSeq.flatten
       case s                    => s :: nil
     }
   }
@@ -744,7 +744,7 @@ trait Init[ScopeType]:
       i: Initialize[A1],
       p: SourcePosition,
       val filter: ScopeType => Boolean,
-      val trigger: AttributeKey[_] => Boolean
+      val trigger: AttributeKey[?] => Boolean
   ) extends Setting[A1](sk, i, p):
 
     override def make[B](key: ScopedKey[B], init: Initialize[B], pos: SourcePosition): Setting[B] =
@@ -770,7 +770,7 @@ trait Init[ScopeType]:
 
     override final def equals(o: Any): Boolean =
       o match
-        case d: DefaultSetting[_] => d.id == id
+        case d: DefaultSetting[?] => d.id == id
         case _                    => false
 
     override def toString: String = s"default($id) " + super.toString
@@ -1001,9 +1001,9 @@ trait Init[ScopeType]:
 
   private def remove[A](s: Seq[A], v: A) = s.filterNot(_ == v)
 
-  final class Undefined private[sbt] (val defining: Setting[_], val referencedKey: ScopedKey[_])
+  final class Undefined private[sbt] (val defining: Setting[?], val referencedKey: ScopedKey[?])
 
-  def Undefined(defining: Setting[_], referencedKey: ScopedKey[_]): Undefined =
+  def Undefined(defining: Setting[?], referencedKey: ScopedKey[?]): Undefined =
     new Undefined(defining, referencedKey)
 
   final class RuntimeUndefined(val undefined: Seq[Undefined])
@@ -1014,7 +1014,7 @@ trait Init[ScopeType]:
       }.mkString
   end RuntimeUndefined
 
-  private final class InvalidReference(val key: ScopedKey[_])
+  private final class InvalidReference(val key: ScopedKey[?])
       extends RuntimeException(
         "Internal settings error: invalid reference to " + showFullKey.show(key)
       )

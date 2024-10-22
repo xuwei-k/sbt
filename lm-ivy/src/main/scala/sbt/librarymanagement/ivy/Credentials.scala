@@ -67,7 +67,7 @@ object Credentials {
   private val UserKeys = List("user", "user.name", "username")
   private val PasswordKeys = List("password", "pwd", "pass", "passwd")
 
-  import scala.jdk.CollectionConverters._
+  import scala.jdk.CollectionConverters.*
   private def read(from: File): Map[String, String] = {
     val properties = new java.util.Properties
     IO.load(properties, from)

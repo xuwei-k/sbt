@@ -280,7 +280,7 @@ object Help {
   def briefOnly(help: Seq[(String, String)]): Help = apply(help, Map.empty[String, String])
   def detailOnly(help: Seq[(String, String)]): Help = apply(Nil, help.toMap)
 
-  import CommandUtil._
+  import CommandUtil.*
 
   def message(h: Help, arg: Option[String]): String =
     arg match {

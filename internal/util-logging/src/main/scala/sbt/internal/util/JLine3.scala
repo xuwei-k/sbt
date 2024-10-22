@@ -15,7 +15,7 @@ import java.util.{ Arrays, EnumSet }
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 import org.jline.utils.InfoCmp.Capability
 import org.jline.utils.{ ClosedException, NonBlockingReader }
-import org.jline.terminal.{ Attributes, Size, Terminal => JTerminal }
+import org.jline.terminal.{ Attributes, Size, Terminal as JTerminal }
 import org.jline.terminal.Attributes.{ InputFlag, LocalFlag }
 import org.jline.terminal.Terminal.SignalHandler
 import org.jline.terminal.impl.{ AbstractTerminal, DumbTerminal }

@@ -70,7 +70,7 @@ sealed trait ProjectDefinition[PR <: ProjectReference] {
   override final def hashCode: Int = id.hashCode ^ base.hashCode ^ getClass.hashCode
 
   override final def equals(o: Any) = o match {
-    case p: ProjectDefinition[_] => p.getClass == this.getClass && p.id == id && p.base == base
+    case p: ProjectDefinition[?] => p.getClass == this.getClass && p.id == id && p.base == base
     case _                       => false
   }
 
@@ -142,7 +142,7 @@ sealed trait Project extends ProjectDefinition[ProjectReference] with CompositeP
 
   /** Appends settings to the current settings sequence for this project. */
   def settings(ss: Def.SettingsDefinition*): Project =
-    copy(settings = (settings: Seq[Def.Setting[_]]) ++ Def.settings(ss: _*))
+    copy(settings = (settings: Seq[Def.Setting[_]]) ++ Def.settings(ss*))
 
   /**
    * Sets the [[AutoPlugin]]s of this project.
@@ -328,7 +328,7 @@ object Project:
   private def validProjectIDStart(id: String): Boolean =
     DefaultParsers.parse(id, DefaultParsers.IDStart).isRight
 
-  def fillTaskAxis(scoped: ScopedKey[_]): ScopedKey[_] =
+  def fillTaskAxis(scoped: ScopedKey[?]): ScopedKey[?] =
     ScopedKey(Scope.fillTaskAxis(scoped.scope, scoped.key), scoped.key)
 
   def mapScope(f: Scope => Scope): [a] => ScopedKey[a] => ScopedKey[a] =

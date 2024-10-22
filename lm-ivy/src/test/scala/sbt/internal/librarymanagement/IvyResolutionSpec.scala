@@ -1,6 +1,6 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 class IvyResolutionSpec extends ResolutionSpec with BaseIvySpecification {
   override val resolvers = Vector(

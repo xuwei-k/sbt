@@ -2,7 +2,7 @@ package lmcoursier.internal
 
 import java.util.concurrent.ConcurrentHashMap
 
-import coursier.core._
+import coursier.core.*
 import sbt.librarymanagement.UpdateReport
 import coursier.cache.FileCache
 import coursier.util.Task
@@ -10,7 +10,7 @@ import coursier.util.Task
 // private[coursier]
 class SbtCoursierCache {
 
-  import SbtCoursierCache._
+  import SbtCoursierCache.*
 
   private val resolutionsCache =
     new ConcurrentHashMap[ResolutionKey, Map[Configuration, Resolution]]

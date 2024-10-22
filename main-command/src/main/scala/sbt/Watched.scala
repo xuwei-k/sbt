@@ -11,14 +11,14 @@ package sbt
 import java.io.File
 import java.nio.file.FileSystems
 
-import sbt.internal.LabeledFunctions._
+import sbt.internal.LabeledFunctions.*
 import sbt.internal.LegacyWatched
 import sbt.internal.io.{ EventMonitor, Source, WatchState }
 import sbt.internal.util.Types.const
 import sbt.internal.util.AttributeKey
-import sbt.io._
+import sbt.io.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Properties
 import scala.annotation.nowarn
 

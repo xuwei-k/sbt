@@ -7,7 +7,7 @@
 
 package sbt.internal.util
 
-import Types._
+import Types.*
 import scala.reflect.ClassTag
 import sbt.util.OptJsonWriter
 import sjsonnew.*
@@ -233,7 +233,7 @@ object AttributeMap {
   def apply(entries: Iterable[AttributeEntry[_]]): AttributeMap = empty ++ entries
 
   /** Constructs an [[AttributeMap]] containing the given `entries`. */
-  def apply(entries: AttributeEntry[_]*): AttributeMap = empty ++ entries
+  def apply(entries: AttributeEntry[?]*): AttributeMap = empty ++ entries
 
   /** Presents an `AttributeMap` as a natural transformation. */
   // implicit def toNatTrans(map: AttributeMap): AttributeKey ~> Id = λ[AttributeKey ~> Id](map(_))
@@ -317,7 +317,7 @@ object Attributed:
         (entry._1.toString, entry._2),
     (entries: Seq[(String, String)]) =>
       Map((entries.map: entry =>
-        (StringAttributeKey(entry._1), entry._2)): _*),
+        (StringAttributeKey(entry._1), entry._2))*),
   )
 
   given [A1: ClassTag: JsonFormat]

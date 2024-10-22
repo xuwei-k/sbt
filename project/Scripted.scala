@@ -2,7 +2,7 @@ package local
 
 import java.lang.reflect.InvocationTargetException
 
-import sbt._
+import sbt.*
 import sbt.internal.inc.ScalaInstance
 import sbt.internal.inc.classpath.{ ClasspathUtilities, FilteredLoader }
 import scala.annotation.nowarn
@@ -29,7 +29,7 @@ object Scripted {
 
   val RepoOverrideTest = config("repoOverrideTest") extend Compile
 
-  import sbt.complete._
+  import sbt.complete.*
 
   // Paging, 1-index based.
   final case class ScriptedTestPage(page: Int, total: Int)
@@ -37,7 +37,7 @@ object Scripted {
   // FIXME: Duplicated with ScriptedPlugin.scriptedParser, this can be
   // avoided once we upgrade build.properties to 0.13.14
   def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
-    import DefaultParsers._
+    import DefaultParsers.*
 
     val scriptedFiles: NameFilter = ("test": NameFilter) | "pending"
     val pairs = (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get map {

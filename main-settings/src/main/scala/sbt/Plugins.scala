@@ -18,10 +18,10 @@ import sbt.librarymanagement.Configuration
 import sbt.internal.util.logic.{ Atom, Clause, Clauses, Formula, Literal, Logic, Negated }
 import Logic.{ CyclicNegation, InitialContradictions, InitialOverlap, LogicException }
 import Def.Setting
-import Plugins._
+import Plugins.*
 import annotation.tailrec
 import sbt.util.Logger
-import PluginTrigger._
+import PluginTrigger.*
 
 /**
  * An AutoPlugin defines a group of settings and the conditions where the settings are automatically added to a build (called "activation").
@@ -113,7 +113,7 @@ abstract class AutoPlugin extends Plugins.Basic with PluginsFunctions {
   def extraProjects: Seq[Project] = Nil
 
   /** The [[Project]]s to add to the current build based on an existing project. */
-  def derivedProjects(@deprecated("unused", "") proj: ProjectDefinition[_]): Seq[Project] = Nil
+  def derivedProjects(@deprecated("unused", "") proj: ProjectDefinition[?]): Seq[Project] = Nil
 
   private[sbt] def unary_! : Exclude = Exclude(this)
 
@@ -280,7 +280,7 @@ object Plugins extends PluginsFunctions {
   private def duplicateProvidesError(byAtom: Seq[(Atom, AutoPlugin)]): Unit = {
     val dupsByAtom = Map(byAtom.groupBy(_._1).toSeq.map { case (k, v) =>
       k -> v.map(_._2)
-    }: _*)
+    }*)
     val dupStrings =
       for ((atom, dups) <- dupsByAtom if dups.size > 1)
         yield s"${atom.label} by ${dups.mkString(", ")}"
@@ -437,7 +437,7 @@ ${listConflicts(conflicting)}""")
     import java.lang.reflect.Field
     import scala.util.control.Exception.catching
     // Make sure that we don't detect user-defined methods called autoImport
-    def existsAutoImportVal(clazz: Class[_]): Option[Field] = {
+    def existsAutoImportVal(clazz: Class[?]): Option[Field] = {
       catching(classOf[NoSuchFieldException])
         .opt(clazz.getDeclaredField(autoImport))
         .orElse(Option(clazz.getSuperclass).flatMap(existsAutoImportVal))

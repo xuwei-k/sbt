@@ -67,7 +67,7 @@ private[sbt] object KeyMacro:
     This(enclosingClass).asExpr
 
   private def enclosingTerm(using qctx: Quotes) =
-    import qctx.reflect._
+    import qctx.reflect.*
     def enclosingTerm0(sym: Symbol): Symbol =
       sym match
         case sym if sym.flags is Flags.Macro => enclosingTerm0(sym.owner)

@@ -8,11 +8,11 @@
 
 package sbt.test
 
-import sbt._
+import sbt.*
 
 object TupleSyntaxTest:
   def t1[A](a: SettingKey[A], b: TaskKey[A], c: Def.Initialize[A], d: Def.Initialize[Task[A]]) = {
-    import sbt.TupleSyntax._
+    import sbt.TupleSyntax.*
     (a, b, c.toTaskable, d.toTaskable).mapN { (x: A, y: A, z: A, w: A) =>
       "" + x + y + z + w
     }

@@ -15,7 +15,7 @@ import java.util.concurrent.Callable
 
 import sbt.internal.util.FullLogger
 import sbt.io.IO
-import xsbti._
+import xsbti.*
 import xsbti.ArtifactInfo.SbtOrganization
 
 /**

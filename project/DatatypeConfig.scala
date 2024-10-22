@@ -1,4 +1,4 @@
-import sbt.contraband.ast._
+import sbt.contraband.ast.*
 import sbt.contraband.CodecCodeGen
 
 object DatatypeConfig {

@@ -105,7 +105,7 @@ object ScopeFilter {
      * static inspections will not show them.
      */
     def all(sfilter: => ScopeFilter): Initialize[Task[Seq[A]]] = Def.flatMap(getData) { data =>
-      import std.TaskExtra._
+      import std.TaskExtra.*
       sfilter(data).toSeq.map(s => Project.inScope(s, i)).join(_.join)
     }
 
@@ -176,7 +176,7 @@ object ScopeFilter {
 
     /** Selects Scopes that have a project axis with one of the provided values. */
     def inProjects(projects: ProjectReference*): ProjectFilter =
-      ScopeFilter.inProjects(projects: _*)
+      ScopeFilter.inProjects(projects*)
 
     /** Selects Scopes that have a task axis with one of the provided values. */
     def inTasks(tasks: Scoped*): TaskFilter = {

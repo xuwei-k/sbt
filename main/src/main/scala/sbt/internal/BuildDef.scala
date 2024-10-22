@@ -53,7 +53,7 @@ private[sbt] object BuildDef:
     Project(id, base).settings(defaultProjectSettings)
 
   def defaultAggregatedProject(id: String, base: File, agg: Seq[ProjectRef]): Project =
-    defaultProject(id, base).aggregate(agg: _*)
+    defaultProject(id, base).aggregate(agg*)
 
   private[sbt] def generatedRootSkipPublish(
       id: String,

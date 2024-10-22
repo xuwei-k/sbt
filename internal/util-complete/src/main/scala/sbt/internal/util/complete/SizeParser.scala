@@ -8,7 +8,7 @@
 
 package sbt.internal.util.complete
 
-import sbt.internal.util.complete.DefaultParsers._
+import sbt.internal.util.complete.DefaultParsers.*
 
 private[sbt] object SizeParser {
   def apply(s: String): Option[Long] = Parser.parse(s, value).toOption

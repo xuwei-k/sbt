@@ -4,17 +4,17 @@
 package sbt.internal.librarymanagement
 
 import java.io.File
-import java.{ util => ju }
+import java.{ util as ju }
 import collection.mutable
 import collection.immutable.ArraySeq
 import org.apache.ivy.core.{ module, report, resolve }
-import module.descriptor.{ Artifact => IvyArtifact, License => IvyLicense }
-import module.id.{ ModuleRevisionId, ModuleId => IvyModuleId }
+import module.descriptor.{ Artifact as IvyArtifact, License as IvyLicense }
+import module.id.{ ModuleRevisionId, ModuleId as IvyModuleId }
 import report.{ ArtifactDownloadReport, ConfigurationResolveReport, ResolveReport }
 import resolve.{ IvyNode, IvyNodeCallers }
-import IvyNodeCallers.{ Caller => IvyCaller }
+import IvyNodeCallers.{ Caller as IvyCaller }
 import ivyint.SbtDefaultDependencyDescriptor
-import sbt.librarymanagement._, syntax._
+import sbt.librarymanagement.*, syntax.*
 
 object IvyRetrieve {
   def reports(report: ResolveReport): Vector[ConfigurationResolveReport] =
@@ -82,9 +82,9 @@ object IvyRetrieve {
       confReport: ConfigurationResolveReport,
       dep: IvyNode
   ): ModuleReport = {
-    def toExtraAttributes(ea: ju.Map[_, _]): Map[String, String] =
+    def toExtraAttributes(ea: ju.Map[?, ?]): Map[String, String] =
       Map(ea.entrySet.toArray collect {
-        case entry: ju.Map.Entry[_, _]
+        case entry: ju.Map.Entry[?, ?]
             if nonEmptyString(entry.getKey.toString).isDefined && nonEmptyString(
               entry.getValue.toString
             ).isDefined =>
@@ -223,7 +223,7 @@ object IvyRetrieve {
       .branch(nonEmptyString(revID.getBranch))
 
   def toArtifact(art: IvyArtifact): Artifact = {
-    import art._
+    import art.*
     Artifact(
       getName,
       getType,

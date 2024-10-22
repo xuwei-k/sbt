@@ -11,7 +11,7 @@ import cache.ArtifactOrigin
 import search.{ ModuleEntry, OrganisationEntry, RevisionEntry }
 import module.id.ModuleRevisionId
 import module.descriptor.{
-  Artifact => IArtifact,
+  Artifact as IArtifact,
   DefaultArtifact,
   DependencyDescriptor,
   ModuleDescriptor

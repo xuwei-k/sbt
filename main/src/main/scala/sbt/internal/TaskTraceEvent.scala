@@ -13,7 +13,7 @@ import java.io.File
 import java.nio.file.Files
 import sbt.internal.util.{ RMap, ConsoleOut }
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sjsonnew.shaded.scalajson.ast.unsafe.JString
 import sjsonnew.support.scalajson.unsafe.CompactPrinter
 

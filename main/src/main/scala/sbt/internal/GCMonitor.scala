@@ -12,7 +12,7 @@ import javax.management.{ NotificationEmitter, NotificationListener }
 import java.lang.management.ManagementFactory
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicReference
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.jdk.CollectionConverters.*
 import scala.util.Try
 import sbt.util.Logger

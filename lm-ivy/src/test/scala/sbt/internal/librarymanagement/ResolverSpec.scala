@@ -1,8 +1,8 @@
 package sbttest
 
 import java.net.URI
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 import verify.BasicTestSuite
 
 class ResolverSpec extends BasicTestSuite {

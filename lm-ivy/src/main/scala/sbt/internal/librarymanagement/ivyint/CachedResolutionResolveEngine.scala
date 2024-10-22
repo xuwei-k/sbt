@@ -9,27 +9,27 @@ import collection.mutable
 import collection.immutable.ListMap
 import org.apache.ivy.Ivy
 import org.apache.ivy.core
-import core.resolve._
-import core.module.id.{ ModuleRevisionId, ModuleId => IvyModuleId }
+import core.resolve.*
+import core.module.id.{ ModuleRevisionId, ModuleId as IvyModuleId }
 import core.report.ResolveReport
 import core.module.descriptor.{
   DefaultModuleDescriptor,
   ModuleDescriptor,
   DefaultDependencyDescriptor,
   DependencyDescriptor,
-  Configuration => IvyConfiguration,
+  Configuration as IvyConfiguration,
   ExcludeRule,
   IncludeRule
 }
 import core.module.descriptor.{ OverrideDependencyDescriptorMediator, DependencyArtifactDescriptor }
 import core.IvyPatternHelper
 import org.apache.ivy.util.{ Message, MessageLogger }
-import org.apache.ivy.plugins.latest.{ ArtifactInfo => IvyArtifactInfo }
+import org.apache.ivy.plugins.latest.{ ArtifactInfo as IvyArtifactInfo }
 import org.apache.ivy.plugins.matcher.{ MapMatcher, PatternMatcher }
 import annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import sbt.io.{ DirectoryFilter, Hash, IO }
-import sbt.librarymanagement._, syntax._
+import sbt.librarymanagement.*, syntax.*
 import sbt.util.Logger
 
 private[sbt] object CachedResolutionResolveCache {
@@ -46,7 +46,7 @@ private[sbt] object CachedResolutionResolveCache {
 }
 
 private[sbt] class CachedResolutionResolveCache {
-  import CachedResolutionResolveCache._
+  import CachedResolutionResolveCache.*
   val updateReportCache: concurrent.Map[ModuleRevisionId, Either[ResolveException, UpdateReport]] =
     concurrent.TrieMap()
   // Used for subproject
@@ -158,7 +158,7 @@ private[sbt] class CachedResolutionResolveCache {
     (md1, IvySbt.isChanging(dd) || internalDependency(dd, prOpt).isDefined, dd)
   }
   def extractOverrides(md0: ModuleDescriptor): Vector[IvyOverride] = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     md0.getAllDependencyDescriptorMediators.getAllRules.asScala.toVector sortBy { case (k, _) =>
       k.toString
     } collect { case (k: MapMatcher, v: OverrideDependencyDescriptorMediator) =>
@@ -181,7 +181,7 @@ private[sbt] class CachedResolutionResolveCache {
   )(
       f: => Either[ResolveException, UpdateReport]
   ): Either[ResolveException, UpdateReport] = {
-    import sbt.io.syntax._
+    import sbt.io.syntax.*
     val mrid = md.getResolvedModuleRevisionId
     def extraPath(id: ModuleRevisionId, key: String, pattern: String): String =
       Option(id.getExtraAttribute(key)).fold(".")(pattern.format(_)) // "." has no affect on paths
@@ -369,7 +369,7 @@ private[sbt] trait CachedResolutionResolveEngine extends ResolveEngine {
       md0.getModuleRevisionId,
       logicalClock
     ) {
-      import sbt.io.syntax._
+      import sbt.io.syntax.*
       val start = System.currentTimeMillis
       val miniGraphPath = depDir / "module"
       val cachedDescriptor =
@@ -397,7 +397,7 @@ private[sbt] trait CachedResolutionResolveEngine extends ResolveEngine {
             doWorkUsingIvy(md)
         }
       def doWorkUsingIvy(md: ModuleDescriptor): Either[ResolveException, UpdateReport] = {
-        import scala.jdk.CollectionConverters._
+        import scala.jdk.CollectionConverters.*
         val options1 = new ResolveOptions(options0)
         val rr = withIvy(log) { ivy =>
           ivy.resolve(md, options1)
@@ -507,7 +507,7 @@ private[sbt] trait CachedResolutionResolveEngine extends ResolveEngine {
           )
       }
     }
-    new ResolveException(messages, failed, ListMap(failedPaths: _*))
+    new ResolveException(messages, failed, ListMap(failedPaths*))
   }
 
   def mergeReports(
@@ -625,7 +625,7 @@ private[sbt] trait CachedResolutionResolveEngine extends ResolveEngine {
       loopLists.toList
     }
     val allModules2: mutable.Map[(String, String), Vector[OrganizationArtifactReport]] =
-      mutable.Map(allModules0.toSeq: _*)
+      mutable.Map(allModules0.toSeq*)
     @tailrec def breakLoops(loops: List[List[(String, String)]]): Unit =
       loops match {
         case Nil => ()
@@ -836,7 +836,7 @@ private[sbt] trait CachedResolutionResolveEngine extends ResolveEngine {
           }
           Seq(((organization, name), oars))
       }
-    Map(reports: _*)
+    Map(reports*)
   }
 
   /**

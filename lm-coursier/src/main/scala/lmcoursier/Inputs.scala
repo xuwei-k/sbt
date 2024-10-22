@@ -1,6 +1,6 @@
 package lmcoursier
 
-import coursier.ivy.IvyXml.{ mappings => initialIvyXmlMappings }
+import coursier.ivy.IvyXml.{ mappings as initialIvyXmlMappings }
 import lmcoursier.definitions.{ Configuration, Module, ModuleName, Organization }
 import sbt.librarymanagement.{ CrossVersion, InclExclRule, ModuleID }
 import sbt.util.Logger

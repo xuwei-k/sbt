@@ -15,7 +15,7 @@ import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
 
 object JLineCompletion {
-  def installCustomCompletor(reader: ConsoleReader, parser: Parser[_]): Unit =
+  def installCustomCompletor(reader: ConsoleReader, parser: Parser[?]): Unit =
     installCustomCompletor(reader)(parserAsCompletor(parser))
 
   def installCustomCompletor(reader: ConsoleReader)(
@@ -69,7 +69,7 @@ object JLineCompletion {
     }
   }
 
-  def parserAsCompletor(p: Parser[_]): (String, Int) => (Seq[String], Seq[String]) =
+  def parserAsCompletor(p: Parser[?]): (String, Int) => (Seq[String], Seq[String]) =
     (str, level) => convertCompletions(Parser.completions(p, str, level))
 
   def convertCompletions(c: Completions): (Seq[String], Seq[String]) = {

@@ -2,7 +2,7 @@ package sbt.internal.librarymanagement
 
 import java.io.File
 import sbt.util.{ CacheStore, Logger }
-import sbt.librarymanagement._, LibraryManagementCodec._
+import sbt.librarymanagement.*, LibraryManagementCodec.*
 import sbt.io.IO
 
 private[sbt] object JsonUtil {

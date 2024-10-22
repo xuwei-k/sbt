@@ -14,12 +14,12 @@ import scala.collection.immutable.ListMap
 import scala.annotation.tailrec
 import scala.util.{ Try, Success, Failure }
 import sbt.io.{ IO, Path }
-import sbt.io.syntax._
-import sbt.Cross._
+import sbt.io.syntax.*
+import sbt.Cross.*
 import sbt.Def.{ ScopedKey, Setting }
 import sbt.ProjectExtra.extract
 import sbt.SlashSyntax0.given
-import sbt.internal.util.complete.DefaultParsers._
+import sbt.internal.util.complete.DefaultParsers.*
 import sbt.internal.util.AttributeKey
 import sbt.internal.util.complete.{ DefaultParsers, Parser }
 import sbt.internal.CommandStrings.{
@@ -133,16 +133,16 @@ private[sbt] object CrossJava {
   private case class SwitchJavaHome(target: SwitchTarget, verbose: Boolean, command: Option[String])
 
   private def switchParser(state: State): Parser[SwitchJavaHome] = {
-    import DefaultParsers._
+    import DefaultParsers.*
     def versionAndCommand(spacePresent: Boolean) = {
       val x = Project.extract(state)
-      import x._
+      import x.*
       val javaHomes = getJavaHomesTyped(x, currentRef)
       val knownVersions = javaHomes.keysIterator.map(_.numberStr).toVector
       val version: Parser[SwitchTarget] =
         (token(
           (StringBasic <~ "@").? ~ ((NatBasic) ~ ("." ~> NatBasic).*)
-            .examples(knownVersions: _*) ~ "!".?
+            .examples(knownVersions*) ~ "!".?
         ) || token(StringBasic))
           .map {
             case Left(((vendor, (v1, vs)), bang)) =>
@@ -170,7 +170,7 @@ private[sbt] object CrossJava {
       extracted: Extracted,
       proj: ResolvedReference
   ): Map[String, File] = {
-    import extracted._
+    import extracted.*
     ((proj / Keys.fullJavaHomes) get structure.data).get
   }
 
@@ -185,14 +185,14 @@ private[sbt] object CrossJava {
       extracted: Extracted,
       proj: ResolvedReference
   ): Seq[String] = {
-    import extracted._
-    import Keys._
+    import extracted.*
+    import Keys.*
     ((proj / crossJavaVersions) get structure.data).getOrElse(Nil)
   }
 
   private def getCrossJavaHomes(extracted: Extracted, proj: ResolvedReference): Seq[File] = {
-    import extracted._
-    import Keys._
+    import extracted.*
+    import Keys.*
     val fjh = ((proj / fullJavaHomes) get structure.data).get
     ((proj / crossJavaVersions) get structure.data) map { jvs =>
       jvs map { jv =>
@@ -203,7 +203,7 @@ private[sbt] object CrossJava {
 
   private def switchCommandImpl(state: State, switch: SwitchJavaHome): State = {
     val extracted = Project.extract(state)
-    import extracted._
+    import extracted.*
     import Keys.javaHome
 
     // filter out subprojects based on switch target e.g. "10" vs what's in crossJavaVersions
@@ -279,7 +279,7 @@ private[sbt] object CrossJava {
 
   private def crossJavaHomeCommandImpl(state: State, args: CrossArgs): State = {
     val x = Project.extract(state)
-    import x._
+    import x.*
     val (aggs, aggCommand) = Cross.parseSlashCommand(x)(args.command)
     val projCrossVersions = aggs map { proj =>
       proj -> getCrossJavaHomes(x, proj)

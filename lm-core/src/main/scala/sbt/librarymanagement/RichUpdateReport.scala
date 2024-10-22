@@ -26,7 +26,7 @@ final class RichUpdateReport(report: UpdateReport) {
     UpdateReport(report.cachedDescriptor, report.configurations, report.stats, stamps)
   }
 
-  import DependencyFilter._
+  import DependencyFilter.*
 
   /** Obtains all successfully retrieved files in all configurations and modules. */
   def allFiles: Vector[File] = matching(DependencyFilter.allPass)
@@ -113,7 +113,7 @@ final class RichUpdateReport(report: UpdateReport) {
 
   private[sbt] def moduleReportMap(f: (ConfigRef, ModuleReport) => ModuleReport): UpdateReport = {
     val newConfigurations = report.configurations.map { confReport =>
-      import confReport._
+      import confReport.*
       val newModules = modules map { modReport =>
         f(configuration, modReport)
       }

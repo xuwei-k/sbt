@@ -10,7 +10,7 @@ package sbt.internal.util
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import sbt.util._
+import sbt.util.*
 import sbt.internal.util.appmacro.StringTypeTag
 import java.io.{ File, PrintWriter }
 import sbt.io.Using
@@ -28,7 +28,7 @@ class ManagedLoggerSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "support event logging" in {
-    import sjsonnew.BasicJsonProtocol._
+    import sjsonnew.BasicJsonProtocol.*
     val log = newLogger("foo")
     context.addAppender("foo", asyncStdout -> Level.Info)
     log.infoEvent(1)
@@ -47,14 +47,14 @@ class ManagedLoggerSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "support logging Throwable out of the box" in {
-    import sbt.internal.util.codec.JsonProtocol._
+    import sbt.internal.util.codec.JsonProtocol.*
     val log = newLogger("foo")
     context.addAppender("foo", asyncStdout -> Level.Info)
     log.infoEvent(SuccessEvent("yes"))
   }
 
   it should "allow registering Show[Int]" in {
-    import sjsonnew.BasicJsonProtocol._
+    import sjsonnew.BasicJsonProtocol.*
     val log = newLogger("foo")
     context.addAppender("foo", asyncStdout -> Level.Info)
     implicit val intShow: ShowLines[Int] =
@@ -64,7 +64,7 @@ class ManagedLoggerSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "allow registering Show[Array[Int]]" in {
-    import sjsonnew.BasicJsonProtocol._
+    import sjsonnew.BasicJsonProtocol.*
     val log = newLogger("foo")
     context.addAppender("foo", asyncStdout -> Level.Info)
     implicit val intArrayShow: ShowLines[Array[Int]] =
@@ -74,7 +74,7 @@ class ManagedLoggerSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "allow registering Show[Vector[Vector[Int]]]" in {
-    import sjsonnew.BasicJsonProtocol._
+    import sjsonnew.BasicJsonProtocol.*
     val log = newLogger("foo")
     context.addAppender("foo", asyncStdout -> Level.Info)
     implicit val intVectorShow: ShowLines[Vector[Vector[Int]]] =

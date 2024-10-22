@@ -20,10 +20,10 @@ import sbt.librarymanagement.{
   UpdateConfiguration,
   VersionNumber,
 }
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 import xsbti.ArtifactInfo.SbtOrganization
-import xsbti._
-import xsbti.compile.{ ClasspathOptions, ScalaInstance => XScalaInstance }
+import xsbti.*
+import xsbti.compile.{ ClasspathOptions, ScalaInstance as XScalaInstance }
 
 object ZincLmUtil {
 

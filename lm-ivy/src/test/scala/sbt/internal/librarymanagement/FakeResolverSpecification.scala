@@ -7,7 +7,7 @@ import java.io.File
 import sbt.librarymanagement.{ ModuleID, RawRepository, Resolver, UpdateReport, ResolveException }
 
 object FakeResolverSpecification extends BaseIvySpecification {
-  import FakeResolver._
+  import FakeResolver.*
 
   val myModule =
     ModuleID("org.example", "my-module", "0.0.1-SNAPSHOT").withConfigurations(Some("compile"))

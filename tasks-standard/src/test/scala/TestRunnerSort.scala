@@ -8,9 +8,9 @@
 
 package sbt
 
-import org.scalacheck._
-import Prop._
-import TaskGen._
+import org.scalacheck.*
+import Prop.*
+import TaskGen.*
 
 object TaskRunnerSortTest extends Properties("TaskRunnerSort") {
   property("sort") = forAll(TaskListGen, MaxWorkersGen) { (list: List[Int], workers: Int) =>

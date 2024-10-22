@@ -35,7 +35,7 @@ sealed trait Reference:
 
   final def /[K](key: Scoped.ScopingSetting[K]): K = key.rescope(asScope)
 
-  final def /(key: AttributeKey[_]): Scope = asScope.rescope(key)
+  final def /(key: AttributeKey[?]): Scope = asScope.rescope(key)
 end Reference
 
 /** A fully resolved, unique identifier for a project or build. */

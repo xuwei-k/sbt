@@ -1,8 +1,8 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.internal.librarymanagement.cross.CrossVersionUtil
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 import sbt.util.Level
 
 object EvictionErrorSpec extends BaseIvySpecification {

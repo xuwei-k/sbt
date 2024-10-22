@@ -1,10 +1,10 @@
 package sbt.internal.librarymanagement
 
 import java.io.File
-import org.apache.ivy.core.module.descriptor.{ Artifact => IvyArtifact }
+import org.apache.ivy.core.module.descriptor.{ Artifact as IvyArtifact }
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.resolve.ResolveOptions
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.{ InlineIvyConfiguration, IvyPaths }
 import sbt.io.IO.withTemporaryDirectory
 import sbt.internal.util.ConsoleLogger

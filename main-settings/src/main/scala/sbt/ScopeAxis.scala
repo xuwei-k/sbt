@@ -8,7 +8,7 @@
 
 package sbt
 
-import sbt.internal.util.Util._
+import sbt.internal.util.Util.*
 
 sealed trait ScopeAxis[+S] {
   def foldStrict[T](f: S => T, ifZero: T, ifThis: T): T = fold(f, ifZero, ifThis)

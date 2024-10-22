@@ -11,7 +11,7 @@ package internal
 package scripted
 
 import java.io.File
-import scala.util.parsing.combinator._
+import scala.util.parsing.combinator.*
 import scala.util.parsing.input.Positional
 import Character.isWhitespace
 import sbt.io.IO
@@ -40,7 +40,7 @@ private object TestScriptParser {
   val WordRegex = """[^ \[\]\s'\"][^ \[\]\s]*""".r
 }
 
-import TestScriptParser._
+import TestScriptParser.*
 class TestScriptParser(handlers: Map[Char, StatementHandler]) extends RegexParsers {
   require(handlers.nonEmpty)
   override def skipWhitespace = false

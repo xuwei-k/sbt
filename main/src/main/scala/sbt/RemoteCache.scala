@@ -12,28 +12,28 @@ package internal
 import java.io.File
 import java.nio.file.Path
 
-import org.apache.ivy.core.module.descriptor.{ DefaultArtifact, Artifact => IArtifact }
+import org.apache.ivy.core.module.descriptor.{ DefaultArtifact, Artifact as IArtifact }
 import org.apache.ivy.core.report.DownloadStatus
 import org.apache.ivy.core.resolve.DownloadOptions
 import org.apache.ivy.plugins.resolver.DependencyResolver
 import sbt.Defaults.prefix
-import sbt.Keys._
-import sbt.Project.{ inConfig => _, * }
+import sbt.Keys.*
+import sbt.Project.{ inConfig as _, * }
 import sbt.ProjectExtra.*
-import sbt.ScopeFilter.Make._
+import sbt.ScopeFilter.Make.*
 import sbt.SlashSyntax0.given
 import sbt.coursierint.LMCoursier
 import sbt.internal.inc.{ HashUtil, JarUtils }
-import sbt.internal.librarymanagement._
-import sbt.internal.remotecache._
+import sbt.internal.librarymanagement.*
+import sbt.internal.remotecache.*
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.librarymanagement._
+import sbt.io.syntax.*
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.{ Credentials, IvyPaths, UpdateOptions }
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 import sbt.nio.FileStamp
 import sbt.nio.Keys.{ inputFileStamps, outputFileStamps }
-import sbt.std.TaskExtra._
+import sbt.std.TaskExtra.*
 import sbt.util.InterfaceUtil.toOption
 import sbt.util.{ ActionCacheStore, DiskActionCacheStore, Logger }
 import sjsonnew.JsonFormat
@@ -52,8 +52,8 @@ object RemoteCache {
     mutable.Map.empty
 
   private[sbt] def artifactToStr(art: Artifact): String = {
-    import LibraryManagementCodec._
-    import sjsonnew.support.scalajson.unsafe._
+    import LibraryManagementCodec.*
+    import sjsonnew.support.scalajson.unsafe.*
     val format: JsonFormat[Artifact] = summon[JsonFormat[Artifact]]
     CompactPrinter(Converter.toJsonUnsafe(art)(format))
   }
@@ -111,7 +111,7 @@ object RemoteCache {
             case _                         => None
           }
         }
-        ScopeFilter(configurations = inConfigurationsByKeys(configs: _*))
+        ScopeFilter(configurations = inConfigurationsByKeys(configs*))
       })
       .flatMapTask { case filter =>
         Def.task {
@@ -129,7 +129,7 @@ object RemoteCache {
             case _                         => None
           }
         }
-        ScopeFilter(configurations = inConfigurationsByKeys(configs: _*))
+        ScopeFilter(configurations = inConfigurationsByKeys(configs*))
       })
       .flatMapTask { case filter =>
         Def.task {

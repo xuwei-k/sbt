@@ -24,7 +24,7 @@ import sbt.librarymanagement.{
 import java.io.File
 import Configurations.Compile
 import Def.Setting
-import Keys._
+import Keys.*
 import Scope.Global
 import sbt.ProjectExtra.{ extract, setProject }
 import sbt.SlashSyntax0.given
@@ -47,7 +47,7 @@ object IvyConsole {
       val (eval, structure) = Load.defaultLoad(state, base, state.log)
       val session = Load.initialSession(structure, eval)
       val extracted = Project.extract(session, structure)
-      import extracted._
+      import extracted.*
 
       val depSettings: Seq[Setting[_]] = Seq(
         libraryDependencies ++= managed.reverse,

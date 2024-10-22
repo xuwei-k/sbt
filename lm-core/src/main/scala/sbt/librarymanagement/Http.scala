@@ -1,6 +1,6 @@
 package sbt.librarymanagement
 
-import gigahorse._, support.apachehttp.Gigahorse
+import gigahorse.*, support.apachehttp.Gigahorse
 import scala.concurrent.duration.DurationInt
 
 object Http {

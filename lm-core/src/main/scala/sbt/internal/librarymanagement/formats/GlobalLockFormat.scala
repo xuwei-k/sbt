@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement.formats
 
-import sjsonnew._
-import xsbti._
+import sjsonnew.*
+import xsbti.*
 import java.io.File
 import java.util.concurrent.Callable
 
@@ -10,7 +10,7 @@ import java.util.concurrent.Callable
  * This is mostly for making IvyConfiguration serializable to JSON.
  */
 trait GlobalLockFormat { self: BasicJsonProtocol =>
-  import GlobalLockFormats._
+  import GlobalLockFormats.*
 
   implicit lazy val globalLockIsoString: IsoString[GlobalLock] =
     IsoString.iso(_ => "<lock>", _ => NoGlobalLock)

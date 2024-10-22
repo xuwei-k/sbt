@@ -6,12 +6,12 @@ package sbt.internal.librarymanagement
 import java.util.Collections.emptyMap
 import scala.collection.mutable.HashSet
 
-import org.apache.ivy.core.module.descriptor._
+import org.apache.ivy.core.module.descriptor.*
 import org.apache.ivy.core.module.id.{ ArtifactId, ModuleId, ModuleRevisionId }
 import org.apache.ivy.plugins.matcher.ExactPatternMatcher
 import org.apache.ivy.plugins.namespace.NamespaceTransformer
 import sbt.util.Logger
-import sbt.librarymanagement.ScalaArtifacts._
+import sbt.librarymanagement.ScalaArtifacts.*
 import sbt.librarymanagement.{ Configuration, CrossVersion, ScalaModuleInfo }
 
 object IvyScalaUtil {
@@ -186,7 +186,7 @@ object IvyScalaUtil {
       if (configurations.isEmpty) names
       else {
         val configSet = configurationSet(configurations)
-        configSet.intersect(HashSet(names: _*))
+        configSet.intersect(HashSet(names*))
         configSet.toArray
       }
     }

@@ -1,8 +1,8 @@
 package lmcoursier
 
 import coursier.cache.CacheDefaults
-import lmcoursier.credentials._
-import lmcoursier.definitions._
+import lmcoursier.credentials.*
+import lmcoursier.definitions.*
 import sbt.librarymanagement.{ Resolver, UpdateConfiguration }
 import xsbti.Logger
 

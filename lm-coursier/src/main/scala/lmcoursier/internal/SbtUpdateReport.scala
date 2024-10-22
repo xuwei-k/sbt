@@ -8,7 +8,7 @@ import coursier.{ Attributes, Dependency, Module, Project, Resolution }
 import coursier.core.{ Classifier, Configuration, Extension, Info, Publication, Type }
 import coursier.maven.MavenAttributes
 import coursier.util.Artifact
-import sbt.librarymanagement.{ Artifact => _, Configuration => _, _ }
+import sbt.librarymanagement.{ Artifact as _, Configuration as _, * }
 import sbt.util.Logger
 
 import scala.annotation.tailrec

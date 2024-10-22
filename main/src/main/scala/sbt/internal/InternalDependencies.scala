@@ -9,7 +9,7 @@
 package sbt
 package internal
 
-import sbt.Keys._
+import sbt.Keys.*
 
 private[sbt] object InternalDependencies {
   def configurations: Def.Initialize[Seq[(ProjectRef, Set[String])]] = Def.setting {

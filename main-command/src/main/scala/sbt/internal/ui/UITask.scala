@@ -17,7 +17,7 @@ import sbt.BasicKeys.{ historyPath, colorShellPrompt }
 import sbt.State
 import sbt.internal.CommandChannel
 import sbt.internal.util.ConsoleAppender.{ ClearPromptLine, ClearScreenAfterCursor, DeleteLine }
-import sbt.internal.util._
+import sbt.internal.util.*
 import sbt.internal.util.complete.{ Parser }
 
 import scala.annotation.tailrec
@@ -55,7 +55,7 @@ private[sbt] object UITask {
   object Reader {
     // Avoid filling the stack trace since it isn't helpful here
     object interrupted extends InterruptedException
-    def terminalReader(parser: Parser[_])(
+    def terminalReader(parser: Parser[?])(
         terminal: Terminal,
         state: State
     ): Reader = new Reader {

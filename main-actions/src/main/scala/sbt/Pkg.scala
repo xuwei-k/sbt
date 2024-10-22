@@ -25,7 +25,7 @@ import sjsonnew.{
 }
 
 import sbt.util.Logger
-import sbt.util.CacheImplicits._
+import sbt.util.CacheImplicits.*
 import scala.sys.process.Process
 import xsbti.{ FileConverter, HashedVirtualFileRef, VirtualFile, VirtualFileRef }
 
@@ -40,10 +40,10 @@ object Pkg:
   def JarManifest(m: Manifest) = PackageOption.JarManifest(m)
   def MainClass(mainClassName: String) = PackageOption.MainClass(mainClassName)
   def MainfestAttributes(attributes: (Attributes.Name, String)*) =
-    PackageOption.ManifestAttributes(attributes: _*)
+    PackageOption.ManifestAttributes(attributes*)
   def ManifestAttributes(attributes: (String, String)*) = {
     val converted = for ((name, value) <- attributes) yield (new Attributes.Name(name), value)
-    PackageOption.ManifestAttributes(converted: _*)
+    PackageOption.ManifestAttributes(converted*)
   }
   // 2010-01-01
   private val default2010Timestamp: Long = 1262304000000L
@@ -170,8 +170,8 @@ object Pkg:
         case PackageOption.JarManifest(mergeManifest) => mergeManifests(manifest, mergeManifest)
         case PackageOption.MainClass(mainClassName) =>
           main.put(Attributes.Name.MAIN_CLASS, mainClassName)
-        case PackageOption.ManifestAttributes(attributes @ _*) => main.asScala ++= attributes
-        case PackageOption.FixedTimestamp(value)               => ()
+        case PackageOption.ManifestAttributes(attributes*) => main.asScala ++= attributes
+        case PackageOption.FixedTimestamp(value)           => ()
     setVersion(main)
     manifest
 
@@ -188,10 +188,10 @@ object Pkg:
     }
   }
   def addSpecManifestAttributes(name: String, version: String, orgName: String): PackageOption = {
-    import Attributes.Name._
+    import Attributes.Name.*
     val attribKeys = Seq(SPECIFICATION_TITLE, SPECIFICATION_VERSION, SPECIFICATION_VENDOR)
     val attribVals = Seq(name, version, orgName)
-    PackageOption.ManifestAttributes(attribKeys.zip(attribVals): _*)
+    PackageOption.ManifestAttributes(attribKeys.zip(attribVals)*)
   }
   def addImplManifestAttributes(
       name: String,
@@ -200,7 +200,7 @@ object Pkg:
       org: String,
       orgName: String
   ): PackageOption = {
-    import Attributes.Name._
+    import Attributes.Name.*
 
     // The ones in Attributes.Name are deprecated saying:
     //   "Extension mechanism will be removed in a future release. Use class path instead."
@@ -308,7 +308,7 @@ object PackageOption:
             unbuilder.endObject()
             PackageOption.ManifestAttributes(attributes.map { case (k, v) =>
               Attributes.Name(k) -> v
-            }: _*)
+            }*)
           case None => deserializationError("Expected JsObject but found None")
       override def write[J](obj: PackageOption.ManifestAttributes, builder: Builder[J]): Unit =
         builder.beginObject()

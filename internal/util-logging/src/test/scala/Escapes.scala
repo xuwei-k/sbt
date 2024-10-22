@@ -8,8 +8,8 @@
 
 package sbt.internal.util
 
-import org.scalacheck._
-import Prop._
+import org.scalacheck.*
+import Prop.*
 import Gen.{ listOf, oneOf }
 
 import EscHelpers.{ ESC, hasEscapeSequence, isEscapeTerminator, removeEscapeSequences }

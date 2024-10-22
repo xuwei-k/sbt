@@ -11,7 +11,7 @@ package scriptedtest
 
 import scala.collection.mutable
 
-import sbt.internal.scripted._
+import sbt.internal.scripted.*
 
 private[sbt] object BatchScriptRunner {
   type States = mutable.HashMap[StatementHandler, StatementHandler#State]

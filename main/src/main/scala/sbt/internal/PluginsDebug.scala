@@ -14,8 +14,8 @@ import sbt.util.Logger
 
 import sbt.ProjectExtra.*
 import Def.Setting
-import Plugins._
-import PluginsDebug._
+import Plugins.*
+import PluginsDebug.*
 import java.net.URI
 
 private[sbt] class PluginsDebug(
@@ -121,7 +121,7 @@ private[sbt] object PluginsDebug {
   def helpAll(s: State): String =
     if (Project.isProjectLoaded(s)) {
       val extracted = Project.extract(s)
-      import extracted._
+      import extracted.*
 
       def helpBuild(build: LoadedBuildUnit): String =
         build.projects.toList
@@ -156,7 +156,7 @@ private[sbt] object PluginsDebug {
 
   def autoPluginMap(s: State): Map[String, AutoPlugin] = {
     val extracted = Project.extract(s)
-    import extracted._
+    import extracted.*
     structure.units.values.toList
       .flatMap(availableAutoPlugins)
       .map(plugin => (plugin.label, plugin))
@@ -168,7 +168,7 @@ private[sbt] object PluginsDebug {
 
   def help(plugin: AutoPlugin, s: State): String = {
     val extracted = Project.extract(s)
-    import extracted._
+    import extracted.*
     def definesPlugin(p: ResolvedProject): Boolean = p.autoPlugins.contains(plugin)
     def projectForRef(ref: ProjectRef): ResolvedProject = get(ref / Keys.thisProject)
     val perBuild: Map[URI, Set[AutoPlugin]] =

@@ -12,12 +12,12 @@ import java.io.File
 import java.net.URLClassLoader
 
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.librarymanagement._
-import sbt.librarymanagement.ivy._
+import sbt.io.syntax.*
+import sbt.librarymanagement.*
+import sbt.librarymanagement.ivy.*
 import sbt.util.Logger
 import xsbti.compile.CompilerBridgeProvider
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.matchers.should.Matchers
 
 /**

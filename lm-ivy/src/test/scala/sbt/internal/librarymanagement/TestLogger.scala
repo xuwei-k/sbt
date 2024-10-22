@@ -2,8 +2,8 @@ package sbt
 package internal
 package librarymanagement
 
-import sbt.util._
-import sbt.internal.util._
+import sbt.util.*
+import sbt.internal.util.*
 
 object TestLogger {
   def apply[T](f: Logger => T): T = {

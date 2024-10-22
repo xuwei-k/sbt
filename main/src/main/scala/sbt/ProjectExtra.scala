@@ -8,7 +8,7 @@
 package sbt
 
 import java.io.File
-import java.nio.file.{ Path => NioPath }
+import java.nio.file.{ Path as NioPath }
 import java.net.URI
 // import Project._
 import Keys.{
@@ -161,7 +161,7 @@ trait ProjectExtra extends Scoped.Syntax:
     /** Adds configurations to this project.  Added configurations replace existing configurations with the same name. */
     def overrideConfigs(cs: Configuration*): Project =
       self.copy(
-        configurations = Defaults.overrideConfigs(cs: _*)(self.configurations),
+        configurations = Defaults.overrideConfigs(cs*)(self.configurations),
       )
 
     /**
@@ -170,7 +170,7 @@ trait ProjectExtra extends Scoped.Syntax:
      */
     private[sbt] def prefixConfigs(cs: Configuration*): Project =
       self.copy(
-        configurations = Defaults.overrideConfigs(self.configurations: _*)(cs),
+        configurations = Defaults.overrideConfigs(self.configurations*)(cs),
       )
 
   extension (m: Project.type)
@@ -361,26 +361,26 @@ trait ProjectExtra extends Scoped.Syntax:
     def setCond[T](key: AttributeKey[T], vopt: Option[T], attributes: AttributeMap): AttributeMap =
       attributes.setCond(key, vopt)
 
-    private[sbt] def equalKeys(a: ScopedKey[_], b: ScopedKey[_], mask: ScopeMask): Boolean =
+    private[sbt] def equalKeys(a: ScopedKey[?], b: ScopedKey[?], mask: ScopeMask): Boolean =
       a.key == b.key && Scope.equal(a.scope, b.scope, mask)
 
     def delegates(
         structure: BuildStructure,
         scope: Scope,
-        key: AttributeKey[_]
+        key: AttributeKey[?]
     ): Seq[ScopedKey[_]] =
       structure.delegates(scope).map(d => ScopedKey(d, key))
 
     private[sbt] def scopedKeyData(
         structure: BuildStructure,
         scope: Scope,
-        key: AttributeKey[_]
+        key: AttributeKey[?]
     ): Option[ScopedKeyData[_]] =
       structure.data.get(scope, key) map { v =>
         ScopedKeyData(ScopedKey(scope, key), v)
       }
 
-    def details(structure: BuildStructure, actual: Boolean, scope: Scope, key: AttributeKey[_])(
+    def details(structure: BuildStructure, actual: Boolean, scope: Scope, key: AttributeKey[?])(
         using display: Show[ScopedKey[_]]
     ): String = {
       val scoped = ScopedKey(scope, key)
@@ -413,7 +413,7 @@ trait ProjectExtra extends Scoped.Syntax:
 
       val cMap = Def.flattenLocals(comp)
       val related = cMap.keys.filter(k => k.key == key && k.scope != scope)
-      def derivedDependencies(c: ScopedKey[_]): List[ScopedKey[_]] =
+      def derivedDependencies(c: ScopedKey[?]): List[ScopedKey[_]] =
         comp
           .get(c)
           .map(_.settings.flatMap(s => if (s.isDerived) s.dependencies else Nil))
@@ -436,7 +436,7 @@ trait ProjectExtra extends Scoped.Syntax:
           derived: Set[ScopedKey[_]]
       ): String = {
         val label = s"$baseLabel${if (derived.isEmpty) "" else s" (D=$derivedLabel)"}"
-        val prefix: ScopedKey[_] => String =
+        val prefix: ScopedKey[?] => String =
           if (derived.isEmpty) const("") else sk => if (derived(sk)) "D " else "  "
         printScopes(label, scopes, prefix = prefix)
       }
@@ -445,7 +445,7 @@ trait ProjectExtra extends Scoped.Syntax:
           label: String,
           scopes: Iterable[ScopedKey[_]],
           max: Int = Int.MaxValue,
-          prefix: ScopedKey[_] => String = const("")
+          prefix: ScopedKey[?] => String = const("")
       ) =
         if (scopes.isEmpty) ""
         else {
@@ -464,7 +464,7 @@ trait ProjectExtra extends Scoped.Syntax:
         printScopes("Related", related, 10)
     }
 
-    def settingGraph(structure: BuildStructure, basedir: File, scoped: ScopedKey[_])(using
+    def settingGraph(structure: BuildStructure, basedir: File, scoped: ScopedKey[?])(using
         display: Show[ScopedKey[_]]
     ): SettingGraph =
       SettingGraph(structure, basedir, scoped, 0)
@@ -507,7 +507,7 @@ trait ProjectExtra extends Scoped.Syntax:
         r + (key, value.dependencies)
       }
 
-    private[sbt] def showDefinitions(key: AttributeKey[_], defs: Seq[Scope])(using
+    private[sbt] def showDefinitions(key: AttributeKey[?], defs: Seq[Scope])(using
         display: Show[ScopedKey[_]]
     ): String =
       showKeys(defs.map(scope => ScopedKey(scope, key)))
@@ -518,14 +518,14 @@ trait ProjectExtra extends Scoped.Syntax:
     private def showKeys(s: Seq[ScopedKey[_]])(using display: Show[ScopedKey[_]]): String =
       s.map(display.show).sorted.mkString("\n\t", "\n\t", "\n\n")
 
-    private[sbt] def definitions(structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(
+    private[sbt] def definitions(structure: BuildStructure, actual: Boolean, key: AttributeKey[?])(
         using display: Show[ScopedKey[_]]
     ): Seq[Scope] =
       relation(structure, actual)(using display)._1s.toSeq flatMap { sk =>
         if (sk.key == key) sk.scope :: Nil else Nil
       }
 
-    private[sbt] def usedBy(structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(using
+    private[sbt] def usedBy(structure: BuildStructure, actual: Boolean, key: AttributeKey[?])(using
         display: Show[ScopedKey[_]]
     ): Seq[ScopedKey[_]] =
       relation(structure, actual)(using display).all.toSeq flatMap { case (a, b) =>
@@ -534,7 +534,7 @@ trait ProjectExtra extends Scoped.Syntax:
 
     def reverseDependencies(
         cMap: Map[ScopedKey[_], Flattened],
-        scoped: ScopedKey[_]
+        scoped: ScopedKey[?]
     ): Iterable[ScopedKey[_]] =
       for {
         (key, compiled) <- cMap

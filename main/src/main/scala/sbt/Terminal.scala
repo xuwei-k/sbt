@@ -9,7 +9,7 @@
 package sbt
 
 import java.io.{ InputStream, PrintStream }
-import sbt.internal.util.{ JLine3, Terminal => ITerminal }
+import sbt.internal.util.{ JLine3, Terminal as ITerminal }
 
 /**
  * A Terminal represents a ui connection to sbt. It may control the embedded console

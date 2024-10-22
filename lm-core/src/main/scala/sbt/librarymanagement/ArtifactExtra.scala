@@ -101,7 +101,7 @@ private[librarymanagement] abstract class ArtifactFunctions {
     )
   }
   def artifactName(scalaVersion: ScalaVersion, module: ModuleID, artifact: Artifact): String = {
-    import artifact._
+    import artifact.*
     val classifierStr = classifier match { case None => ""; case Some(c) => "-" + c }
     val cross = CrossVersion(module.crossVersion, scalaVersion.full, scalaVersion.binary)
     val base = CrossVersion.applyCross(artifact.name, cross)

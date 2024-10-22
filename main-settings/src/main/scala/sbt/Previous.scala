@@ -9,11 +9,11 @@
 package sbt
 
 import sbt.Def.{ Initialize, ScopedKey }
-import sbt.Previous._
+import sbt.Previous.*
 import sbt.Scope.Global
 import sbt.SlashSyntax0.given
-import sbt.internal.util._
-import sbt.std.TaskExtra._
+import sbt.internal.util.*
+import sbt.std.TaskExtra.*
 import sbt.util.StampedFormat
 import sjsonnew.JsonFormat
 
@@ -78,7 +78,7 @@ object Previous {
 
   private[sbt] class Key[T](val task: ScopedKey[Task[T]], val enclosing: AnyTaskKey) {
     override def equals(o: Any): Boolean = o match {
-      case that: Key[_] => this.task == that.task && this.enclosing == that.enclosing
+      case that: Key[?] => this.task == that.task && this.enclosing == that.enclosing
       case _            => false
     }
     override def hashCode(): Int = (task.## * 31) ^ enclosing.##

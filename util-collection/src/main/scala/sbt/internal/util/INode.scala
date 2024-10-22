@@ -22,7 +22,7 @@ enum EvaluationState:
 
 abstract class EvaluateSettings[ScopeType]:
   protected val init: Init[ScopeType]
-  import init._
+  import init.*
 
   protected def executor: Executor
   protected def compiledSettings: Seq[Compiled[_]]
@@ -85,9 +85,9 @@ abstract class EvaluateSettings[ScopeType]:
 
   private lazy val getValue: [A] => INode[A] => A = [A] => (fa: INode[A]) => fa.get
 
-  private def submitEvaluate(node: INode[_]) = submit(node.evaluate())
+  private def submitEvaluate(node: INode[?]) = submit(node.evaluate())
 
-  private def submitCallComplete[A](node: BindNode[_, A], value: A) =
+  private def submitCallComplete[A](node: BindNode[?, A], value: A) =
     submit(node.callComplete(value))
 
   private def submit(work: => Unit): Unit =
@@ -129,7 +129,7 @@ abstract class EvaluateSettings[ScopeType]:
       value
     }
 
-    final def doneOrBlock(from: INode[_]): Boolean = synchronized {
+    final def doneOrBlock(from: INode[?]): Boolean = synchronized {
       val ready = state == Evaluated
       if (!ready) {
         blocking += from
@@ -167,7 +167,7 @@ abstract class EvaluateSettings[ScopeType]:
 
     final def evaluate(): Unit = synchronized { evaluate0() }
 
-    protected final def makeCall(source: BindNode[_, A1], target: INode[A1]): Unit = {
+    protected final def makeCall(source: BindNode[?, A1], target: INode[A1]): Unit = {
       assert(state == Ready, "Invalid state for call to makeCall: " + toString)
       state = Calling
       target.call(source)
@@ -189,7 +189,7 @@ abstract class EvaluateSettings[ScopeType]:
       calledBy.clear()
     }
 
-    final def call(by: BindNode[_, A1]): Unit = synchronized {
+    final def call(by: BindNode[?, A1]): Unit = synchronized {
       registerIfNew()
       state match {
         case Evaluated => submitCallComplete(by, value)

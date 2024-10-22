@@ -15,7 +15,7 @@ import sbt.KeyRanks.{ DTask, Invisible }
 import sbt.Scope.{ GlobalScope, ThisScope }
 import sbt.internal.util.Types.const
 import sbt.internal.util.complete.Parser
-import sbt.internal.util.{ Terminal => ITerminal, * }
+import sbt.internal.util.{ Terminal as ITerminal, * }
 import sbt.util.{
   ActionCacheStore,
   AggregateActionCacheStore,
@@ -23,7 +23,7 @@ import sbt.util.{
   cacheLevel,
   DiskActionCacheStore
 }
-import Util._
+import Util.*
 import sbt.util.Show
 import xsbti.{ HashedVirtualFileRef, VirtualFile, VirtualFileRef }
 import sjsonnew.JsonFormat
@@ -79,7 +79,7 @@ object Def extends BuildSyntax with Init[Scope] with InitializeImplicits:
   lazy val showFullKey: Show[ScopedKey[_]] = showFullKey(None)
 
   def showFullKey(keyNameColor: Option[String]): Show[ScopedKey[_]] =
-    Show[ScopedKey[_]]((key: ScopedKey[_]) => displayFull(key, keyNameColor))
+    Show[ScopedKey[_]]((key: ScopedKey[?]) => displayFull(key, keyNameColor))
 
   @deprecated("Use showRelativeKey2 which doesn't take the unused multi param", "1.1.1")
   def showRelativeKey(
@@ -167,7 +167,7 @@ object Def extends BuildSyntax with Init[Scope] with InitializeImplicits:
       project: Reference,
       trailingSlash: Boolean
   ): String = {
-    import Reference.{ display => displayRef }
+    import Reference.{ display as displayRef }
     @tailrec def loop(ref: Reference): String = ref match {
       case ProjectRef(b, p) => if (b == current.build) loop(LocalProject(p)) else displayRef(ref)
       case BuildRef(b)      => if (b == current.build) loop(ThisBuild) else displayRef(ref)
@@ -193,15 +193,15 @@ object Def extends BuildSyntax with Init[Scope] with InitializeImplicits:
       case _                             => Reference.display(project) + " /"
     }
 
-  def displayFull(scoped: ScopedKey[_]): String = displayFull(scoped, None)
+  def displayFull(scoped: ScopedKey[?]): String = displayFull(scoped, None)
 
-  def displayFull(scoped: ScopedKey[_], keyNameColor: Option[String]): String =
+  def displayFull(scoped: ScopedKey[?], keyNameColor: Option[String]): String =
     Scope.display(scoped.scope, withColor(scoped.key.label, keyNameColor))
 
-  def displayMasked(scoped: ScopedKey[_], mask: ScopeMask): String =
+  def displayMasked(scoped: ScopedKey[?], mask: ScopeMask): String =
     Scope.displayMasked(scoped.scope, scoped.key.label, mask)
 
-  def displayMasked(scoped: ScopedKey[_], mask: ScopeMask, showZeroConfig: Boolean): String =
+  def displayMasked(scoped: ScopedKey[?], mask: ScopeMask, showZeroConfig: Boolean): String =
     Scope.displayMasked(scoped.scope, scoped.key.label, mask, showZeroConfig)
 
   def withColor(s: String, color: Option[String]): String =
@@ -229,9 +229,9 @@ object Def extends BuildSyntax with Init[Scope] with InitializeImplicits:
     else if (s1 == GlobalScope) Some(s2) // s2 is more specific
     else super.intersect(s1, s2)
 
-  private def definedSettingString(s: Setting[_]): String =
+  private def definedSettingString(s: Setting[?]): String =
     s"derived setting ${s.key.key.label}${positionString(s)}"
-  private def positionString(s: Setting[_]): String =
+  private def positionString(s: Setting[?]): String =
     s.positionString match { case None => ""; case Some(pos) => s" defined at $pos" }
 
   /**
@@ -460,7 +460,7 @@ object Def extends BuildSyntax with Init[Scope] with InitializeImplicits:
     base.copy(info = base.info.set(isDummyTask, true))
   }
 
-  private[sbt] def isDummy(t: Task[_]): Boolean =
+  private[sbt] def isDummy(t: Task[?]): Boolean =
     t.info.attributes.get(isDummyTask) getOrElse false
 end Def
 

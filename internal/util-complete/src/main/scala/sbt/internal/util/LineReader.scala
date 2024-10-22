@@ -8,8 +8,8 @@
 
 package sbt.internal.util
 
-import java.io._
-import java.util.{ List => JList }
+import java.io.*
+import java.util.{ List as JList }
 
 import jline.console.ConsoleReader
 import jline.console.history.{ FileHistory, MemoryHistory }
@@ -17,14 +17,14 @@ import org.jline.reader.{
   Candidate,
   Completer,
   EndOfFileException,
-  LineReader => JLineReader,
+  LineReader as JLineReader,
   LineReaderBuilder,
   ParsedLine,
   UserInterruptException,
 }
 import org.jline.utils.ClosedException
 import sbt.internal.util.complete.Parser
-import sbt.io.syntax._
+import sbt.io.syntax.*
 
 import scala.util.control.NonFatal
 import java.nio.channels.ClosedByInterruptException
@@ -42,7 +42,7 @@ object LineReader {
     !java.lang.Boolean.getBoolean("sbt.disable.cont") && Signals.supported(Signals.CONT)
   val MaxHistorySize = 500
 
-  private def completer(parser: Parser[_]): Completer = new Completer {
+  private def completer(parser: Parser[?]): Completer = new Completer {
     def complete(lr: JLineReader, pl: ParsedLine, candidates: JList[Candidate]): Unit = {
       Parser.completions(parser, pl.line(), 10).get.foreach { c =>
         /*
@@ -99,7 +99,7 @@ object LineReader {
     inputrcFileUrl().map(in => sbt.io.IO.readBytes(in.openStream()))
   def createReader(
       historyPath: Option[File],
-      parser: Parser[_],
+      parser: Parser[?],
       terminal: Terminal,
   ): LineReader = {
     // We may want to consider insourcing LineReader.java from jline. We don't otherwise
@@ -223,7 +223,7 @@ abstract class JLine extends LineReader {
   }
 
   private def handleProgress(prompt: String): String = {
-    import ConsoleAppender._
+    import ConsoleAppender.*
     if (showProgress) s"$DeleteLine" + prompt
     else prompt
   }
@@ -291,14 +291,14 @@ private[sbt] object JLine {
 
 final class FullReader(
     historyPath: Option[File],
-    complete: Parser[_],
+    complete: Parser[?],
     val handleCONT: Boolean,
     terminal: Terminal
 ) extends JLine {
   @deprecated("Use the constructor with no injectThreadSleep parameter", "1.4.0")
   def this(
       historyPath: Option[File],
-      complete: Parser[_],
+      complete: Parser[?],
       handleCONT: Boolean = LineReader.HandleCONT,
       injectThreadSleep: Boolean = false
   ) =

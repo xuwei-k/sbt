@@ -12,7 +12,7 @@ package internal
 import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicReference
 
-import sbt.internal.io.{ EventMonitor, Source, WatchState => WS }
+import sbt.internal.io.{ EventMonitor, Source, WatchState as WS }
 import sbt.internal.util.AttributeKey
 import sbt.nio.file.Glob
 

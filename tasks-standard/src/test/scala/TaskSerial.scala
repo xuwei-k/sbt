@@ -9,12 +9,12 @@
 package sbt
 package std
 
-import sbt.internal.util.Types._
-import TaskExtra._
+import sbt.internal.util.Types.*
+import TaskExtra.*
 import TaskTest.tryRun
 import TaskGen.MaxWorkers
 
-import org.scalacheck._
+import org.scalacheck.*
 import Prop.forAll
 import Transform.taskToNode
 import ConcurrentRestrictions.{ completionService, limitTotal }

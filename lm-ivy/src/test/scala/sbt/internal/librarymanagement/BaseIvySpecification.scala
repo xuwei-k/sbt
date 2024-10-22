@@ -1,13 +1,13 @@
 package sbt.internal.librarymanagement
 
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import java.io.File
 import sbt.internal.util.ConsoleLogger
-import sbt.librarymanagement._
-import sbt.librarymanagement.ivy._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.ivy.*
 import cross.CrossVersionUtil
-import Configurations._
+import Configurations.*
 
 trait BaseIvySpecification extends AbstractEngineSpec {
   def currentBase: File = new File(".")

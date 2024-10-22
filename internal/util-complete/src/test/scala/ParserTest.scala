@@ -10,7 +10,7 @@ package sbt.internal.util
 package complete
 
 object JLineTest {
-  import DefaultParsers._
+  import DefaultParsers.*
 
   val one = "blue" | "green" | "black"
   val two = token("color" ~> Space) ~> token(one)
@@ -44,11 +44,11 @@ object JLineTest {
   }
 }
 
-import Parser._
-import org.scalacheck._
+import Parser.*
+import org.scalacheck.*
 
 object ParserTest extends Properties("Completing Parser") {
-  import Parsers._
+  import Parsers.*
   import DefaultParsers.matches
 
   val nested = (token("a1") ~ token("b2")) ~ "c3"
@@ -62,10 +62,10 @@ object ParserTest extends Properties("Completing Parser") {
     (("token '" + in + "'") |: checkOne(in, nested, expect)) &&
       (("display '" + in + "'") |: checkOne(in, nestedDisplay, expectDisplay))
 
-  def checkOne(in: String, parser: Parser[_], expect: Completion): Prop =
+  def checkOne(in: String, parser: Parser[?], expect: Completion): Prop =
     completions(parser, in, 1) == Completions.single(expect)
 
-  def checkAll(in: String, parser: Parser[_], expect: Completions): Prop = {
+  def checkAll(in: String, parser: Parser[?], expect: Completions): Prop = {
     val cs = completions(parser, in, 1)
     ("completions: " + cs) |: ("Expected: " + expect) |: (cs == expect: Prop)
   }
@@ -74,7 +74,7 @@ object ParserTest extends Properties("Completing Parser") {
     (("token '" + in + "'") |: checkInv(in, nested)) &&
       (("display '" + in + "'") |: checkInv(in, nestedDisplay))
 
-  def checkInv(in: String, parser: Parser[_]): Prop = {
+  def checkInv(in: String, parser: Parser[?]): Prop = {
     val cs = completions(parser, in, 1)
     ("completions: " + cs) |: (cs == Completions.nil: Prop)
   }

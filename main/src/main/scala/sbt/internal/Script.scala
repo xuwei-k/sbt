@@ -14,8 +14,8 @@ import sbt.librarymanagement.Configurations
 import sbt.util.Level
 
 import java.io.File
-import Keys._
-import EvaluateConfigurations.{ evaluateConfiguration => evaluate }
+import Keys.*
+import EvaluateConfigurations.{ evaluateConfiguration as evaluate }
 import Configurations.Compile
 import Scope.Global
 import sbt.ProjectExtra.{ extract, setProject }

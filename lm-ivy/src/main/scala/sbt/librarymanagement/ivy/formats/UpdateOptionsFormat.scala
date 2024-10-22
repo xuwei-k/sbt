@@ -1,8 +1,8 @@
 package sbt.librarymanagement.ivy
 package formats
 
-import sjsonnew._
-import sbt.librarymanagement._
+import sjsonnew.*
+import sbt.librarymanagement.*
 
 trait UpdateOptionsFormat {
   self: BasicJsonProtocol
@@ -36,7 +36,7 @@ trait UpdateOptionsFormat {
   /* This is necessary to serialize/deserialize `directResolvers`. */
   private implicit val moduleIdJsonKeyFormat: sjsonnew.JsonKeyFormat[ModuleID] = {
     new sjsonnew.JsonKeyFormat[ModuleID] {
-      import sjsonnew.support.scalajson.unsafe._
+      import sjsonnew.support.scalajson.unsafe.*
       val moduleIdFormat: JsonFormat[ModuleID] = implicitly[JsonFormat[ModuleID]]
       def write(key: ModuleID): String =
         CompactPrinter(Converter.toJsonUnsafe(key)(moduleIdFormat))

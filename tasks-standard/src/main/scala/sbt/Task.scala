@@ -20,7 +20,7 @@ final case class Task[A](info: Info[A], work: Action[A]) extends TaskId[A]:
   override def toString = info.name getOrElse ("Task(" + info + ")")
   override def hashCode = info.hashCode
 
-  def tag(tags: Tag*): Task[A] = tagw(tags.map(t => (t, 1)): _*)
+  def tag(tags: Tag*): Task[A] = tagw(tags.map(t => (t, 1))*)
   def tagw(tags: (Tag, Int)*): Task[A] = {
     val tgs: TagMap = info.get(tagsKey).getOrElse(TagMap.empty)
     val value = tags.foldLeft(tgs)((acc, tag) => acc + tag)
@@ -68,7 +68,7 @@ final case class Info[T](
     attributes: AttributeMap = AttributeMap.empty,
     post: T => AttributeMap = Info.defaultAttributeMap
 ) {
-  import Info._
+  import Info.*
   def name = attributes.get(Name)
   def description = attributes.get(Description)
   def setName(n: String) = set(Name, n)

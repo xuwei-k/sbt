@@ -10,13 +10,13 @@ import org.apache.ivy.core.cache.{
   CacheDownloadOptions,
   DefaultRepositoryCacheManager
 }
-import org.apache.ivy.core.module.descriptor.{ Artifact => IvyArtifact, DefaultArtifact }
-import org.apache.ivy.plugins.repository.file.{ FileRepository => IvyFileRepository, FileResource }
+import org.apache.ivy.core.module.descriptor.{ Artifact as IvyArtifact, DefaultArtifact }
+import org.apache.ivy.plugins.repository.file.{ FileRepository as IvyFileRepository, FileResource }
 import org.apache.ivy.plugins.repository.{ ArtifactResourceResolver, Resource, ResourceDownloader }
 import org.apache.ivy.plugins.resolver.util.ResolvedResource
 import org.apache.ivy.util.FileUtil
 import sbt.io.Path
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.{ InlineIvyConfiguration, IvyPaths }
 import sbt.util.Logger
 

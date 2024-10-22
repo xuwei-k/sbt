@@ -10,10 +10,10 @@ package sbt
 
 import scala.annotation.tailrec
 import java.io.File
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sbt.io.IO
 import sbt.internal.inc.{ RawCompiler, ScalaInstance }
-import sbt.util.CacheImplicits._
+import sbt.util.CacheImplicits.*
 import sbt.util.Tracked.inputChanged
 import sbt.util.{ CacheStoreFactory, FilesInfo, HashFileInfo, ModifiedFileInfo, PlainFileInfo }
 import sbt.util.FileInfo.{ exists, hash, lastModified }
@@ -27,7 +27,7 @@ object RawCompileLike {
     @tailrec
     def loop(opt: List[String], result: List[File]): List[File] = {
       opt.dropWhile(!fileInputOpts.contains(_)) match {
-        case List(_, fileOpt, tail @ _*) => {
+        case List(_, fileOpt, tail*) => {
           val file = new File(fileOpt)
           if (file.isFile) loop(tail.toList, file :: result)
           else loop(tail.toList, result)

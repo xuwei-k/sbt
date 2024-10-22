@@ -20,19 +20,19 @@ import java.util.concurrent.{ ConcurrentHashMap, LinkedBlockingQueue, TimeUnit }
 
 import sbt.BasicCommandStrings.{ DashDashDetachStdio, DashDashServer, Shutdown, TerminateAction }
 import sbt.internal.langserver.{ LogMessageParams, MessageType, PublishDiagnosticsParams }
-import sbt.internal.protocol._
+import sbt.internal.protocol.*
 import sbt.internal.util.{ ConsoleAppender, ConsoleOut, Signals, Terminal, Util }
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.protocol._
+import sbt.io.syntax.*
+import sbt.protocol.*
 import sbt.util.Level
-import sjsonnew.BasicJsonProtocol._
+import sjsonnew.BasicJsonProtocol.*
 import sjsonnew.shaded.scalajson.ast.unsafe.{ JObject, JValue }
 import sjsonnew.support.scalajson.unsafe.Converter
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.control.NonFatal
 import scala.util.{ Failure, Properties, Success, Try }
 import Serialization.{
@@ -361,7 +361,7 @@ class NetworkClient(
           else Nil
 
         val processBuilder =
-          new ProcessBuilder((nohup ++ cmd): _*)
+          new ProcessBuilder((nohup ++ cmd)*)
             .directory(arguments.baseDirectory)
             .redirectInput(Redirect.PIPE)
         processBuilder.environment.put(Terminal.TERMINAL_PROPS, props)
@@ -589,7 +589,7 @@ class NetworkClient(
       (msg.method, msg.params) match {
         case ("build/logMessage", Some(json)) =>
           if (!attached.get) {
-            import sbt.internal.langserver.codec.JsonProtocol._
+            import sbt.internal.langserver.codec.JsonProtocol.*
             Converter.fromJson[LogMessageParams](json) match {
               case Success(params) => splitLogMessage(params)
               case Failure(_)      => Vector()
@@ -619,7 +619,7 @@ class NetworkClient(
           batchMode.set(false)
           Vector.empty
         case ("textDocument/publishDiagnostics", Some(json)) =>
-          import sbt.internal.langserver.codec.JsonProtocol._
+          import sbt.internal.langserver.codec.JsonProtocol.*
           Converter.fromJson[PublishDiagnosticsParams](json) match {
             case Success(params) => splitDiagnostics(params); Vector()
             case Failure(_)      => Vector()
@@ -671,7 +671,7 @@ class NetworkClient(
   }
 
   def onRequest(msg: JsonRpcRequestMessage): Unit = {
-    import sbt.protocol.codec.JsonProtocol._
+    import sbt.protocol.codec.JsonProtocol.*
     (msg.method, msg.params) match {
       case (`terminalCapabilities`, Some(json)) =>
         Converter.fromJson[TerminalCapabilitiesQuery](json) match {

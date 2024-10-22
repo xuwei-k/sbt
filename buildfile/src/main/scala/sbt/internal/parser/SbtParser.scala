@@ -13,7 +13,7 @@ import sbt.internal.util.{ LineRange, MessageOnlyException }
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
-import sbt.internal.parser.SbtParser._
+import sbt.internal.parser.SbtParser.*
 import dotty.tools.dotc.ast.Trees.Lazy
 import dotty.tools.dotc.ast.untpd.*
 import dotty.tools.dotc.core.Contexts.*

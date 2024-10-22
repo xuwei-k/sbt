@@ -1,7 +1,7 @@
 package sbt.librarymanagement
 
 import sbt.internal.librarymanagement.UnitSpec
-import CrossVersion._
+import CrossVersion.*
 import scala.annotation.nowarn
 
 class CrossVersionTest extends UnitSpec {

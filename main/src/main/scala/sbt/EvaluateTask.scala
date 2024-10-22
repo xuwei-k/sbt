@@ -12,16 +12,16 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
 import sbt.Def.{ ScopedKey, Setting, dummyState }
-import sbt.Keys.{ TaskProgress => _, name => _, _ }
+import sbt.Keys.{ TaskProgress as _, name as _, * }
 import sbt.BuildExtra.*
 import sbt.ProjectExtra.*
 import sbt.Scope.Global
 import sbt.SlashSyntax0.given
 import sbt.internal.Aggregation.KeyValue
-import sbt.internal.TaskName._
-import sbt.internal._
+import sbt.internal.TaskName.*
+import sbt.internal.*
 import sbt.internal.langserver.ErrorCodes
-import sbt.internal.util.{ Terminal => ITerminal, _ }
+import sbt.internal.util.{ Terminal as ITerminal, * }
 import sbt.librarymanagement.{ Resolver, UpdateReport }
 import sbt.std.Transform.DummyTaskMap
 import sbt.util.{ Logger, Show }
@@ -392,18 +392,18 @@ object EvaluateTask {
     }
   }
 
-  def logIncResult(result: Result[_], state: State, streams: Streams) = result match {
+  def logIncResult(result: Result[?], state: State, streams: Streams) = result match {
     case Result.Inc(i) => logIncomplete(i, state, streams); case _ => ()
   }
 
   def logIncomplete(result: Incomplete, state: State, streams: Streams): Unit = {
     val all = Incomplete linearize result
     val keyed =
-      all collect { case Incomplete(Some(key: ScopedKey[_]), _, msg, _, ex) =>
+      all collect { case Incomplete(Some(key: ScopedKey[?]), _, msg, _, ex) =>
         (key, msg, ex)
       }
 
-    import ExceptionCategory._
+    import ExceptionCategory.*
     for case (key, msg, Some(ex)) <- keyed
     do
       def log = getStreams(key, streams).log
@@ -426,10 +426,10 @@ object EvaluateTask {
   private def contextDisplay(state: State, highlight: Boolean) =
     Project.showContextKey(state, if (highlight) Some(RED) else None)
 
-  def suppressedMessage(key: ScopedKey[_])(implicit display: Show[ScopedKey[_]]): String =
+  def suppressedMessage(key: ScopedKey[?])(implicit display: Show[ScopedKey[_]]): String =
     "Stack trace suppressed.  Run 'last %s' for the full log.".format(display.show(key))
 
-  def getStreams(key: ScopedKey[_], streams: Streams): TaskStreams =
+  def getStreams(key: ScopedKey[?], streams: Streams): TaskStreams =
     streams(ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key))
 
   def withStreams[T](structure: BuildStructure, state: State)(f: Streams => T): T = {
@@ -647,7 +647,7 @@ object EvaluateTask {
     }
 
   // if the return type Seq[Setting[_]] is not explicitly given, scalac hangs
-  val injectStreams: ScopedKey[_] => Seq[Setting[_]] = scoped =>
+  val injectStreams: ScopedKey[?] => Seq[Setting[_]] = scoped =>
     if (scoped.key == streams.key) {
       Seq(scoped.scope / streams := {
         (streamsManager.map { mgr =>

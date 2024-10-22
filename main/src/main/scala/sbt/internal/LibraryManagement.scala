@@ -13,12 +13,12 @@ import java.io.File
 import java.util.concurrent.Callable
 
 import sbt.Def.ScopedKey
-import sbt.internal.librarymanagement._
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.internal.librarymanagement.*
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 import sbt.util.{ CacheStore, CacheStoreFactory, Level, Logger, Tracked }
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sbt.ProjectExtra.*
 import sjsonnew.JsonFormat
 import scala.concurrent.duration.FiniteDuration
@@ -54,7 +54,7 @@ private[sbt] object LibraryManagement {
 
     /* Resolve the module settings from the inputs. */
     def resolve: UpdateReport = {
-      import sbt.util.ShowLines._
+      import sbt.util.ShowLines.*
 
       log.debug(s"Updating $label...")
       val reportOrUnresolved: Either[UnresolvedWarning, UpdateReport] =
@@ -116,7 +116,7 @@ private[sbt] object LibraryManagement {
 
     /* Skip resolve if last output exists, otherwise error. */
     def skipResolve(cache: CacheStore)(inputs: UpdateInputs): UpdateReport = {
-      import sbt.librarymanagement.LibraryManagementCodec._
+      import sbt.librarymanagement.LibraryManagementCodec.*
       val cachedReport = Tracked
         .lastOutput[UpdateInputs, UpdateReport](cache) {
           case (_, Some(out)) => out
@@ -134,7 +134,7 @@ private[sbt] object LibraryManagement {
 
     def doResolve(cache: CacheStore): UpdateInputs => UpdateReport = {
       val doCachedResolve = { (inChanged: Boolean, updateInputs: UpdateInputs) =>
-        import sbt.librarymanagement.LibraryManagementCodec._
+        import sbt.librarymanagement.LibraryManagementCodec.*
         try
           var isCached = false
           val report = Tracked
@@ -158,7 +158,7 @@ private[sbt] object LibraryManagement {
             log.trace(t)
             resolvedAgain
       }
-      import LibraryManagementCodec._
+      import LibraryManagementCodec.*
       Tracked.inputChanged(cacheStoreFactory.make("inputs"))(doCachedResolve)
     }
 
@@ -238,8 +238,8 @@ private[sbt] object LibraryManagement {
 
   val moduleIdJsonKeyFormat: sjsonnew.JsonKeyFormat[ModuleID] =
     new sjsonnew.JsonKeyFormat[ModuleID] {
-      import LibraryManagementCodec._
-      import sjsonnew.support.scalajson.unsafe._
+      import LibraryManagementCodec.*
+      import sjsonnew.support.scalajson.unsafe.*
       val moduleIdFormat: JsonFormat[ModuleID] = implicitly[JsonFormat[ModuleID]]
       def write(key: ModuleID): String =
         CompactPrinter(Converter.toJsonUnsafe(key)(moduleIdFormat))
@@ -326,7 +326,7 @@ private[sbt] object LibraryManagement {
             srcTypes,
             docTypes,
           ) =>
-        import Keys._
+        import Keys.*
         val cacheDirectory = s.cacheDirectory
         val isRoot = er.contains(rs)
         // following copied from https://github.com/coursier/sbt-coursier/blob/9173406bb399879508aa481fed16efda72f55820/modules/sbt-lm-coursier/src/main/scala/sbt/hack/Foo.scala
@@ -382,7 +382,7 @@ private[sbt] object LibraryManagement {
   def withExcludes(out: File, classifiers: Seq[String], lock: xsbti.GlobalLock)(
       f: Map[ModuleID, Vector[ConfigRef]] => UpdateReport
   ): UpdateReport = {
-    import sbt.librarymanagement.LibraryManagementCodec._
+    import sbt.librarymanagement.LibraryManagementCodec.*
     import sbt.util.FileBasedStore
     val exclName = "exclude_classifiers"
     val file = out / exclName

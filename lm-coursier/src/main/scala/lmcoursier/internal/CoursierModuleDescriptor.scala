@@ -1,7 +1,7 @@
 package lmcoursier.internal
 
 import lmcoursier.CoursierConfiguration
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 private[lmcoursier] final case class CoursierModuleDescriptor(
     descriptor: ModuleDescriptorConfiguration,

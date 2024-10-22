@@ -17,7 +17,7 @@ import sbt.ProjectExtra.*
 import sbt.SlashSyntax0.given
 import sbt.internal.util.complete.Parser
 import sbt.internal.util.complete.Parser.{ failure, seq, success }
-import sbt.internal.util._
+import sbt.internal.util.*
 import sbt.std.Transform.DummyTaskMap
 import sbt.util.{ Logger, Show }
 
@@ -38,7 +38,7 @@ object Aggregation {
       state: State
   )
 
-  final case class KeyValue[+T](key: ScopedKey[_], value: T)
+  final case class KeyValue[+T](key: ScopedKey[?], value: T)
 
   def defaultShow(state: State, showTasks: Boolean): ShowConfig =
     ShowConfig(
@@ -52,7 +52,7 @@ object Aggregation {
       display: Show[ScopedKey[_]]
   ): Unit =
     xs match {
-      case KeyValue(_, x: Seq[_]) :: Nil => print(x.mkString("* ", "\n* ", ""))
+      case KeyValue(_, x: Seq[?]) :: Nil => print(x.mkString("* ", "\n* ", ""))
       case KeyValue(_, x) :: Nil         => print(x.toString)
       case _ =>
         xs foreach (kv => print(display.show(kv.key) + "\n\t" + kv.value.toString))
@@ -104,8 +104,8 @@ object Aggregation {
       ts: Values[Task[A]],
       extra: DummyTaskMap,
   ): Complete[A] =
-    import EvaluateTask._
-    import std.TaskExtra._
+    import EvaluateTask.*
+    import std.TaskExtra.*
     val extracted = Project.extract(s)
     import extracted.structure
     val toRun = ts.map { case KeyValue(k, t) => t.map(v => KeyValue(k, v)) }.join
@@ -202,7 +202,7 @@ object Aggregation {
 
     // to make the call sites clearer
     def separate[L](in: Seq[KeyValue[_]])(
-        f: KeyValue[_] => Either[KeyValue[L], KeyValue[_]]
+        f: KeyValue[?] => Either[KeyValue[L], KeyValue[_]]
     ): (Seq[KeyValue[L]], Seq[KeyValue[_]]) =
       Util.separate(in)(f)
 
@@ -210,11 +210,11 @@ object Aggregation {
     if (kvs.isEmpty) failure("No such setting/task")
     else {
       val (inputTasks, other) = separate[InputTask[_]](kvs) {
-        case KeyValue(k, v: InputTask[_]) => Left(KeyValue(k, v))
+        case KeyValue(k, v: InputTask[?]) => Left(KeyValue(k, v))
         case kv                           => Right(kv)
       }
       val (tasks, settings) = separate[Task[_]](other) {
-        case KeyValue(k, v: Task[_]) => Left(KeyValue(k, v))
+        case KeyValue(k, v: Task[?]) => Left(KeyValue(k, v))
         case kv                      => Right(kv)
       }
       // currently, disallow input tasks to be mixed with normal tasks.
@@ -280,7 +280,7 @@ object Aggregation {
 
   def reverseAggregatedKeys[T](
       key: ScopedKey[T],
-      extra: BuildUtil[_],
+      extra: BuildUtil[?],
       mask: ScopeMask
   ): Seq[ScopedKey[T]] =
     projectAggregates(key.scope.project.toOption, extra, reverse = true) flatMap { ref =>
@@ -292,7 +292,7 @@ object Aggregation {
 
   def aggregatedKeys[T](
       key: ScopedKey[T],
-      extra: BuildUtil[_],
+      extra: BuildUtil[?],
       mask: ScopeMask
   ): Seq[ScopedKey[T]] =
     projectAggregates(key.scope.project.toOption, extra, reverse = false) map { ref =>
@@ -301,7 +301,7 @@ object Aggregation {
       ScopedKey(resolved, key.key)
     }
 
-  def aggregationEnabled(key: ScopedKey[_], data: Settings[Scope]): Boolean =
+  def aggregationEnabled(key: ScopedKey[?], data: Settings[Scope]): Boolean =
     (Scope.fillTaskAxis(key.scope, key.key) / Keys.aggregate).get(data).getOrElse(true)
   private[sbt] val suppressShow =
     AttributeKey[Boolean]("suppress-aggregation-show", Int.MaxValue)

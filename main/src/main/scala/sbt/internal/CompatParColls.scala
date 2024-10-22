@@ -14,9 +14,9 @@ import scala.annotation.nowarn
 private[sbt] object CompatParColls {
   @nowarn
   val Converters = {
-    import Compat._
+    import Compat.*
     {
-      import scala.collection.parallel._
+      import scala.collection.parallel.*
       CollectionConverters
     }
   }

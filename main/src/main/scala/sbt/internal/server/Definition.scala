@@ -11,7 +11,7 @@ package internal
 package server
 
 import java.net.URI
-import java.nio.file._
+import java.nio.file.*
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
@@ -24,13 +24,13 @@ import sjsonnew.shaded.scalajson.ast.unsafe.JValue
 import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Converter }
 
 import sbt.internal.inc.Analysis
-import sbt.internal.inc.JavaInterfaceUtil._
+import sbt.internal.inc.JavaInterfaceUtil.*
 import sbt.internal.parser.SbtParser
 import sbt.internal.protocol.JsonRpcResponseError
 import sbt.internal.protocol.codec.JsonRPCProtocol
 import sbt.internal.langserver.{ ErrorCodes, Location, Position, Range, TextDocumentPositionParams }
 import sbt.util.Logger
-import sbt.Keys._
+import sbt.Keys.*
 import xsbti.{ FileConverter, VirtualFileRef }
 import com.github.benmanes.caffeine.cache.Cache
 import scala.concurrent.Promise
@@ -158,7 +158,7 @@ private[sbt] object Definition {
   }
 
   private def getDefinition(jsonDefinition: JValue): Option[TextDocumentPositionParams] = {
-    import langserver.codec.JsonProtocol._
+    import langserver.codec.JsonProtocol.*
     Converter.fromJson[TextDocumentPositionParams](jsonDefinition).toOption
   }
 
@@ -279,7 +279,7 @@ private[sbt] object Definition {
         log.debug(s"symbol $sym")
         analyses
           .map { analyses =>
-            import sbt.internal.CompatParColls.Converters._
+            import sbt.internal.CompatParColls.Converters.*
             val locations = analyses.par.flatMap { analysis =>
               val selectPotentials = textProcessor.potentialClsOrTraitOrObj(sym)
               val classes =
@@ -303,7 +303,7 @@ private[sbt] object Definition {
                 }
             }.seq
             log.debug(s"$LspDefinitionLogHead locations $locations")
-            import langserver.codec.JsonProtocol._
+            import langserver.codec.JsonProtocol.*
             send(commandSource, requestId)(locations.toArray)
           }
           .recover { case t =>
@@ -313,13 +313,13 @@ private[sbt] object Definition {
               "Problem with processing analyses.",
               None,
             )
-            import JsonRPCProtocol._
+            import JsonRPCProtocol.*
             send(commandSource, requestId)(rsp)
           }
         ()
       case None =>
         log.info(s"Symbol not found in definition request $jsonDefinitionString")
-        import langserver.codec.JsonProtocol._
+        import langserver.codec.JsonProtocol.*
         send(commandSource, requestId)(Array.empty[Location])
     }
   }

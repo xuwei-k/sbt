@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap
 import sbt.internal.inc.Stamper
 import xsbti.{ FileConverter, VirtualFile, VirtualFileRef }
 import xsbti.compile.DefinesClass
-import xsbti.compile.analysis.{ Stamp => XStamp }
+import xsbti.compile.analysis.{ Stamp as XStamp }
 import sbt.internal.inc.Locate
 
 /**
@@ -34,7 +34,7 @@ object VirtualFileValueCache {
   def apply[A](converter: FileConverter)(f: VirtualFile => A): VirtualFileValueCache[A] = {
     import collection.concurrent.Map
     import java.util.concurrent.ConcurrentHashMap
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     val stampCache: Map[VirtualFileRef, (Long, XStamp)] = new ConcurrentHashMap().asScala
     make(
       Stamper.timeWrap(

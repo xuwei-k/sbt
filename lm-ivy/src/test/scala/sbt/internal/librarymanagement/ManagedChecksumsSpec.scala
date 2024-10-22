@@ -1,8 +1,8 @@
 package sbt.internal.librarymanagement
 
 import org.apache.ivy.util.Message
-import sbt.librarymanagement._
-import sbt.librarymanagement.ivy._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.ivy.*
 import sbt.io.IO
 
 object ManagedChecksumsSpec extends BaseIvySpecification {
@@ -17,7 +17,7 @@ object ManagedChecksumsSpec extends BaseIvySpecification {
   final def dependencies: Vector[ModuleID] =
     Vector(avro177, dataAvro1940, netty320).map(_.withConfigurations(Some("compile")))
 
-  import sbt.io.syntax._
+  import sbt.io.syntax.*
   override def mkIvyConfiguration(uo: UpdateOptions): IvyConfiguration = {
     val moduleConfs = Vector(ModuleConfiguration("*", chainResolver))
     val resCacheDir = currentTarget / "resolution-cache"

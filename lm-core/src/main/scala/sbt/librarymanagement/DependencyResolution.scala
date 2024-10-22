@@ -3,14 +3,14 @@ package sbt.librarymanagement
 import java.io.File
 import sbt.util.Logger
 import sbt.io.Hash
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 
 /**
  * Library management API to resolve dependencies.
  */
 class DependencyResolution private[sbt] (lmEngine: DependencyResolutionInterface) {
-  import sbt.internal.librarymanagement.InternalDefaults._
-  import sbt.internal.librarymanagement.UpdateClassifiersUtil._
+  import sbt.internal.librarymanagement.InternalDefaults.*
+  import sbt.internal.librarymanagement.UpdateClassifiersUtil.*
 
   /**
    * Builds a ModuleDescriptor that describes a subproject with dependencies.
@@ -161,7 +161,7 @@ class DependencyResolution private[sbt] (lmEngine: DependencyResolutionInterface
       artifacts: Vector[(String, ModuleID, Artifact, File)],
       log: Logger
   ): Either[UnresolvedWarning, UpdateReport] = {
-    import config.module._
+    import config.module.*
     val artifactFilter = getArtifactTypeFilter(config.updateConfiguration.artifactFilter)
     assert(classifiers.nonEmpty, "classifiers cannot be empty")
     assert(artifactFilter.types.nonEmpty, "UpdateConfiguration must filter on some types")
@@ -199,7 +199,7 @@ class DependencyResolution private[sbt] (lmEngine: DependencyResolutionInterface
 
   protected def directDependenciesNames(module: ModuleDescriptor): String =
     (module.directDependencies map { case mID: ModuleID =>
-      import mID._
+      import mID.*
       s"$organization % $name % $revision"
     }).mkString(", ")
 }

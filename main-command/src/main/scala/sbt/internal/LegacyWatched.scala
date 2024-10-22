@@ -15,7 +15,7 @@ import sbt.internal.nio.{ FileEventMonitor, FileTreeRepository, WatchLogger }
 import sbt.{ State, Watched }
 
 import scala.annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.control.NonFatal
 
 private[sbt] object LegacyWatched {

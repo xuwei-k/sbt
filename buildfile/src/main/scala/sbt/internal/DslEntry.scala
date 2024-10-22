@@ -13,7 +13,7 @@ import sbt.internal.util.RangePosition
 
 import sbt.librarymanagement.Configuration
 
-import Def._
+import Def.*
 
 /** This represents a `Setting` expression configured by the sbt DSL. */
 sealed trait DslEntry {
@@ -62,26 +62,26 @@ object DslEntry {
 
   /** this represents an `enablePlugins()` in the sbt DSL */
   case class DslEnablePlugins(plugins: Seq[AutoPlugin]) extends ProjectManipulation {
-    override val toFunction: Project => Project = _.enablePlugins(plugins: _*)
+    override val toFunction: Project => Project = _.enablePlugins(plugins*)
   }
 
   /** this represents an `disablePlugins()` in the sbt DSL */
   case class DslDisablePlugins(plugins: Seq[AutoPlugin]) extends ProjectManipulation {
-    override val toFunction: Project => Project = _.disablePlugins(plugins: _*)
+    override val toFunction: Project => Project = _.disablePlugins(plugins*)
   }
 
   /** Represents registering an internal dependency for the current project */
   case class DslDependsOn(cs: Seq[ClasspathDep[ProjectReference]]) extends ProjectManipulation {
-    override val toFunction: Project => Project = _.dependsOn(cs: _*)
+    override val toFunction: Project => Project = _.dependsOn(cs*)
   }
 
   /** Represents registering a set of configurations with the current project. */
   case class DslConfigs(cs: Seq[Configuration]) extends ProjectManipulation {
-    override val toFunction: Project => Project = _.configs(cs: _*)
+    override val toFunction: Project => Project = _.configs(cs*)
   }
 
   /** this represents an `aggregateProjects()` in the sbt DSL */
   case class DslAggregate(refs: Seq[ProjectReference]) extends ProjectManipulation {
-    override val toFunction: Project => Project = _.aggregate(refs: _*)
+    override val toFunction: Project => Project = _.aggregate(refs*)
   }
 }

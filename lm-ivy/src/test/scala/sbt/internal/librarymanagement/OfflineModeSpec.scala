@@ -1,6 +1,6 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.UpdateOptions
 import sbt.io.IO
 

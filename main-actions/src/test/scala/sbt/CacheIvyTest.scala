@@ -8,17 +8,17 @@
 
 package sbt
 
-import org.scalacheck._
-import org.scalacheck.Arbitrary._
-import Prop._
-import sbt.librarymanagement._
+import org.scalacheck.*
+import org.scalacheck.Arbitrary.*
+import Prop.*
+import sbt.librarymanagement.*
 import sjsonnew.shaded.scalajson.ast.unsafe.JValue
 
 class CacheIvyTest extends Properties("CacheIvy") {
   import sbt.util.{ CacheStore, SingletonCache }
-  import SingletonCache._
+  import SingletonCache.*
 
-  import sjsonnew._
+  import sjsonnew.*
   import sjsonnew.support.scalajson.unsafe.Converter
 
   private class InMemoryStore(converter: SupportConverter[JValue]) extends CacheStore {
@@ -116,7 +116,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
 
   property("moduleIDFormat") = forAll { (m: ModuleID) =>
     def str(m: ModuleID) = {
-      import m._
+      import m.*
       s"ModuleID($organization, ${m.name}, $revision, $configurations, $isChanging, $isTransitive, $isForce, $explicitArtifacts, $exclusions, " +
         s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
     }
@@ -130,7 +130,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
       }
 
     }
-    import sbt.librarymanagement.LibraryManagementCodec._
+    import sbt.librarymanagement.LibraryManagementCodec.*
     cachePreservesEquality(m, eq _, str)
   }
 }

@@ -5,8 +5,8 @@ import java.util.concurrent.Executors
 import org.apache.ivy.core.event.EventManager
 import org.apache.ivy.core.event.download.PrepareDownloadEvent
 import org.apache.ivy.core.module.descriptor.Artifact
-import org.apache.ivy.core.report._
-import org.apache.ivy.core.resolve._
+import org.apache.ivy.core.report.*
+import org.apache.ivy.core.resolve.*
 import org.apache.ivy.core.sort.SortEngine
 import org.apache.ivy.util.filter.Filter
 
@@ -40,7 +40,7 @@ private[sbt] class ParallelResolveEngine(
       artifactFilter: Filter,
       options: DownloadOptions
   ): Unit = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     val start = System.currentTimeMillis
     report.getArtifacts match {
       case typed: java.util.List[Artifact @unchecked] =>

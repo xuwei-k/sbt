@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement
 
 import java.io.File
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 object UpdateClassifiersUtil {
 

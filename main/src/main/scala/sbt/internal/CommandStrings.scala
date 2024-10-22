@@ -323,7 +323,7 @@ defaults
 """
 
   import java.io.File
-  import sbt.io.syntax._
+  import sbt.io.syntax.*
 
   def sbtRCs(s: State): Seq[File] =
     (Path.userHome / sbtrc) ::

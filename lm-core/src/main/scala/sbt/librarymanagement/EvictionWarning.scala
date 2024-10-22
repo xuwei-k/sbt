@@ -398,7 +398,7 @@ object EvictionWarning {
   }
 
   given evictionWarningLines: ShowLines[EvictionWarning] = ShowLines { (a: EvictionWarning) =>
-    import ShowLines._
+    import ShowLines.*
     val out: mutable.ListBuffer[String] = mutable.ListBuffer()
     if (a.options.warnEvictionSummary && a.binaryIncompatibleEvictionExists) {
       out += "There may be incompatibilities among your library dependencies; run 'evicted' to see detailed eviction warnings."
@@ -423,7 +423,7 @@ object EvictionWarning {
 
   private[sbt] def infoAllTheThings(a: EvictionWarning): List[String] =
     if (a.options.infoAllEvictions) {
-      import ShowLines._
+      import ShowLines.*
       val evo = a.options
       val out: mutable.ListBuffer[String] = mutable.ListBuffer()
       a.allEvictions foreach { ev =>

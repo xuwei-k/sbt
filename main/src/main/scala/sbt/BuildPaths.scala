@@ -42,7 +42,7 @@ object BuildPaths {
   val globalZincDirectory =
     AttributeKey[File]("global-zinc-directory", "The base directory for Zinc internals.", DSetting)
 
-  import sbt.io.syntax._
+  import sbt.io.syntax.*
 
   def getGlobalBase(state: State): File = {
     val default = defaultVersionedGlobalBase(binarySbtVersion(state))

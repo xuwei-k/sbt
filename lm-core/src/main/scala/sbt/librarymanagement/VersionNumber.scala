@@ -179,7 +179,7 @@ object VersionNumber {
    * Also API compatibility is expected even when the first segment is zero.
    */
   object PackVer extends VersionNumberCompatibility {
-    import SemVer._
+    import SemVer.*
 
     def name: String = "Package Versioning Policy"
 
@@ -199,7 +199,7 @@ object VersionNumber {
    * A variant of SemVar that enforces API compatibility when the first segment is zero.
    */
   object EarlySemVer extends VersionNumberCompatibility {
-    import SemVer._
+    import SemVer.*
 
     def name: String = "Early Semantic Versioning"
 

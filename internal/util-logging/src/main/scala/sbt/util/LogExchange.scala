@@ -10,8 +10,8 @@ package sbt.util
 
 import org.apache.logging.log4j.core.config.LoggerConfig
 import org.apache.logging.log4j.core.layout.PatternLayout
-import org.apache.logging.log4j.core.{ LoggerContext => XLoggerContext }
-import org.apache.logging.log4j.{ LogManager => XLogManager }
+import org.apache.logging.log4j.core.{ LoggerContext as XLoggerContext }
+import org.apache.logging.log4j.{ LogManager as XLogManager }
 import sbt.internal.util.{ Appender, ManagedLogger, TraceEvent, SuccessEvent, Util }
 import sbt.internal.util.appmacro.StringTypeTag
 
@@ -46,9 +46,9 @@ sealed abstract class LogExchange {
   }
 
   private[sbt] def initStringCodecs(): Unit = {
-    import sbt.internal.util.codec.SuccessEventShowLines._
-    import sbt.internal.util.codec.ThrowableShowLines._
-    import sbt.internal.util.codec.TraceEventShowLines._
+    import sbt.internal.util.codec.SuccessEventShowLines.*
+    import sbt.internal.util.codec.ThrowableShowLines.*
+    import sbt.internal.util.codec.TraceEventShowLines.*
 
     registerStringCodec[Throwable]
     registerStringCodec[TraceEvent]

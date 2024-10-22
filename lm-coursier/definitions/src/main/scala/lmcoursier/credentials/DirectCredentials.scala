@@ -1,6 +1,6 @@
 package lmcoursier.credentials
 
-import dataclass._
+import dataclass.*
 
 @data class DirectCredentials(
     host: String = "",

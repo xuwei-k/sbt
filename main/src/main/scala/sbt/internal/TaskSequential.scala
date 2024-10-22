@@ -9,7 +9,7 @@
 package sbt
 package internal
 
-import Def._
+import Def.*
 
 /**
  * This trait injected to `Def` object to provide `sequential` functions for tasks.

@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.{ AtomicInteger, AtomicReference }
 
 import sbt.internal.inc.classpath.{
   AbstractClassLoaderCache,
-  ClassLoaderCache => IncClassLoaderCache
+  ClassLoaderCache as IncClassLoaderCache
 }
 import sbt.internal.inc.{ AnalyzingCompiler, ZincUtil }
 import sbt.io.IO

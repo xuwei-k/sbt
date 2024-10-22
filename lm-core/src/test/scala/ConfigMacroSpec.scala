@@ -3,8 +3,8 @@ package sbt.internal.librarymanagement
 import sbt.librarymanagement.Configuration
 import sbt.librarymanagement.Configurations.config
 import scala.util.control.NonFatal
-import org.scalacheck._
-import Prop._
+import org.scalacheck.*
+import Prop.*
 
 class ConfigDefs {
   lazy val Kompile = config("kompile")
@@ -16,7 +16,7 @@ class ConfigDefs {
 
 object ConfigMacroSpec extends Properties("ConfigMacroSpec") {
   lazy val cd = new ConfigDefs
-  import cd._
+  import cd.*
 
   def secure(f: => Prop): Prop =
     try {

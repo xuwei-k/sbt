@@ -3,7 +3,7 @@ package sbt.internal.librarymanagement
 import java.io.IOException
 
 import org.scalatest.funsuite.AnyFunSuite
-import sbt.internal.librarymanagement.IvyUtil._
+import sbt.internal.librarymanagement.IvyUtil.*
 
 class IvyUtilSpec extends AnyFunSuite {
   test("503 should be a TransientNetworkException") {

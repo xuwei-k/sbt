@@ -13,7 +13,7 @@ import scala.util.Try
 import sjsonnew.JsonFormat
 import sjsonnew.support.murmurhash.Hasher
 
-import CacheImplicits._
+import CacheImplicits.*
 
 /**
  * A cache that stores a single value.

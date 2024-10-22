@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import sbt.internal.util.AttributeKey
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.{ Future => JFuture, RejectedExecutionException }
+import java.util.concurrent.{ Future as JFuture, RejectedExecutionException }
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 

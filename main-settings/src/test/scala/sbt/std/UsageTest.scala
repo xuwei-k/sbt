@@ -93,7 +93,7 @@ object Assign {
     else Def.task { 0 }
   }
 
-  import DefaultParsers._
+  import DefaultParsers.*
   val p = Def.setting { name.value ~> Space ~> ID }
   val is = Seq(
     mk := 3,

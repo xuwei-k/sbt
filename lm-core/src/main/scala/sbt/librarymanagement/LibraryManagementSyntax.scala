@@ -24,7 +24,7 @@ trait LibraryManagementSyntax
   type InclusionRule = InclExclRule
   final val InclusionRule = InclExclRule
 
-  import sbt.librarymanagement.{ Configurations => C }
+  import sbt.librarymanagement.{ Configurations as C }
   final val Compile = C.Compile
   final val Test = C.Test
   final val Runtime = C.Runtime

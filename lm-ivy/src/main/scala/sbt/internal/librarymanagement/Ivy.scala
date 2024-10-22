@@ -15,7 +15,7 @@ import org.apache.ivy.core.module.descriptor.{
   DefaultArtifact,
   DefaultDependencyArtifactDescriptor,
   MDArtifact,
-  Artifact => IArtifact
+  Artifact as IArtifact
 }
 import org.apache.ivy.core.module.descriptor.{
   DefaultDependencyDescriptor,
@@ -26,25 +26,25 @@ import org.apache.ivy.core.module.descriptor.{
 }
 import org.apache.ivy.core.module.descriptor.OverrideDependencyDescriptorMediator
 import org.apache.ivy.core.module.id.{ ModuleId, ModuleRevisionId }
-import org.apache.ivy.core.resolve._
+import org.apache.ivy.core.resolve.*
 import org.apache.ivy.core.settings.IvySettings
 import org.apache.ivy.core.sort.SortEngine
 import org.apache.ivy.plugins.matcher.PatternMatcher
 import org.apache.ivy.plugins.resolver.DependencyResolver
 import org.apache.ivy.util.{ Message, MessageLogger }
 import org.apache.ivy.util.extendable.ExtendableItem
-import org.apache.ivy.util.url._
+import org.apache.ivy.util.url.*
 import scala.xml.NodeSeq
 import scala.collection.mutable
 import scala.collection.immutable.ArraySeq
 import scala.util.{ Success, Failure }
-import sbt.util._
-import sbt.librarymanagement.{ ModuleDescriptorConfiguration => InlineConfiguration, _ }
+import sbt.util.*
+import sbt.librarymanagement.{ ModuleDescriptorConfiguration as InlineConfiguration, * }
 import sbt.librarymanagement.Platform
-import sbt.librarymanagement.ivy._
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.ivy.*
+import sbt.librarymanagement.syntax.*
 
-import IvyInternalDefaults._
+import IvyInternalDefaults.*
 import Resolver.PluginPattern
 import ivyint.{
   CachedResolutionResolveCache,
@@ -295,7 +295,7 @@ final class IvySbt(
       (baseModule, baseConfiguration)
     }
     private def configureInline(ic: InlineConfiguration, log: Logger) = {
-      import ic._
+      import ic.*
       val moduleID = newConfiguredModuleID(module, moduleInfo, ic.configurations)
       IvySbt.setConflictManager(moduleID, conflictManager, ivy.getSettings)
       val defaultConf = defaultConfiguration getOrElse Configuration.of(
@@ -461,7 +461,7 @@ final class IvySbt(
     }
 
     def extraInputHash: Long = {
-      import AltLibraryManagementCodec._
+      import AltLibraryManagementCodec.*
       Hasher.hash(owner.configuration) match {
         case Success(keyHash) => keyHash.toLong
         case Failure(_)       => 0L
@@ -562,7 +562,7 @@ private[sbt] object IvySbt {
    * Clearly, it would be better to have an explicit option in Ivy to control this.
    */
   def hasImplicitClassifier(artifact: IArtifact): Boolean = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     artifact.getQualifiedExtraAttributes.asScala.keys
       .exists(_.asInstanceOf[String] startsWith "m:")
   }
@@ -573,9 +573,9 @@ private[sbt] object IvySbt {
   ): Unit = {
     val existing = settings.getResolverNames
     for (moduleConf <- moduleConfigurations) {
-      import moduleConf._
-      import IvyPatternHelper._
-      import PatternMatcher._
+      import moduleConf.*
+      import IvyPatternHelper.*
+      import PatternMatcher.*
       if (!existing.contains(resolver.name))
         settings.addResolver(ConvertResolver(resolver, settings, UpdateOptions(), log))
       val attributes = javaMap(
@@ -672,9 +672,9 @@ private[sbt] object IvySbt {
     settings.setDefaultRepositoryCacheManager(manager)
   }
   def toIvyConfiguration(configuration: Configuration) = {
-    import org.apache.ivy.core.module.descriptor.{ Configuration => IvyConfig }
-    import IvyConfig.Visibility._
-    import configuration._
+    import org.apache.ivy.core.module.descriptor.{ Configuration as IvyConfig }
+    import IvyConfig.Visibility.*
+    import configuration.*
     new IvyConfig(
       name,
       if (isPublic) PUBLIC else PRIVATE,
@@ -709,7 +709,7 @@ private[sbt] object IvySbt {
 
   /** Converts the given sbt module id into an Ivy ModuleRevisionId. */
   def toID(m: ModuleID) = {
-    import m._
+    import m.*
     ModuleRevisionId.newInstance(
       organization,
       name,
@@ -796,7 +796,7 @@ private[sbt] object IvySbt {
     artifact
   }
   def getExtraAttributes(revID: ExtendableItem): Map[String, String] = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     revID.getExtraAttributes.asInstanceOf[java.util.Map[String, String]].asScala.toMap
   }
   private[sbt] def extra(
@@ -809,7 +809,7 @@ private[sbt] object IvySbt {
     javaMap(ea.extraAttributes, unqualify)
   }
   private[sbt] def javaMap(m: Map[String, String], unqualify: Boolean = false) = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     val map = if (unqualify) m map { case (k, v) => (k.stripPrefix("e:"), v) }
     else m
     if (map.isEmpty) null else map.asJava
@@ -832,7 +832,7 @@ private[sbt] object IvySbt {
     </ivy-module>
   }
   private def defaultInfo(module: ModuleID): scala.xml.Elem = {
-    import module._
+    import module.*
     val base = <info organisation={organization} module={name} revision={revision}/>
     branchName.fold(base) { br =>
       base % new scala.xml.UnprefixedAttribute("branch", br, scala.xml.Null)
@@ -963,7 +963,7 @@ private[sbt] object IvySbt {
       deps.put(id, updated)
     }
 
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     deps.values.asScala.toSeq.flatMap { dds =>
       val mergeable = dds.lazyZip(dds.tail).forall(ivyint.MergeDescriptors.mergeable _)
       if (mergeable) dds.reverse.reduceLeft(ivyint.MergeDescriptors.apply _) :: Nil else dds

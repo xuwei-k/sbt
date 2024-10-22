@@ -18,18 +18,18 @@ import sbt.internal.util.{
   ErrorHandling,
   GlobalLogBacking,
   Prompt,
-  Terminal => ITerminal
+  Terminal as ITerminal
 }
 import sbt.internal.{ FastTrackCommands, ShutdownHooks, SysProp, TaskProgress }
 import sbt.io.{ IO, Using }
-import sbt.protocol._
+import sbt.protocol.*
 import sbt.util.{ Logger, LoggerContext }
 
 import java.io.PrintWriter
 import java.util.Properties
 import java.util.concurrent.RejectedExecutionException
 import scala.annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.control.NonFatal
 
 import java.text.ParseException
@@ -93,7 +93,7 @@ object MainLoop {
 
   /** Deletes the current sbt artifacts from boot. */
   private[sbt] def deleteCurrentArtifacts(state: State): Unit = {
-    import sbt.io.syntax._
+    import sbt.io.syntax.*
     val provider = state.configuration.provider
     val appId = provider.id
     // If we can obtain boot directory more accurately it'd be better.

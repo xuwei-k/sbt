@@ -6,7 +6,7 @@ import java.net.URI
 import org.apache.ivy.core.cache.ArtifactOrigin
 import org.apache.ivy.core.cache.{ DefaultRepositoryCacheManager, RepositoryCacheManager }
 import org.apache.ivy.core.module.descriptor.{
-  Artifact => IvyArtifact,
+  Artifact as IvyArtifact,
   DefaultArtifact,
   DefaultDependencyArtifactDescriptor,
   DefaultModuleDescriptor,
@@ -24,7 +24,7 @@ import org.apache.ivy.plugins.namespace.Namespace
 import org.apache.ivy.plugins.resolver.{ DependencyResolver, ResolverSettings }
 import org.apache.ivy.plugins.resolver.util.ResolvedResource
 
-import FakeResolver._
+import FakeResolver.*
 
 /**
  * A fake `DependencyResolver` that statically serves predefined artifacts.
@@ -163,13 +163,13 @@ private[sbt] class FakeResolver(private var name: String, cacheDir: File, module
 
   override def listTokenValues(
       tokens: Array[String],
-      criteria: java.util.Map[_, _]
+      criteria: java.util.Map[?, ?]
   ): Array[java.util.Map[_, _]] =
     Array.empty
 
   override def listTokenValues(
       token: String,
-      otherTokenValues: java.util.Map[_, _]
+      otherTokenValues: java.util.Map[?, ?]
   ): Array[String] =
     Array.empty
 

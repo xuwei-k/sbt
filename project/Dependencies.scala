@@ -1,6 +1,6 @@
-import sbt._
-import Keys._
-import sbt.contraband.ContrabandPlugin.autoImport._
+import sbt.*
+import Keys.*
+import sbt.contraband.ContrabandPlugin.autoImport.*
 
 object Dependencies {
   // WARNING: Please Scala update versions in PluginCross.scala too

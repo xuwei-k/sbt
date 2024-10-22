@@ -1,6 +1,6 @@
 package lmcoursier.internal
 
-import coursier.core._
+import coursier.core.*
 import coursier.util.{ EitherT, Monad }
 
 // private[coursier]

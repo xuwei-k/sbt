@@ -14,7 +14,7 @@ import sbt.internal.util.{ complete, LineRange, RangePosition }
 import java.io.File
 import java.net.URI
 import Def.{ ScopedKey, Setting }
-import SessionSettings._
+import SessionSettings.*
 import sbt.ProjectExtra.{ extract, getProject, session, structure }
 import sbt.internal.parser.SbtRefactorings
 import sbt.io.IO
@@ -326,8 +326,8 @@ save, save-all
 
   final class Remove(val ranges: Seq[(Int, Int)]) extends SessionCommand
 
-  import complete._
-  import DefaultParsers._
+  import complete.*
+  import DefaultParsers.*
 
   /** Parser for the session command. */
   lazy val parser =

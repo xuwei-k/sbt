@@ -9,11 +9,11 @@
 package sbt.test
 
 import java.io.File
-import sjsonnew._
+import sjsonnew.*
 import sbt.Def.{ Setting, inputKey, settingKey, taskKey }
 import sbt.Scope.Global
 import sbt.librarymanagement.ModuleID
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 import sbt.{ LocalProject, ProjectReference, ThisBuild, Zero }
 
 object SlashSyntaxTest extends sbt.SlashSyntax {

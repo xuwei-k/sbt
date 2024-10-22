@@ -2,9 +2,9 @@ package sbt
 package internal.librarymanagement
 
 import java.io.File
-import sbt.librarymanagement.ivy._
-import sbt.io.syntax._
-import xsbti.{ Logger => XLogger }
+import sbt.librarymanagement.ivy.*
+import sbt.io.syntax.*
+import xsbti.{ Logger as XLogger }
 import sbt.util.Logger
 
 /**

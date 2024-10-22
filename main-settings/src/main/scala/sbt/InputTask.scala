@@ -10,9 +10,9 @@ package sbt
 
 import sbt.internal.util.complete.Parser
 import Def.Initialize
-import std.TaskExtra._
+import std.TaskExtra.*
 import sbt.internal.util.Types
-import sbt.internal.util.Types._
+import sbt.internal.util.Types.*
 import sbt.util.Applicative
 
 /** Parses input and produces a task to run.  Constructed using the companion object. */

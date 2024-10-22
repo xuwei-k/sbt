@@ -7,9 +7,9 @@
  */
 package sbt
 
-import java.io._
+import java.io.*
 
-import sbt.internal._
+import sbt.internal.*
 import sbt.internal.inc.MappedFileConverter
 import sbt.internal.util.{
   AttributeEntry,
@@ -29,8 +29,8 @@ package subpackage {
 }
 
 object PluginCommandTest extends verify.BasicTestSuite {
-  import subpackage._
-  import FakeState._
+  import subpackage.*
+  import FakeState.*
 
   test("`plugin` command should work for plugins within nested in one package") {
     val output = processCommand(
@@ -71,7 +71,7 @@ object FakeState {
     val outBuffer = new ByteArrayOutputStream
     val logFile = File.createTempFile("sbt", ".log")
     try {
-      val state = FakeState(logFile, enabledPlugins: _*)
+      val state = FakeState(logFile, enabledPlugins*)
       Terminal.withOut(new PrintStream(outBuffer, true)) {
         MainLoop.processCommand(Exec(input, None), state)
       }
@@ -99,7 +99,7 @@ object FakeState {
 
     val (cMap, data: Settings[Scope]) =
       Def.makeWithCompiledMap(settings)(using delegates, scopeLocal, Def.showFullKey)
-    val extra: KeyIndex => BuildUtil[_] = (keyIndex) =>
+    val extra: KeyIndex => BuildUtil[?] = (keyIndex) =>
       BuildUtil(base.toURI, Map.empty, keyIndex, data)
     val structureIndex: StructureIndex =
       Load.structureIndex(data, settings, extra, Map.empty)

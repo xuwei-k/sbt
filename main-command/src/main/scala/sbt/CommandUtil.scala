@@ -13,11 +13,11 @@ import java.util.regex.{ Pattern, PatternSyntaxException }
 
 import sbt.internal.util.AttributeKey
 import sbt.internal.util.complete.Parser
-import sbt.internal.util.complete.DefaultParsers._
+import sbt.internal.util.complete.DefaultParsers.*
 import sbt.internal.util.Util.nilSeq
 
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 
 object CommandUtil {
   def readLines(files: Seq[File]): Seq[String] =

@@ -18,7 +18,7 @@ import BuildPaths.outputDirectory
 import Scope.GlobalScope
 import sbt.SlashSyntax0.given
 import BuildStreams.Streams
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sbt.internal.inc.MappedFileConverter
 import sbt.internal.util.{ AttributeEntry, AttributeKey, AttributeMap, Attributed, Settings }
 import sbt.internal.util.Attributed.data
@@ -314,7 +314,7 @@ object BuildStreams {
     (s get Keys.stateStreams) getOrElse {
       std.Streams(
         path(units, root, data)(_),
-        displayFull: ScopedKey[_] => String,
+        displayFull: ScopedKey[?] => String,
         LogManager.construct(data, s), {
           val factory =
             s.get(Keys.cacheStoreFactoryFactory).getOrElse(InMemoryCacheStore.factory(0))
@@ -325,14 +325,14 @@ object BuildStreams {
   }
 
   def path(units: Map[URI, LoadedBuildUnit], root: URI, data: Settings[Scope])(
-      scoped: ScopedKey[_]
+      scoped: ScopedKey[?]
   ): File =
     resolvePath(projectPath(units, root, scoped, data), nonProjectPath(scoped))
 
   def resolvePath(base: File, components: Seq[String]): File =
     components.foldLeft(base)((b, p) => new File(b, p))
 
-  def pathComponent[T](axis: ScopeAxis[T], scoped: ScopedKey[_], label: String)(
+  def pathComponent[T](axis: ScopeAxis[T], scoped: ScopedKey[?], label: String)(
       show: T => String
   ): String =
     axis match {
@@ -385,7 +385,7 @@ object BuildStreams {
   def projectPath(
       units: Map[URI, LoadedBuildUnit],
       root: URI,
-      scoped: ScopedKey[_],
+      scoped: ScopedKey[?],
       data: Settings[Scope]
   ): File =
     scoped.scope.project match {

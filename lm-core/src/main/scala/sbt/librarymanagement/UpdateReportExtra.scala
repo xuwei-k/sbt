@@ -4,7 +4,7 @@
 package sbt.librarymanagement
 
 import java.io.File
-import java.{ util => ju }
+import java.{ util as ju }
 
 private[librarymanagement] abstract class ConfigurationReportExtra {
   def configuration: ConfigRef
@@ -111,7 +111,7 @@ private[librarymanagement] abstract class ModuleReportExtra {
     } getOrElse ""
 
   private def calendarToString(c: ju.Calendar): String = {
-    import sjsonnew._, BasicJsonProtocol._
+    import sjsonnew.*, BasicJsonProtocol.*
     implicitly[IsoString[ju.Calendar]] to c
   }
 

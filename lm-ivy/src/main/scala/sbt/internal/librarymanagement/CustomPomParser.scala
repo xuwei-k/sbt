@@ -172,7 +172,7 @@ object CustomPomParser {
   // The extra sbt plugin metadata in pom.xml does not need to be readable by maven, but the other information may be.
   // However, the pom.xml needs to be valid in all cases because other tools like repository managers may read the pom.xml.
   private[sbt] def getPomProperties(md: ModuleDescriptor): Map[String, String] = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     PomModuleDescriptorBuilder
       .extractPomProperties(md.getExtraInfo)
       .asInstanceOf[java.util.Map[String, String]]
@@ -189,7 +189,7 @@ object CustomPomParser {
       properties: Map[String, String],
       id: ModuleRevisionId
   ): ModuleRevisionId = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     val oldExtra = qualifiedExtra(id)
     val newExtra = (oldExtra ++ properties).asJava
     // remove the sbt plugin cross version from the resolved ModuleRevisionId
@@ -276,7 +276,7 @@ object CustomPomParser {
       case None => dd
     }
 
-  import scala.jdk.CollectionConverters._
+  import scala.jdk.CollectionConverters.*
   def addExtra(
       properties: Map[String, String],
       dependencyExtra: Map[ModuleRevisionId, Map[String, String]],

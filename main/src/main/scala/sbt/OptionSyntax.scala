@@ -12,7 +12,7 @@ import java.util.Optional
 
 // Todo: port this back to Zinc in place of JavaInterfaceUtil.
 trait OptionSyntax {
-  import OptionSyntax._
+  import OptionSyntax.*
   implicit def sbtOptionSyntaxRichOptional[A](optional: Optional[A]): RichOptional[A] =
     new RichOptional[A](optional)
 

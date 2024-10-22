@@ -17,7 +17,7 @@ import sbt.librarymanagement.Configuration
 
 import java.net.URI
 
-import hedgehog._
+import hedgehog.*
 import hedgehog.predef.sequence
 
 object TestBuild extends TestBuild
@@ -100,7 +100,7 @@ abstract class TestBuild {
       val taskAxesMappings =
         for ((scope, keys) <- data.data; key <- keys.keys)
           yield (ScopedKey(scope.copy(task = Zero), key), scope.task): (
-              ScopedKey[_],
+              ScopedKey[?],
               ScopeAxis[AttributeKey[_]]
           )
 
@@ -140,7 +140,7 @@ abstract class TestBuild {
     def rootProject(uri: URI): String = buildMap(uri).root.id
     def inheritConfig(ref: ResolvedReference, config: ConfigKey) =
       projectFor(ref).confMap(config.name).extendsConfigs map toConfigKey
-    def inheritTask(task: AttributeKey[_]) = taskMap.get(task) match {
+    def inheritTask(task: AttributeKey[?]) = taskMap.get(task) match {
       case None    => Vector()
       case Some(t) => t.delegates.toVector map getKey
     }
@@ -163,7 +163,7 @@ abstract class TestBuild {
         c <- Zero +: p.configurations.map(c => Select(ConfigKey(c.name)))
       } yield Scope(project = ref, config = c, task = t, extra = Zero)
   }
-  def getKey: Taskk => AttributeKey[_] = _.key
+  def getKey: Taskk => AttributeKey[?] = _.key
   def toConfigKey: Configuration => ConfigKey = c => ConfigKey(c.name)
   case class Build(uri: URI, projects: Seq[Proj]) {
     override def toString = "Build " + uri.toString + " :\n    " + projects.mkString("\n    ")
@@ -217,7 +217,7 @@ abstract class TestBuild {
   def oneOrGlobal[T](gen: Seq[T]): Gen[ScopeAxis[T]] = orGlobal(oneOf(gen))
 
   def makeParser(structure: Structure): Parser[ScopedKey[_]] = {
-    import structure._
+    import structure.*
     def confs(uri: URI) =
       env.buildMap.get(uri).toList.flatMap { _.root.configurations.map(_.name) }
     val defaultConfs: Option[ResolvedReference] => Seq[String] = {
@@ -374,7 +374,7 @@ abstract class TestBuild {
   ): Gen[Vector[(T, Vector[T])]] =
     names match {
       case Vector() => sequence(acc.toList).map(_.toVector)
-      case Vector(x, xs @ _*) =>
+      case Vector(x, xs*) =>
         val next =
           for (depCount <- Gen.int(maxDeps); d <- pick(depCount, xs))
             yield (x, d.toVector)

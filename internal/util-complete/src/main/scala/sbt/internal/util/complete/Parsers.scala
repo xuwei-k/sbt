@@ -9,7 +9,7 @@
 package sbt.internal.util
 package complete
 
-import Parser._
+import Parser.*
 import java.io.File
 import java.net.URI
 import java.lang.Character.{
@@ -322,14 +322,14 @@ trait Parsers {
    * Applies `rep` zero or more times, separated by `sep`. The result is the (possibly empty)
    * sequence of results from the multiple `rep` applications. The `sep` results are discarded.
    */
-  def repsep[T](rep: Parser[T], sep: Parser[_]): Parser[Seq[T]] =
+  def repsep[T](rep: Parser[T], sep: Parser[?]): Parser[Seq[T]] =
     rep1sep(rep, sep) ?? nilSeq[T]
 
   /**
    * Applies `rep` one or more times, separated by `sep`. The result is the non-empty sequence of
    * results from the multiple `rep` applications. The `sep` results are discarded.
    */
-  def rep1sep[T](rep: Parser[T], sep: Parser[_]): Parser[Seq[T]] =
+  def rep1sep[T](rep: Parser[T], sep: Parser[?]): Parser[Seq[T]] =
     (rep ~ (sep ~> rep).*).map { case (x ~ xs) => x +: xs }
 
   /** Wraps the result of `p` in `Some`. */
@@ -400,7 +400,7 @@ object Parsers extends Parsers
 object DefaultParsers extends Parsers with ParserMain {
 
   /** Applies parser `p` to input `s` and returns `true` if the parse was successful. */
-  def matches(p: Parser[_], s: String): Boolean =
+  def matches(p: Parser[?], s: String): Boolean =
     apply(p)(s).resultEmpty.isValid
 
   /** Returns `true` if `s` parses successfully according to [[ID]]. */

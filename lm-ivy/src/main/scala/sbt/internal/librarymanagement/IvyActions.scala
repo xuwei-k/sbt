@@ -14,17 +14,17 @@ import org.apache.ivy.core.module.descriptor.{
   DefaultModuleDescriptor,
   MDArtifact,
   ModuleDescriptor,
-  Artifact => IArtifact
+  Artifact as IArtifact
 }
 import org.apache.ivy.core.resolve.ResolveOptions
 import org.apache.ivy.plugins.resolver.{ BasicResolver, DependencyResolver }
-import org.apache.ivy.util.filter.{ Filter => IvyFilter }
+import org.apache.ivy.util.filter.{ Filter as IvyFilter }
 import sbt.io.{ IO, PathFinder }
 import sbt.util.Logger
-import sbt.librarymanagement.{ ModuleDescriptorConfiguration => InlineConfiguration, _ }
-import syntax._
-import InternalDefaults._
-import UpdateClassifiersUtil._
+import sbt.librarymanagement.{ ModuleDescriptorConfiguration as InlineConfiguration, * }
+import syntax.*
+import InternalDefaults.*
+import UpdateClassifiersUtil.*
 import sbt.internal.librarymanagement.IvyUtil.TransientNetworkException
 
 object IvyActions {
@@ -127,7 +127,7 @@ object IvyActions {
         Option(deliver(module, configuration, log))
       }
 
-    val artifacts = Map(configuration.artifacts: _*)
+    val artifacts = Map(configuration.artifacts*)
     val checksums = configuration.checksums
     module.withModule(log) { case (ivy, md, _) =>
       val resolver = ivy.getSettings.getResolver(resolverName)
@@ -303,7 +303,7 @@ object IvyActions {
     val resolveOptions = new ResolveOptions
     val resolveId = ResolveOptions.getDefaultResolveId(moduleDescriptor)
     val artifactFilter = getArtifactTypeFilter(updateConfiguration.artifactFilter)
-    import updateConfiguration._
+    import updateConfiguration.*
     resolveOptions.setResolveId(resolveId)
     resolveOptions.setArtifactFilter(artifactFilter)
     resolveOptions.setUseCacheOnly(offline)
@@ -320,7 +320,7 @@ object IvyActions {
 
     val resolveReport = ivyInstance.resolve(moduleDescriptor, resolveOptions)
     if (resolveReport.hasError && !missingOk) {
-      import scala.jdk.CollectionConverters._
+      import scala.jdk.CollectionConverters.*
       // If strict error, collect report information and generated UnresolvedWarning
       val messages = resolveReport.getAllProblemMessages.asScala.toSeq.map(_.toString).distinct
       val failedPaths = resolveReport.getUnresolvedDependencies.map { node =>
@@ -362,7 +362,7 @@ object IvyActions {
     val resolveOptions = new ResolveOptions
     val resolveId = ResolveOptions.getDefaultResolveId(descriptor)
     val artifactFilter = getArtifactTypeFilter(updateConfiguration.artifactFilter)
-    import updateConfiguration._
+    import updateConfiguration.*
     resolveOptions.setResolveId(resolveId)
     resolveOptions.setArtifactFilter(artifactFilter)
     resolveOptions.setUseCacheOnly(offline)

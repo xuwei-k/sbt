@@ -337,7 +337,7 @@ trait Cont:
               summon[HashWriter[Unit]]
             }.asExprOf[HashWriter[A2]]
           else summonHashWriter[A2]
-        val tagsExpr = '{ List(${ Varargs(tags.map(Expr[CacheLevelTag](_))) }: _*) }
+        val tagsExpr = '{ List(${ Varargs(tags.map(Expr[CacheLevelTag](_))) }*) }
         val block = letOutput(outputs, cacheConfigExpr)(body)
         '{
           given HashWriter[A2] = $inputHashWriter
@@ -374,7 +374,7 @@ trait Cont:
               outputs = List(${
                 Varargs[VirtualFile](outputs.map: out =>
                   out.toRef.asExprOf[VirtualFile])
-              }: _*),
+              }*),
             )
           }.asTerm
         ).asExprOf[ActionCache.InternalActionResult[A1]]

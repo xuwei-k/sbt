@@ -16,7 +16,7 @@ import java.util.concurrent.{ Executors, LinkedBlockingQueue, TimeUnit }
 
 import jline.console.ConsoleReader
 import scala.annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -484,7 +484,7 @@ object Terminal {
     override private[sbt] def withRawOutput[R](f: => R): R = t.withRawOutput(f)
     override def restore(): Unit = t.restore()
     override def close(): Unit = {}
-    override private[sbt] def write(bytes: Int*): Unit = t.write(bytes: _*)
+    override private[sbt] def write(bytes: Int*): Unit = t.write(bytes*)
     override def getLastLine: Option[String] = t.getLastLine
     override def getLines: Seq[String] = t.getLines
     override private[sbt] def name: String = t.name
@@ -1041,7 +1041,7 @@ object Terminal {
     override private[sbt] val printStream: PrintStream = new LinePrintStream(outputStream)
     override def inputStream: InputStream = in
 
-    private[sbt] def write(bytes: Int*): Unit = in.write(bytes: _*)
+    private[sbt] def write(bytes: Int*): Unit = in.write(bytes*)
     private val isStopped = new AtomicBoolean(false)
 
     override def getLineHeightAndWidth(line: String): (Int, Int) = getWidth match {

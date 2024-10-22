@@ -9,10 +9,10 @@
 package sbt
 package internal
 
-import BasicCommandStrings._
-import BasicCommands._
+import BasicCommandStrings.*
+import BasicCommands.*
 import BuiltinCommands.{ shell, waitCmd }
-import ContinuousCommands._
+import ContinuousCommands.*
 
 import sbt.internal.util.complete.Parser
 

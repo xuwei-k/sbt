@@ -1,6 +1,6 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import verify.BasicTestSuite
 
 // This is a specification to check the inconsistent duplicate warnings

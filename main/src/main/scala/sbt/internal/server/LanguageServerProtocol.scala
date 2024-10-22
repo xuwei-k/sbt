@@ -10,10 +10,10 @@ package sbt
 package internal
 package server
 
-import sbt.internal.langserver._
-import sbt.internal.protocol._
-import sbt.internal.protocol.codec._
-import sbt.protocol.{ CompletionParams => CP, SettingQuery => Q }
+import sbt.internal.langserver.*
+import sbt.internal.protocol.*
+import sbt.internal.protocol.codec.*
+import sbt.protocol.{ CompletionParams as CP, SettingQuery as Q }
 import sjsonnew.shaded.scalajson.ast.unsafe.JValue
 import sjsonnew.support.scalajson.unsafe.Converter
 import xsbti.FileConverter
@@ -27,7 +27,7 @@ private[sbt] object LanguageServerProtocol {
     with sjsonnew.BasicJsonProtocol
     with InitializeOptionFormats
 
-  import internalJsonProtocol._
+  import internalJsonProtocol.*
 
   def json(r: JsonRpcRequestMessage): JValue =
     r.params.getOrElse(
@@ -46,7 +46,7 @@ private[sbt] object LanguageServerProtocol {
   }
 
   def handler(converter: FileConverter): ServerHandler = ServerHandler { callback =>
-    import callback._
+    import callback.*
     ServerIntent(
       onRequest = {
         case r: JsonRpcRequestMessage if r.method == "initialize" =>

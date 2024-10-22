@@ -3,7 +3,7 @@ package lmcoursier.internal
 import coursier.{ Resolution, Resolve }
 import coursier.cache.internal.ThreadUtil
 import coursier.cache.loggers.{ FallbackRefreshDisplay, ProgressBarRefreshDisplay, RefreshLogger }
-import coursier.core._
+import coursier.core.*
 import coursier.error.ResolutionError
 import coursier.error.ResolutionError.CantDownloadModule
 import coursier.ivy.IvyRepository
@@ -104,7 +104,7 @@ object ResolutionRun {
           params.params
             .addForceVersion(
               (if (isSandboxConfig) Nil
-               else params.interProjectDependencies.map(_.moduleVersion)): _*
+               else params.interProjectDependencies.map(_.moduleVersion))*
             )
             .withForceScalaVersion(params.autoScalaLibOpt.nonEmpty)
             .withScalaVersionOpt(params.autoScalaLibOpt.map(_._2))

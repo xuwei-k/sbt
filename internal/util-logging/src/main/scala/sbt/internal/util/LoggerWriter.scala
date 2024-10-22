@@ -8,7 +8,7 @@
 
 package sbt.internal.util
 
-import sbt.util._
+import sbt.util.*
 
 /**
  * Provides a `java.io.Writer` interface to a `Logger`. Content is line-buffered and logged at

@@ -7,7 +7,7 @@ import java.net.URI
 
 import sbt.internal.librarymanagement.mavenint.SbtPomExtraProperties
 import scala.collection.mutable.ListBuffer
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 import sbt.util.Logger
 
 private[librarymanagement] abstract class ModuleIDExtra {

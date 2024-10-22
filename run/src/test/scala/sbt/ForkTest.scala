@@ -8,15 +8,15 @@
 
 package sbt
 
-import org.scalacheck._
-import Prop.{ Exception => _, _ }
+import org.scalacheck.*
+import Prop.{ Exception as _, * }
 import Gen.{ alphaNumChar, frequency, nonEmptyListOf }
 import java.io.File
 
 import sbt.internal.TestLogger
 import sbt.io.{ IO, Path }
-import OutputStrategy._
-import sbt.internal.util.Util._
+import OutputStrategy.*
+import sbt.internal.util.Util.*
 
 object ForkTest extends Properties("Fork") {
 

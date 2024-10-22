@@ -17,13 +17,13 @@ import sbt.util.OptJsonWriter
 import sbt.ConcurrentRestrictions.Tag
 import sbt.Def.{ Initialize, ScopedKey, Setting, setting }
 import std.TaskMacro
-import std.TaskExtra.{ task => mktask, _ }
+import std.TaskExtra.{ task as mktask, * }
 import scala.reflect.ClassTag
 
 /** An abstraction on top of Settings for build configuration and task definition. */
 sealed trait Scoped extends Equals:
   def scope: Scope
-  val key: AttributeKey[_]
+  val key: AttributeKey[?]
 
   override def equals(that: Any): Boolean =
     (this eq that.asInstanceOf[AnyRef]) || (that match {
@@ -361,8 +361,8 @@ object Scoped:
       def doFinally(t: Task[Unit]): Initialize[Task[A1]] = onTask(_.doFinally(t))
       def ||[T >: A1](alt: Task[T]): Initialize[Task[T]] = onTask(_ || alt)
       def &&[T](alt: Task[T]): Initialize[Task[T]] = onTask(_ && alt)
-      def tag(tags: Tag*): Initialize[Task[A1]] = onTask(_.tag(tags: _*))
-      def tagw(tags: (Tag, Int)*): Initialize[Task[A1]] = onTask(_.tagw(tags: _*))
+      def tag(tags: Tag*): Initialize[Task[A1]] = onTask(_.tag(tags*))
+      def tagw(tags: (Tag, Int)*): Initialize[Task[A1]] = onTask(_.tagw(tags*))
 
       // Task-specific extensions
       def dependsOn(tasks: Initialize[? <: Task[?]]*): Initialize[Task[A1]] =
@@ -372,7 +372,7 @@ object Scoped:
       def dependsOnSeq(tasks: Seq[AnyInitTask]): Initialize[Task[A1]] =
         init.zipWith(
           Initialize.joinAny[Task](coerceToAnyTaskSeq(tasks))
-        )((thisTask, deps) => thisTask.dependsOn(deps: _*))
+        )((thisTask, deps) => thisTask.dependsOn(deps*))
       def failure: Initialize[Task[Incomplete]] = init(_.failure)
       def result: Initialize[Task[Result[A1]]] = init(_.result)
       def triggeredBy[A2](tasks: Initialize[Task[A2]]*): Initialize[Task[A1]] =
@@ -407,9 +407,9 @@ object Scoped:
       @targetName("&&_InitializeInputTask")
       def &&[T](alt: Task[T]): Initialize[InputTask[T]] = onTask(_ && alt)
       @targetName("tagInitializeInputTask")
-      def tag(tags: Tag*): Initialize[InputTask[A1]] = onTask(_.tag(tags: _*))
+      def tag(tags: Tag*): Initialize[InputTask[A1]] = onTask(_.tag(tags*))
       @targetName("tagwInitializeInputTask")
-      def tagw(tags: (Tag, Int)*): Initialize[InputTask[A1]] = onTask(_.tagw(tags: _*))
+      def tagw(tags: (Tag, Int)*): Initialize[InputTask[A1]] = onTask(_.tagw(tags*))
 
       // InputTask specific extensions
       @targetName("dependsOnInitializeInputTask")
@@ -423,7 +423,7 @@ object Scoped:
       @targetName("dependsOnSeqInitializeInputTask")
       def dependsOnSeq(tasks: Seq[AnyInitTask]): Initialize[InputTask[A1]] =
         init.zipWith(Initialize.joinAny[Task](coerceToAnyTaskSeq(tasks)))((thisTask, deps) =>
-          thisTask.mapTask(_.dependsOn(deps: _*))
+          thisTask.mapTask(_.dependsOn(deps*))
         )
   end Syntax
 
@@ -507,7 +507,7 @@ object Scoped:
     def dependOn: Initialize[Task[Unit]] =
       Initialize
         .joinAny[Task](coerceToAnyTaskSeq(keys))
-        .apply(deps => nop.dependsOn(deps: _*))
+        .apply(deps => nop.dependsOn(deps*))
   }
 
   sealed abstract class RichTaskables[Tup <: Tuple](final val keys: Tuple.Map[Tup, Taskable]):
@@ -682,7 +682,7 @@ end Scoped
  * See https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html#Migrating+from+sbt+0.12+style for how to migrate.
  */
 trait TupleSyntax:
-  import Scoped._
+  import Scoped.*
 
   // format: off
 
@@ -744,7 +744,7 @@ object InputKey:
       description: String,
       extend1: Scoped,
       extendN: Scoped*
-  ): InputKey[A1] = apply(label, description, KeyRanks.DefaultInputRank, extend1, extendN: _*)
+  ): InputKey[A1] = apply(label, description, KeyRanks.DefaultInputRank, extend1, extendN*)
 
   def apply[A1: ClassTag](
       label: String,

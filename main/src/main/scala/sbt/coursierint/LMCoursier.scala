@@ -13,26 +13,26 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import lmcoursier.definitions.{
   Classifier,
-  Configuration => CConfiguration,
+  Configuration as CConfiguration,
   CacheLogger,
-  Project => CProject,
+  Project as CProject,
   ModuleMatchers,
   Reconciliation,
-  Strict => CStrict,
+  Strict as CStrict,
 }
 import lmcoursier.*
 import lmcoursier.syntax.*
 import lmcoursier.credentials.Credentials
-import Keys._
+import Keys.*
 import sbt.internal.util.Util
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.{
-  Credentials => IvyCredentials,
+  Credentials as IvyCredentials,
   DirectCredentials,
   FileCredentials
 }
 import sbt.util.Logger
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import xsbti.AppConfiguration
 
 object LMCoursier {
@@ -251,8 +251,8 @@ object LMCoursier {
       logger.debug(s"downloaded $url")
   }
 
-  def publicationsSetting(packageConfigs: Seq[(Configuration, CConfiguration)]): Def.Setting[_] = {
-    csrPublications := CoursierArtifactsTasks.coursierPublicationsTask(packageConfigs: _*).value
+  def publicationsSetting(packageConfigs: Seq[(Configuration, CConfiguration)]): Def.Setting[?] = {
+    csrPublications := CoursierArtifactsTasks.coursierPublicationsTask(packageConfigs*).value
   }
 
   // This emulates Ivy's credential registration which basically keeps mutating global registry

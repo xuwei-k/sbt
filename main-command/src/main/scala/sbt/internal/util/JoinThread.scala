@@ -9,7 +9,7 @@
 package sbt.internal.util
 
 import scala.annotation.tailrec
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import java.util.concurrent.TimeoutException
 
 object JoinThread {

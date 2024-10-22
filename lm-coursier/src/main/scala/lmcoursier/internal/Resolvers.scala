@@ -8,10 +8,10 @@ import coursier.core.{ Authentication, Repository }
 import coursier.ivy.IvyRepository
 import coursier.maven.SbtMavenRepository
 import org.apache.ivy.plugins.resolver.IBiblioResolver
-import sbt.librarymanagement.{ Configuration => _, MavenRepository => _, _ }
+import sbt.librarymanagement.{ Configuration as _, MavenRepository as _, * }
 import sbt.util.Logger
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object Resolvers {
 
@@ -133,7 +133,7 @@ object Resolvers {
 
   private object IBiblioRepository {
 
-    private def stringVector(v: java.util.List[_]): Vector[String] =
+    private def stringVector(v: java.util.List[?]): Vector[String] =
       Option(v).map(_.asScala.toVector).getOrElse(Vector.empty).collect { case s: String =>
         s
       }

@@ -17,8 +17,8 @@ import ProjectExtra.{ relation }
 import Def.{ ScopedKey, Setting }
 import Scope.Global
 import sbt.SlashSyntax0.given
-import complete._
-import DefaultParsers._
+import complete.*
+import DefaultParsers.*
 
 /**
  * The resulting `session` and verbose and quiet summaries of the result of a set operation.
@@ -40,7 +40,7 @@ private[sbt] object SettingCompletions {
    * The settings injected by this method cannot be later persisted by the `session save` command.
    */
   def setAll(extracted: Extracted, settings: Seq[Setting[_]]): SetResult = {
-    import extracted._
+    import extracted.*
     val r = Project.relation(extracted.structure, true)
     val allDefs = Def
       .flattenLocals(
@@ -52,7 +52,7 @@ private[sbt] object SettingCompletions {
       )
       .keys
     val projectScope = Load.projectScope(currentRef)
-    def resolve(s: Setting[_]): Seq[Setting[_]] =
+    def resolve(s: Setting[?]): Seq[Setting[_]] =
       Load.transformSettings(projectScope, currentRef.build, rootProject, s :: Nil)
 
     def rescope[T](setting: Setting[T]): Seq[Setting[_]] = {
@@ -74,7 +74,7 @@ private[sbt] object SettingCompletions {
    *  appended to the current settings.
    */
   def setThis(extracted: Extracted, settings: Seq[Def.Setting[_]], arg: String): SetResult = {
-    import extracted._
+    import extracted.*
     val append =
       Load.transformSettings(Load.projectScope(currentRef), currentRef.build, rootProject, settings)
     val newSession = session.appendSettings(append map (a => (a, arg.split('\n').toList)))
@@ -176,7 +176,7 @@ private[sbt] object SettingCompletions {
    * Parser for the initialization expression for the assignment method `assign` on the key `sk`.
    * `scopedKeyP` is used to parse and complete the input keys for an initialization that depends on other keys.
    */
-  def valueParser(sk: ScopedKey[_], assign: Assign.Value): Parser[Seq[ScopedKey[_]]] = {
+  def valueParser(sk: ScopedKey[?], assign: Assign.Value): Parser[Seq[ScopedKey[_]]] = {
     val fullTypeString = keyTypeString(sk.key)
     val typeString = if (assignNoAppend(assign)) fullTypeString else "..."
     if (assign == Assign.Update) {
@@ -194,7 +194,7 @@ private[sbt] object SettingCompletions {
    * only known axis values for configurations and tasks and only in that order.
    */
   def scopeParser(
-      key: AttributeKey[_],
+      key: AttributeKey[?],
       settings: Settings[Scope],
       context: ResolvedProject
   ): Parser[Scope] = {
@@ -249,7 +249,7 @@ private[sbt] object SettingCompletions {
   }
 
   /** Parser for the assignment method (such as `:=`) for defining `key`. */
-  def assign(key: ScopedKey[_]): Parser[Assign.Value] = {
+  def assign(key: ScopedKey[?]): Parser[Assign.Value] = {
     val completions = fixedCompletions { (seen, _) =>
       completeAssign(seen, key).toSet
     }
@@ -276,7 +276,7 @@ private[sbt] object SettingCompletions {
    * Completions for an assignment method for `key` given the tab completion `level` and existing partial string `seen`.
    * This will filter possible assignment methods based on the underlying type of `key`, so that only `<<=` is shown for input tasks, for example.
    */
-  def completeAssign(seen: String, key: ScopedKey[_]): Seq[Completion] = {
+  def completeAssign(seen: String, key: ScopedKey[?]): Seq[Completion] = {
     val allowed: Iterable[Assign.Value] =
       if (appendable(key.key)) Assign.values
       else assignNoAppend
@@ -352,11 +352,11 @@ private[sbt] object SettingCompletions {
    * Returns a string representation of the underlying type T for a `key` representing a `Setting[T]`, `Task[T]`, or `InputTask[T]`.
    * This string representation is currently a cleaned up toString of the underlying ClassTag.
    */
-  def keyTypeString[T](key: AttributeKey[_]): String =
+  def keyTypeString[T](key: AttributeKey[?]): String =
     complete.TypeString.cleanup(key.tag.typeArg.toString)
 
   /** True if the `key` represents a setting or task that may be appended using an assignment method such as `+=`. */
-  def appendable(key: AttributeKey[_]): Boolean =
+  def appendable(key: AttributeKey[?]): Boolean =
     appendableClasses.exists(_.isAssignableFrom(key.tag.typeArg))
 
   /** The simple name of the Global scope, which can be used to reference it in the default setting context. */
@@ -375,7 +375,7 @@ private[sbt] object SettingCompletions {
     val Define = Value(":=")
     val Update = Value("~=")
   }
-  import Assign._
+  import Assign.*
 
   /** Returns the description associated with the provided assignment method. */
   def assignDescription(a: Assign.Value): String = a match {

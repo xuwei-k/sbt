@@ -17,7 +17,7 @@ private[sbt] object SbtRefactorings:
   import sbt.internal.parser.SbtParser.{ END_OF_LINE, FAKE_FILE }
 
   /** A session setting is simply a tuple of a Setting[_] and the strings which define it. */
-  type SessionSetting = (Def.Setting[_], Seq[String])
+  type SessionSetting = (Def.Setting[?], Seq[String])
   val emptyString = ""
   val reverseOrderingInt = Ordering[Int].reverse
 

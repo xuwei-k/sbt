@@ -8,7 +8,7 @@
 
 package sbt
 
-import org.scalacheck._
+import org.scalacheck.*
 import Gen.choose
 
 object TaskGen extends std.TaskExtra {

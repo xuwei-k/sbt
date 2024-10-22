@@ -42,7 +42,7 @@ object PluginDiscovery:
   def discoverAll(data: PluginData, loader: ClassLoader): DetectedPlugins = {
     def discover[A1: ClassTag](resource: String) =
       binarySourceModules[A1](data, loader, resource)
-    import Paths._
+    import Paths.*
     // TODO - Fix this once we can autodetect AutoPlugins defined by sbt itself.
     val defaultAutoPlugins = Seq(
       "sbt.plugins.IvyPlugin" -> sbt.plugins.IvyPlugin,
@@ -73,7 +73,7 @@ object PluginDiscovery:
   // TODO: consider consolidating into a single file, which would make the classpath search 4x faster
   /** Writes discovered module `names` to zero or more files in `dir` as per [[writeDescriptor]] and returns the list of files written. */
   def writeDescriptors(names: DiscoveredNames, dir: File): Seq[File] = {
-    import Paths._
+    import Paths.*
     val files =
       writeDescriptor(names.autoPlugins, dir, AutoPlugins) ::
         writeDescriptor(names.builds, dir, Builds) ::
@@ -106,7 +106,7 @@ object PluginDiscovery:
   ): Seq[String] =
     (
       binaryModuleNames(classpath, converter, loader, resourceName) ++
-        analyzed(classpath, converter).flatMap(a => sourceModuleNames(a, subclasses: _*))
+        analyzed(classpath, converter).flatMap(a => sourceModuleNames(a, subclasses*))
     ).distinct
 
   /** Discovers top-level modules in `analysis` that inherit from any of `subclasses`. */

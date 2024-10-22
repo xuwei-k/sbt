@@ -8,7 +8,7 @@
 
 package sbt.util
 
-import sbt.internal.util._
+import sbt.internal.util.*
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.{ AtomicReference, AtomicBoolean }

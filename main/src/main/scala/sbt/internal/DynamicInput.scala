@@ -9,7 +9,7 @@
 package sbt
 package internal
 
-import java.nio.file.{ WatchService => _ }
+import java.nio.file.{ WatchService as _ }
 
 import sbt.nio.FileStamper
 import sbt.nio.file.Glob

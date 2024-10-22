@@ -29,9 +29,9 @@ import java.util.concurrent.{
   Executor,
   ExecutorCompletionService,
   Executors,
-  Future => JFuture,
+  Future as JFuture,
   RejectedExecutionException,
-  CompletionService => JCompletionService
+  CompletionService as JCompletionService
 }
 
 object CompletionService {

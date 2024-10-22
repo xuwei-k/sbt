@@ -8,9 +8,9 @@
 
 package sbt.internal.util
 
-import sbt.util._
+import sbt.util.*
 import scala.collection.mutable.ListBuffer
-import org.apache.logging.log4j.core.{ LogEvent => XLogEvent }
+import org.apache.logging.log4j.core.{ LogEvent as XLogEvent }
 import org.apache.logging.log4j.core.appender.AbstractAppender
 import org.apache.logging.log4j.core.layout.PatternLayout
 import java.util.concurrent.atomic.AtomicInteger

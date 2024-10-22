@@ -1,6 +1,6 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 class CachedResolutionSpec extends ResolutionSpec with BaseCachedResolutionSpec {
   override val resolvers = Vector(

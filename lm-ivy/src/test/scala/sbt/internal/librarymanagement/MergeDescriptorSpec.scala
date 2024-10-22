@@ -1,9 +1,9 @@
 package sbt.internal.librarymanagement
 
 import org.apache.ivy.core.module.descriptor.DependencyArtifactDescriptor
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.UpdateOptions
-import sbt.internal.librarymanagement.ivyint._
+import sbt.internal.librarymanagement.ivyint.*
 
 object MergeDescriptorSpec extends BaseIvySpecification {
   test("Merging duplicate dependencies should work") {

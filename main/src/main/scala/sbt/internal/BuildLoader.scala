@@ -11,7 +11,7 @@ package internal
 
 import java.io.File
 import java.net.URI
-import BuildLoader._
+import BuildLoader.*
 import sbt.internal.util.Types.{ const, idFun }
 import sbt.util.Logger
 import sbt.librarymanagement.ModuleID

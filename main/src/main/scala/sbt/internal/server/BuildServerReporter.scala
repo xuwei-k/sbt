@@ -9,7 +9,7 @@
 package sbt.internal.server
 
 import sbt.StandardMain
-import sbt.internal.bsp._
+import sbt.internal.bsp.*
 import sbt.internal.util.ManagedLogger
 import sbt.internal.server.BuildServerProtocol.BspCompileState
 import xsbti.compile.CompileAnalysis
@@ -20,7 +20,7 @@ import xsbti.{
   Severity,
   VirtualFile,
   VirtualFileRef,
-  Position => XPosition
+  Position as XPosition
 }
 
 import scala.jdk.CollectionConverters.*
@@ -85,8 +85,8 @@ final class BuildServerReporterImpl(
     protected override val logger: ManagedLogger,
     protected override val underlying: Reporter
 ) extends BuildServerReporter {
-  import sbt.internal.bsp.codec.JsonProtocol._
-  import sbt.internal.inc.JavaInterfaceUtil._
+  import sbt.internal.bsp.codec.JsonProtocol.*
+  import sbt.internal.inc.JavaInterfaceUtil.*
 
   private lazy val exchange = StandardMain.exchange
   private val problemsByFile = mutable.Map[Path, Vector[Problem]]()

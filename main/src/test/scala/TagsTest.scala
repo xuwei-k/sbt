@@ -8,10 +8,10 @@
 
 package sbt
 
-import org.scalacheck._
+import org.scalacheck.*
 import Gen.listOf
-import Prop._
-import Tags._
+import Prop.*
+import Tags.*
 
 object TagsTest extends Properties("Tags") {
   final case class Size(value: Int)

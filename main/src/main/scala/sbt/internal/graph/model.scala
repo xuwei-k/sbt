@@ -11,7 +11,7 @@ package internal
 package graph
 
 import java.io.File
-import sjsonnew._
+import sjsonnew.*
 import scala.collection.mutable
 
 private[sbt] case class GraphModuleId(
@@ -113,7 +113,7 @@ private[sbt] case class ModuleGraph(nodes: Seq[Module], edges: Seq[Edge]) {
 private[sbt] object ModuleGraph:
   val empty = ModuleGraph(Seq.empty, Seq.empty)
 
-  import BasicJsonProtocol._
+  import BasicJsonProtocol.*
   given moduleGraphIso: IsoLList.Aux[ModuleGraph, Vector[Module] :*: Vector[Edge] :*: LNil] =
     LList.iso[ModuleGraph, Vector[Module] :*: Vector[Edge] :*: LNil](
       { (g: ModuleGraph) =>

@@ -9,7 +9,7 @@
 package sbt.internal.util
 package complete
 
-import Completion._
+import Completion.*
 
 class ParserWithExamplesTest extends UnitSpec {
 
@@ -84,7 +84,7 @@ class ParserWithExamplesTest extends UnitSpec {
       removeInvalidExamples: Boolean
   ) {
 
-    import DefaultParsers._
+    import DefaultParsers.*
 
     val colorParser = "blue" | "green" | "black" | "red"
     val parserWithExamples: Parser[String] = new ParserWithExamples[String](

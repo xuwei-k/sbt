@@ -8,7 +8,7 @@
 
 package sbt.internal.util
 
-import sbt.util._
+import sbt.util.*
 import scala.annotation.nowarn
 
 /**

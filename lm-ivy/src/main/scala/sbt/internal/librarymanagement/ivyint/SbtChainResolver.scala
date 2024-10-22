@@ -11,16 +11,16 @@ import org.apache.ivy.core.{ IvyContext, LogOptions }
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor
-import org.apache.ivy.core.module.descriptor.{ Artifact => IArtifact }
+import org.apache.ivy.core.module.descriptor.{ Artifact as IArtifact }
 import org.apache.ivy.core.resolve.{ ResolveData, ResolvedModuleRevision }
 import org.apache.ivy.plugins.latest.LatestStrategy
-import org.apache.ivy.plugins.repository.file.{ FileResource, FileRepository => IFileRepository }
+import org.apache.ivy.plugins.repository.file.{ FileResource, FileRepository as IFileRepository }
 import org.apache.ivy.plugins.repository.url.URLResource
-import org.apache.ivy.plugins.resolver._
+import org.apache.ivy.plugins.resolver.*
 import org.apache.ivy.plugins.resolver.util.{ HasLatestStrategy, ResolvedResource }
-import org.apache.ivy.util.{ Message, StringUtils => IvyStringUtils }
+import org.apache.ivy.util.{ Message, StringUtils as IvyStringUtils }
 import sbt.util.Logger
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.UpdateOptions
 
 import scala.util.control.NonFatal

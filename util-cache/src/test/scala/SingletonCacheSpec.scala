@@ -9,9 +9,9 @@
 package sbt.util
 
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 
-import CacheImplicits._
+import CacheImplicits.*
 
 import sjsonnew.{ Builder, deserializationError, JsonFormat, Unbuilder }
 import org.scalatest.flatspec.AnyFlatSpec

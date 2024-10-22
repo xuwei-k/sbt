@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement.formats
 
-import sjsonnew._
-import scala.xml._
+import sjsonnew.*
+import scala.xml.*
 
 trait NodeSeqFormat { self: BasicJsonProtocol =>
   implicit lazy val NodeSeqFormat: JsonFormat[NodeSeq] = projectFormat[NodeSeq, String](

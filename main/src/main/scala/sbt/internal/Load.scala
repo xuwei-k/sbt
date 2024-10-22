@@ -9,14 +9,14 @@
 package sbt
 package internal
 
-import sbt.BuildPaths._
+import sbt.BuildPaths.*
 import sbt.Def.{ ScopeLocal, ScopedKey, Setting, isDummy }
-import sbt.Keys._
+import sbt.Keys.*
 import sbt.Project.inScope
 import sbt.ProjectExtra.{ prefixConfigs, setProject, showLoadingKey, structure }
 import sbt.Scope.GlobalScope
 import sbt.SlashSyntax0.given
-import sbt.internal.BuildStreams._
+import sbt.internal.BuildStreams.*
 import sbt.internal.inc.classpath.ClasspathUtil
 import sbt.internal.inc.{ MappedFileConverter, ScalaInstance, ZincLmUtil, ZincUtil }
 import sbt.internal.util.Attributed.data
@@ -318,7 +318,7 @@ private[sbt] object Load {
     targets.groupBy(_._2).view.filter(_._2.size > 1).mapValues(_.map(_._1)).toMap
 
   private def allTargets(data: Settings[Scope]): Seq[(ProjectRef, File)] = {
-    import ScopeFilter._
+    import ScopeFilter.*
     val allProjects = ScopeFilter(Make.inAnyProject)
     val targetAndRef = Def.setting { (Keys.thisProjectRef.value, Keys.target.value) }
     new SettingKeyAll(Def.optional(targetAndRef)(identity))
@@ -333,7 +333,7 @@ private[sbt] object Load {
   // 3. resolvedScoped is replaced with the defining key as a value
   // Note: this must be idempotent.
   def finalTransforms(ss: Seq[Setting[_]]): Seq[Setting[_]] = {
-    def mapSpecial(to: ScopedKey[_]): [a] => ScopedKey[a] => ScopedKey[a] =
+    def mapSpecial(to: ScopedKey[?]): [a] => ScopedKey[a] => ScopedKey[a] =
       [a] =>
         (key: ScopedKey[a]) =>
           if key.key == streams.key then
@@ -346,7 +346,7 @@ private[sbt] object Load {
           case ik: InputTask[t] => ik.mapTask(tk => setDefinitionKey(tk, key)).asInstanceOf[T]
           case _                => value
         }
-    def setResolved(defining: ScopedKey[_]): [a] => ScopedKey[a] => Option[a] =
+    def setResolved(defining: ScopedKey[?]): [a] => ScopedKey[a] => Option[a] =
       [a] =>
         (key: ScopedKey[a]) =>
           key.key match
@@ -357,13 +357,13 @@ private[sbt] object Load {
     )
   }
 
-  def setDefinitionKey[T](tk: Task[T], key: ScopedKey[_]): Task[T] =
+  def setDefinitionKey[T](tk: Task[T], key: ScopedKey[?]): Task[T] =
     if (isDummy(tk)) tk else Task(tk.info.set(Keys.taskDefinitionKey, key), tk.work)
 
   def structureIndex(
       data: Settings[Scope],
       settings: Seq[Setting[_]],
-      extra: KeyIndex => BuildUtil[_],
+      extra: KeyIndex => BuildUtil[?],
       projects: Map[URI, LoadedBuildUnit]
   ): StructureIndex = {
     val keys = Index.allKeys(settings)
@@ -509,7 +509,7 @@ private[sbt] object Load {
     // put cleanups there, perhaps.
     if (keepSet.nonEmpty) {
       def keepFile(f: Path) = keepSet(f.toAbsolutePath().normalize())
-      import sbt.io.syntax._
+      import sbt.io.syntax.*
       val existing = (baseTarget.allPaths
         .get())
         .filterNot(_.isDirectory)
@@ -1051,7 +1051,7 @@ private[sbt] object Load {
     // Load all config files AND finalize the project at the root directory, if it exists.
     // Continue loading if we find any more.
     newProjects match
-      case Seq(next, rest @ _*) =>
+      case Seq(next, rest*) =>
         log.debug(s"[Loading] Loading project ${next.id} @ ${next.base}")
         discoverAndLoad(next, rest)
       case Nil if makeOrDiscoverRoot =>
@@ -1084,7 +1084,7 @@ private[sbt] object Load {
                 )
               val existingIds = otherProjects.projects.map(_.id)
               val refs = existingIds.map(id => ProjectRef(buildUri, id))
-              (root.aggregate(refs: _*), false, Nil, otherProjects)
+              (root.aggregate(refs*), false, Nil, otherProjects)
         val (finalRoot, projectLevelExtra) =
           timed(s"Load.loadTransitive: finalizeProject($root)", log) {
             finalizeProject(root, files, extraFiles, expand)
@@ -1149,7 +1149,7 @@ private[sbt] object Load {
       log: Logger
   ): Project =
     timed(s"Load.resolveProjectSettings(${p.id})", log) {
-      import AddSettings._
+      import AddSettings.*
       val autoConfigs = projectPlugins.flatMap(_.projectConfigurations)
       val auto = AddSettings.allDefaults
       // 3. Use AddSettings instance to order all Setting[_]s appropriately
@@ -1189,7 +1189,7 @@ private[sbt] object Load {
       p.copy(settings = allAutoPluginSettings ++ commonSettings ++ allProjectSettings)
         .setCommonSettings(commonSettings)
         .setAutoPlugins(projectPlugins)
-        .prefixConfigs(autoConfigs: _*)
+        .prefixConfigs(autoConfigs*)
     }
 
   private def expandCommonSettingsPerBase(
@@ -1395,7 +1395,7 @@ private[sbt] object Load {
     !context.globalPluginProject && context.pluginProjectDepth == 1
 
   def hasDefinition(dir: File): Boolean = {
-    import sbt.io.syntax._
+    import sbt.io.syntax.*
     (dir * -GlobFilter(DefaultTargetName)).get().nonEmpty
   }
 

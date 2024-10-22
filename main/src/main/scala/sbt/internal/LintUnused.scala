@@ -9,13 +9,13 @@
 package sbt
 package internal
 
-import Keys._
+import Keys.*
 import sbt.internal.util.{ FilePosition, NoPosition, SourcePosition }
 import java.io.File
 import ProjectExtra.{ extract, scopedKeyData }
 import Scope.Global
 import sbt.SlashSyntax0.given
-import sbt.Def._
+import sbt.Def.*
 
 object LintUnused {
   lazy val lintSettings: Seq[Setting[_]] = Seq(
@@ -173,7 +173,7 @@ object LintUnused {
   }
 
   private case class UnusedKey(
-      scoped: ScopedKey[_],
+      scoped: ScopedKey[?],
       positions: Vector[SourcePosition],
       data: Option[ScopedKeyData[_]]
   )

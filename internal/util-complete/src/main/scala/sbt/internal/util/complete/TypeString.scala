@@ -9,8 +9,8 @@
 package sbt.internal.util
 package complete
 
-import DefaultParsers._
-import TypeString._
+import DefaultParsers.*
+import TypeString.*
 
 /**
  * Basic representation of types parsed from Manifest.toString. This can only represent the

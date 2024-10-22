@@ -52,7 +52,7 @@ object HistoryCommands {
   def printHistory(history: complete.History, historySize: Int, show: Int): Unit =
     history.list(historySize, show).foreach(println)
 
-  import DefaultParsers._
+  import DefaultParsers.*
 
   val MaxLines = 500
   lazy val num = token(NatBasic, "<integer>")

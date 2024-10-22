@@ -12,11 +12,11 @@ import java.io.File
 import java.io.PrintWriter
 import java.lang.ProcessBuilder.Redirect
 import scala.sys.process.Process
-import OutputStrategy._
+import OutputStrategy.*
 import sbt.internal.util.{ RunningProcesses, Util }
 import Util.*
 
-import java.lang.{ ProcessBuilder => JProcessBuilder }
+import java.lang.{ ProcessBuilder as JProcessBuilder }
 import java.util.Locale
 
 /**
@@ -65,7 +65,7 @@ final class Fork(val commandName: String, val runnerClass: Option[String]) {
       if (Fork.shouldUseArgumentsFile(options))
         new JProcessBuilder(executable, Fork.createArgumentsFile(options))
       else
-        new JProcessBuilder(command.toArray: _*)
+        new JProcessBuilder(command.toArray*)
     workingDirectory foreach (jpb directory _)
     environment foreach { case (k, v) => jpb.environment.put(k, v) }
     if (connectInput) {

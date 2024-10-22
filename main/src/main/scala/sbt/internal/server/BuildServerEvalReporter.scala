@@ -10,7 +10,7 @@ package sbt.internal.server
 
 import dotty.tools.dotc.core.Contexts.Context
 import dotty.tools.dotc.reporting.Reporter
-import dotty.tools.dotc.reporting.{ Diagnostic => ScalaDiagnostic }
+import dotty.tools.dotc.reporting.{ Diagnostic as ScalaDiagnostic }
 import dotty.tools.dotc.util.SourcePosition
 import sbt.StandardMain.exchange
 import sbt.internal.EvalReporter
@@ -21,7 +21,7 @@ import sbt.internal.bsp.DiagnosticSeverity
 import sbt.internal.bsp.PublishDiagnosticsParams
 import sbt.internal.bsp.Range
 import sbt.internal.bsp.TextDocumentIdentifier
-import sbt.internal.bsp.codec.JsonProtocol._
+import sbt.internal.bsp.codec.JsonProtocol.*
 
 import java.nio.file.Path
 import java.nio.file.Paths

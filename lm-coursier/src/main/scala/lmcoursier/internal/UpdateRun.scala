@@ -2,7 +2,7 @@ package lmcoursier.internal
 
 import coursier.cache.loggers.RefreshLogger
 import coursier.core.Resolution.ModuleVersion
-import coursier.core._
+import coursier.core.*
 import coursier.util.Print
 import sbt.librarymanagement.UpdateReport
 import sbt.util.Logger
@@ -44,7 +44,7 @@ object UpdateRun {
       }
       .groupBy(_.withConfiguration(Configuration.empty))
       .map { case (dep, l) =>
-        dep.withConfiguration(Configuration.join(l.map(_.configuration).toSeq: _*))
+        dep.withConfiguration(Configuration.join(l.map(_.configuration).toSeq*))
       }
       .toSet
 

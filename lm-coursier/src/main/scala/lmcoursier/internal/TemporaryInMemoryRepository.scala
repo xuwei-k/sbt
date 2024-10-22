@@ -4,7 +4,7 @@ import java.io.{ File, FileNotFoundException, IOException }
 import java.net.{ HttpURLConnection, URL, URLConnection }
 
 import coursier.cache.{ ConnectionBuilder, FileCache }
-import coursier.core._
+import coursier.core.*
 import coursier.util.{ Artifact, EitherT, Monad }
 
 import scala.util.Try

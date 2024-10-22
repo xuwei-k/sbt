@@ -12,12 +12,12 @@ package plugins
 import java.io.File
 
 import Def.{ Setting, settingKey }
-import Defaults._
-import Keys._
-import KeyRanks._
+import Defaults.*
+import Keys.*
+import KeyRanks.*
 import sbt.ProjectExtra.inConfig
-import sbt.internal._
-import sbt.io.syntax._
+import sbt.internal.*
+import sbt.io.syntax.*
 import sbt.librarymanagement.Configurations.{ IntegrationTest, Test }
 import scala.annotation.nowarn
 
@@ -50,7 +50,7 @@ object JUnitXmlReportPlugin extends AutoPlugin {
     )
   }
 
-  import autoImport._
+  import autoImport.*
 
   @nowarn
   override lazy val projectSettings: Seq[Setting[_]] =

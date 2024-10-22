@@ -8,7 +8,7 @@
 
 package sbt.util
 
-import xsbti.{ Logger => xLogger }
+import xsbti.{ Logger as xLogger }
 import xsbti.{ Position, Problem, Severity }
 
 import sys.process.ProcessLogger

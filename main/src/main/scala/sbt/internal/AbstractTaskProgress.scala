@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import scala.collection.immutable.VectorBuilder
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress {
   import AbstractTaskExecuteProgress.Timer
@@ -37,7 +37,7 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress 
   private[sbt] def anyTimings = !timings.isEmpty
   def currentTimings: Iterator[(TaskId[_], Timer)] = timings.asScala.iterator
 
-  private[internal] def exceededThreshold(task: TaskId[_], threshold: FiniteDuration): Boolean =
+  private[internal] def exceededThreshold(task: TaskId[?], threshold: FiniteDuration): Boolean =
     timings.get(task) match {
       case null => false
       case t    => t.durationMicros > threshold.toMicros
@@ -103,18 +103,18 @@ private[sbt] abstract class AbstractTaskExecuteProgress extends ExecuteProgress 
   }
 
   private val taskNameCache = new ConcurrentHashMap[TaskId[_], String]
-  protected def taskName(t: TaskId[_]): String = taskNameCache.get(t) match {
+  protected def taskName(t: TaskId[?]): String = taskNameCache.get(t) match {
     case null =>
       val name = taskName0(t)
       taskNameCache.putIfAbsent(t, name)
       name
     case name => name
   }
-  private def taskName0(t: TaskId[_]): String = {
-    def definedName(node: Task[_]): Option[String] =
+  private def taskName0(t: TaskId[?]): String = {
+    def definedName(node: Task[?]): Option[String] =
       node.info.name.orElse(TaskName.transformNode(node).map(showScopedKey.show))
-    def inferredName(t: Task[_]): Option[String] = nameDelegate(t) map taskName
-    def nameDelegate(t: Task[_]): Option[TaskId[_]] =
+    def inferredName(t: Task[?]): Option[String] = nameDelegate(t) map taskName
+    def nameDelegate(t: Task[?]): Option[TaskId[_]] =
       Option(anonOwners.get(t)).orElse(Option(calledBy.get(t)))
     t match
       case t: Task[?] => definedName(t).orElse(inferredName(t)).getOrElse(TaskName.anonymousName(t))

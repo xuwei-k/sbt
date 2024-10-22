@@ -9,7 +9,7 @@
 package sbt
 package internal
 
-import Def._
+import Def.*
 import Keys.{ sbtVersion, state, terminal }
 
 import java.io.{ File, FileInputStream, FileOutputStream, InputStream, IOException }
@@ -18,7 +18,7 @@ import java.nio.file.{ Files, Path }
 import java.util.zip.ZipInputStream
 import sbt.io.IO
 import sbt.io.Path.userHome
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import scala.util.{ Properties, Try }
 
 private[sbt] object InstallSbtn {
@@ -220,7 +220,7 @@ private[sbt] object InstallSbtn {
   private def setupPowershell(baseDirectory: Path, term: Terminal): Unit = {
     val comp = (completions: Path) => s""". "$completions\\sbtn.ps1""""
     val path = (bin: Path) => s"""$$env:Path += ";$bin""""
-    import scala.sys.process._
+    import scala.sys.process.*
     Try(Seq("pwsh", "-Command", "echo $PROFILE").!!).foreach { output =>
       output.linesIterator.toSeq.headOption.foreach { l =>
         setupShell("pwsh", baseDirectory, term, new File(l), path, comp)

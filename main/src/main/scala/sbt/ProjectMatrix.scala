@@ -191,7 +191,7 @@ trait ProjectFinder {
 }
 
 object ProjectMatrix {
-  import sbt.io.syntax._
+  import sbt.io.syntax.*
 
   val jvmIdSuffix: String = "JVM"
   val jvmDirectorySuffix: String = "-jvm"
@@ -266,7 +266,7 @@ object ProjectMatrix {
         val idSuffix = axes.map(_.idSuffix).mkString("")
         val childId = self.id + idSuffix
         r -> childId
-      }): _*)
+      })*)
     }
 
     private def isSortOfDefaultAxis(a: VirtualAxis): Boolean =
@@ -299,10 +299,10 @@ object ProjectMatrix {
           val dotSbtMatrix = new java.io.File(".sbt") / "matrix"
           IO.createDirectory(dotSbtMatrix)
           val p = Project(childId, dotSbtMatrix / childId)
-            .dependsOn(deps: _*)
-            .aggregate(aggs: _*)
+            .dependsOn(deps*)
+            .aggregate(aggs*)
             .setPlugins(plugins)
-            .configs(configurations: _*)
+            .configs(configurations*)
             .settings(
               name := self.id
             )
@@ -329,7 +329,7 @@ object ProjectMatrix {
               projectMatrixBaseDirectory := base,
             )
             .settings(self.settings)
-            .configure(transforms: _*)
+            .configure(transforms*)
 
           r -> r.process(p)
         }
@@ -388,7 +388,7 @@ object ProjectMatrix {
         case _       => sys.error(s"no rows were found in $id matching $thatRow: $rows")
       }
 
-    private def makeSources(dirSuffix: String, svDirSuffix: String): Def.Setting[_] = {
+    private def makeSources(dirSuffix: String, svDirSuffix: String): Def.Setting[?] = {
       unmanagedSourceDirectories ++= Seq(
         scalaSource.value.getParentFile / s"scala${dirSuffix}",
         scalaSource.value.getParentFile / s"scala$svDirSuffix",
@@ -421,7 +421,7 @@ object ProjectMatrix {
 
     /** Appends settings to the current settings sequence for this project. */
     override def settings(ss: Def.SettingsDefinition*): ProjectMatrix =
-      copy(settings = (settings: Seq[Def.Setting[_]]) ++ Def.settings(ss: _*))
+      copy(settings = (settings: Seq[Def.Setting[_]]) ++ Def.settings(ss*))
 
     override def enablePlugins(ns: Plugins*): ProjectMatrix =
       setPlugins(ns.foldLeft(plugins)(Plugins.and))

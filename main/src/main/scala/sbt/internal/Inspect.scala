@@ -12,7 +12,7 @@ package internal
 import sbt.internal.util.{ AttributeKey, complete, Types }
 
 import complete.{ DefaultParsers, Parser }
-import DefaultParsers._
+import DefaultParsers.*
 import Def.ScopedKey
 import Types.idFun
 import java.io.File
@@ -84,9 +84,9 @@ object Inspect {
     })
   }
 
-  def keyOutput(s: State, option: Mode, sk: Def.ScopedKey[_]): String = {
+  def keyOutput(s: State, option: Mode, sk: Def.ScopedKey[?]): String = {
     val extracted = Project.extract(s)
-    import extracted._
+    import extracted.*
     option match {
       case Details(actual) =>
         Project.details(extracted.structure, actual, sk.scope, sk.key)

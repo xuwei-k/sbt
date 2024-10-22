@@ -10,8 +10,8 @@ package sbt.util
 
 import org.scalatest.flatspec.AnyFlatSpec
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.util.CacheImplicits._
+import sbt.io.syntax.*
+import sbt.util.CacheImplicits.*
 import sjsonnew.{ Builder, JsonWriter }
 
 import scala.concurrent.Promise

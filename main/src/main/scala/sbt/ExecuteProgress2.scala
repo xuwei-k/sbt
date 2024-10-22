@@ -45,12 +45,12 @@ class ExecuteProgressAdapter(ep: ExecuteProgress) extends ExecuteProgress2 {
   override def afterCommand(cmd: String, result: Either[Throwable, State]): Unit = {}
   override def initial(): Unit = ep.initial()
   override def afterRegistered(
-      task: TaskId[_],
+      task: TaskId[?],
       allDeps: Iterable[TaskId[_]],
       pendingDeps: Iterable[TaskId[_]]
   ): Unit = ep.afterRegistered(task, allDeps, pendingDeps)
-  override def afterReady(task: TaskId[_]): Unit = ep.afterReady(task)
-  override def beforeWork(task: TaskId[_]): Unit = ep.beforeWork(task)
+  override def afterReady(task: TaskId[?]): Unit = ep.afterReady(task)
+  override def beforeWork(task: TaskId[?]): Unit = ep.beforeWork(task)
   override def afterWork[A](task: TaskId[A], result: Either[TaskId[A], Result[A]]): Unit =
     ep.afterWork(task, result)
   override def afterCompleted[A](task: TaskId[A], result: Result[A]): Unit =
@@ -68,12 +68,12 @@ object ExecuteProgress2 {
       xs.foreach(_.afterCommand(cmd, result))
     override def initial(): Unit = xs.foreach(_.initial())
     override def afterRegistered(
-        task: TaskId[_],
+        task: TaskId[?],
         allDeps: Iterable[TaskId[_]],
         pendingDeps: Iterable[TaskId[_]]
     ): Unit = xs.foreach(_.afterRegistered(task, allDeps, pendingDeps))
-    override def afterReady(task: TaskId[_]): Unit = xs.foreach(_.afterReady(task))
-    override def beforeWork(task: TaskId[_]): Unit = xs.foreach(_.beforeWork(task))
+    override def afterReady(task: TaskId[?]): Unit = xs.foreach(_.afterReady(task))
+    override def beforeWork(task: TaskId[?]): Unit = xs.foreach(_.beforeWork(task))
     override def afterWork[A](task: TaskId[A], result: Either[TaskId[A], Result[A]]): Unit =
       xs.foreach(_.afterWork(task, result))
     override def afterCompleted[A](task: TaskId[A], result: Result[A]): Unit =

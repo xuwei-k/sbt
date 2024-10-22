@@ -22,7 +22,7 @@ object ClassLoaderCacheTest {
   }
 }
 class ClassLoaderCacheTest extends AnyFlatSpec with Matchers {
-  import ClassLoaderCacheTest._
+  import ClassLoaderCacheTest.*
   private def withCache[R](f: ClassLoaderCache => R): R = {
     val cache = new ClassLoaderCache(ClassLoader.getSystemClassLoader)
     try f(cache)

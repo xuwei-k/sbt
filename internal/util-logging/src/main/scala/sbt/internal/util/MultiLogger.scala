@@ -8,7 +8,7 @@
 
 package sbt.internal.util
 
-import sbt.util._
+import sbt.util.*
 import scala.annotation.nowarn
 
 // note that setting the logging level on this logger has no effect on its behavior, only

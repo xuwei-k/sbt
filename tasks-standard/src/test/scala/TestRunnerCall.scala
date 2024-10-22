@@ -6,11 +6,11 @@
  * Licensed under Apache License 2.0 (see LICENSE)
  */
 
-import sbt._
+import sbt.*
 
-import org.scalacheck._
-import Prop._
-import TaskGen._
+import org.scalacheck.*
+import Prop.*
+import TaskGen.*
 
 object TaskRunnerCallTest extends Properties("TaskRunner Call") {
   property("calculates fibonacci") = forAll(MaxTasksGen, MaxWorkersGen) { (i: Int, workers: Int) =>

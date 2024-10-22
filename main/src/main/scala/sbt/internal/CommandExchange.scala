@@ -11,7 +11,7 @@ package sbt
 package internal
 import java.io.IOException
 import java.net.Socket
-import java.util.concurrent.atomic._
+import java.util.concurrent.atomic.*
 import java.util.concurrent.{ LinkedBlockingQueue, TimeUnit }
 
 import sbt.BasicCommandStrings.{
@@ -21,12 +21,12 @@ import sbt.BasicCommandStrings.{
   TerminateAction,
   networkExecPrefix
 }
-import sbt.BasicKeys._
+import sbt.BasicKeys.*
 import sbt.internal.protocol.JsonRpcResponseError
-import sbt.internal.server._
+import sbt.internal.server.*
 import sbt.internal.ui.UITask
-import sbt.internal.util._
-import sbt.io.syntax._
+import sbt.internal.util.*
+import sbt.io.syntax.*
 import sbt.io.{ Hash, IO }
 import sbt.nio.Watch.NullLogger
 import sbt.protocol.Serialization.attach
@@ -37,7 +37,7 @@ import sjsonnew.JsonFormat
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.{ Failure, Success, Try }
 
 /**
@@ -355,7 +355,7 @@ private[sbt] final class CommandExchange {
     catch { case _: IOException => removeChannel(channel) }
 
   def respondStatus(event: ExecStatusEvent): Unit = {
-    import sbt.protocol.codec.JsonProtocol._
+    import sbt.protocol.codec.JsonProtocol.*
     for {
       source <- event.channelName
       channel <- channels.collectFirst {

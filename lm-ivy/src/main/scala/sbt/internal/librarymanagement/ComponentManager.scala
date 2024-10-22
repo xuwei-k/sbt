@@ -6,7 +6,7 @@ package sbt.internal.librarymanagement
 import java.io.File
 import java.util.concurrent.Callable
 import sbt.util.Logger
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 /**
  * A component manager provides access to the pieces of xsbt that are distributed as components.

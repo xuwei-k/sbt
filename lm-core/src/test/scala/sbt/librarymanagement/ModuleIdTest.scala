@@ -22,13 +22,13 @@ object ModuleIdTest extends verify.BasicTestSuite {
   }
 
   test("it should format itself into JSON") {
-    import LibraryManagementCodec._
+    import LibraryManagementCodec.*
     val json = Converter.toJson(ModuleID("com.acme", "foo", "1")).get
     assert(CompactPrinter(json) == expectedJson)
   }
 
   test("it should thaw back from JSON") {
-    import LibraryManagementCodec._
+    import LibraryManagementCodec.*
     val json = Parser.parseUnsafe(expectedJson)
     val m = Converter.fromJsonUnsafe[ModuleID](json)
     assert(m == ModuleID("com.acme", "foo", "1"))

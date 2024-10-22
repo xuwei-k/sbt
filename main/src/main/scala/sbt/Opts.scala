@@ -15,7 +15,7 @@ import java.io.File
 import java.net.URL
 
 import sbt.io.Path
-import Path._
+import Path.*
 
 /** Options for well-known tasks. */
 object Opts {
@@ -41,7 +41,7 @@ object Opts {
           .mkString("-doc-external-doc:", ",", "") :: Nil
   }
   object resolver {
-    import sbt.io.syntax._
+    import sbt.io.syntax.*
     @deprecated("Use sonatypeOssReleases instead", "1.7.0")
     val sonatypeReleases = Resolver.sonatypeRepo("releases")
     // todo: fix
@@ -66,8 +66,8 @@ object Opts {
 }
 
 object DefaultOptions {
-  import Opts._
-  import sbt.io.syntax._
+  import Opts.*
+  import sbt.io.syntax.*
   import BuildPaths.{ getGlobalBase, getGlobalSettingsDirectory }
   import sbt.ProjectExtra.extract
   import Def.Setting
@@ -86,13 +86,13 @@ object DefaultOptions {
     if (plugin && snapshot) Vector(resolver.sbtSnapshots, resolver.sbtIvySnapshots)
     else Vector.empty
   }
-  def addResolvers: Setting[_] = Keys.resolvers ++= { resolvers(Keys.isSnapshot.value) }
-  def addPluginResolvers: Setting[_] =
+  def addResolvers: Setting[?] = Keys.resolvers ++= { resolvers(Keys.isSnapshot.value) }
+  def addPluginResolvers: Setting[?] =
     Keys.resolvers ++= pluginResolvers(Keys.sbtPlugin.value, Keys.isSnapshot.value)
 
   def credentials(state: State): Credentials =
     Credentials(getGlobalSettingsDirectory(state, getGlobalBase(state)) / ".credentials")
-  def addCredentials: Setting[_] = Keys.credentials += { credentials(Keys.state.value) }
+  def addCredentials: Setting[?] = Keys.credentials += { credentials(Keys.state.value) }
 
   def shellPrompt(version: String): State => String =
     s =>
@@ -101,5 +101,5 @@ object DefaultOptions {
         Project.extract(s).currentProject.id,
         version
       )
-  def setupShellPrompt: Setting[_] = Keys.shellPrompt := { shellPrompt(Keys.version.value) }
+  def setupShellPrompt: Setting[?] = Keys.shellPrompt := { shellPrompt(Keys.version.value) }
 }

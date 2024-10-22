@@ -2,8 +2,8 @@ package sbt
 package internal.librarymanagement
 
 import java.io.File
-import sbt.librarymanagement._
-import sbt.io.syntax._
+import sbt.librarymanagement.*
+import sbt.io.syntax.*
 
 /**
  * This is a list of functions with default values.

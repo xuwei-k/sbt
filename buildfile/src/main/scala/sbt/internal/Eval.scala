@@ -299,7 +299,7 @@ object Eval:
   inline def apply[A](expression: String): A = ${ evalImpl[A]('{ expression }) }
   private def thisClassLoader = this.getClass.getClassLoader
   def evalImpl[A: Type](expression: Expr[String])(using qctx: Quotes): Expr[A] =
-    import quotes.reflect._
+    import quotes.reflect.*
     val sym = TypeRepr.of[A].typeSymbol
     val fullName = Expr(sym.fullName)
     '{

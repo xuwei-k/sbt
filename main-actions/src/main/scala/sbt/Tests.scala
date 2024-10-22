@@ -8,10 +8,10 @@
 
 package sbt
 
-import std._
+import std.*
 import xsbt.api.{ Discovered, Discovery }
 import sbt.internal.inc.Analysis
-import TaskExtra._
+import TaskExtra.*
 import sbt.internal.Action
 import sbt.internal.util.FeedbackProvidedException
 import xsbti.api.Definition
@@ -27,7 +27,7 @@ import testing.{
   SubclassFingerprint,
   SuiteSelector,
   TaskDef,
-  Task => TestTask
+  Task as TestTask
 }
 
 import scala.annotation.tailrec
@@ -385,7 +385,7 @@ object Tests {
       testListeners: Vector[TestReportListener],
       config: Execution
   ): Task[Output] = {
-    def fj(actions: Iterable[() => Unit]): Task[Unit] = nop.dependsOn(actions.toSeq.fork(_()): _*)
+    def fj(actions: Iterable[() => Unit]): Task[Unit] = nop.dependsOn(actions.toSeq.fork(_())*)
     def partApp(actions: Iterable[ClassLoader => Unit]) = actions.toSeq map { a => () =>
       a(loader)
     }
@@ -399,7 +399,7 @@ object Tests {
         makeParallel(loader, runnables, setupTasks, config.tags).map(_.toList)
       else
         makeSerial(loader, runnables, setupTasks)
-    val taggedMainTasks = mainTasks.tagw(config.tags: _*)
+    val taggedMainTasks = mainTasks.tagw(config.tags*)
     taggedMainTasks
       .map(processResults)
       .flatMap { results =>
@@ -467,7 +467,7 @@ object Tests {
       Info[(String, (SuiteResult, Seq[TestTask]))]().setName(name),
       Action.Pure(() => (name, fun.apply()), `inline` = false)
     )
-    val taggedBase = base.tagw(tags: _*).tag(fun.tags.map(ConcurrentRestrictions.Tag(_)): _*)
+    val taggedBase = base.tagw(tags*).tag(fun.tags.map(ConcurrentRestrictions.Tag(_))*)
     taggedBase flatMap { case (name, (result, nested)) =>
       val nestedRunnables = createNestedRunnables(loader, fun, nested)
       toTasks(loader, nestedRunnables, tags).map { currentResultMap =>
@@ -531,7 +531,7 @@ object Tests {
         { case (Output(v1, m1, _), Output(v2, m2, _)) =>
           Output(
             (if (severity(v1) < severity(v2)) v2 else v1): TestResult,
-            Map((m1.toSeq ++ m2.toSeq): _*),
+            Map((m1.toSeq ++ m2.toSeq)*),
             Iterable.empty[Summary]
           )
         }
@@ -550,7 +550,7 @@ object Tests {
           (e.overall, e.events)
         }
         val m = ms reduce { (m1: Map[String, SuiteResult], m2: Map[String, SuiteResult]) =>
-          Map((m1.toSeq ++ m2.toSeq): _*)
+          Map((m1.toSeq ++ m2.toSeq)*)
         }
         Output(overall(rs), m, Iterable.empty)
       }

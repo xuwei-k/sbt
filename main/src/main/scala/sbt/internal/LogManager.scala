@@ -10,12 +10,12 @@ package sbt
 package internal
 
 import sbt.Def.ScopedKey
-import sbt.Keys._
+import sbt.Keys.*
 import sbt.ProjectExtra.showContextKey
 import sbt.Scope.Global
 import sbt.SlashSyntax0.given
-import sbt.internal.util.MainAppender._
-import sbt.internal.util.{ Terminal => ITerminal, _ }
+import sbt.internal.util.MainAppender.*
+import sbt.internal.util.{ Terminal as ITerminal, * }
 import sbt.util.{ Level, Logger, LoggerContext }
 
 import java.io.PrintWriter
@@ -24,7 +24,7 @@ sealed abstract class LogManager {
   def apply(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       writer: PrintWriter,
       context: LoggerContext,
   ): ManagedLogger
@@ -32,18 +32,18 @@ sealed abstract class LogManager {
   def apply(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       writer: PrintWriter
   ): ManagedLogger = apply(data, state, task, writer, LoggerContext.globalContext)
 
   def backgroundLog(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       context: LoggerContext
   ): ManagedLogger
   @deprecated("Use alternate background log that provides a LoggerContext", "1.4.0")
-  final def backgroundLog(data: Settings[Scope], state: State, task: ScopedKey[_]): ManagedLogger =
+  final def backgroundLog(data: Settings[Scope], state: State, task: ScopedKey[?]): ManagedLogger =
     backgroundLog(data, state, task, LoggerContext.globalContext)
 }
 
@@ -52,7 +52,7 @@ sealed abstract class LogManager {
  * for LogManager.defaults with the old log4j variant.
  */
 trait AppenderSupplier {
-  def apply(s: ScopedKey[_]): Seq[Appender]
+  def apply(s: ScopedKey[?]): Seq[Appender]
 }
 
 object LogManager {
@@ -64,8 +64,8 @@ object LogManager {
   def construct(
       data: Settings[Scope],
       state: State
-  ): (ScopedKey[_], PrintWriter) => ManagedLogger =
-    (task: ScopedKey[_], to: PrintWriter) => {
+  ): (ScopedKey[?], PrintWriter) => ManagedLogger =
+    (task: ScopedKey[?], to: PrintWriter) => {
       val context = state.get(Keys.loggerContext).getOrElse(LoggerContext.globalContext)
       val manager: LogManager =
         (task.scope / logManager).get(data) getOrElse defaultManager(state.globalLogging.console)
@@ -76,7 +76,7 @@ object LogManager {
   def constructBackgroundLog(
       data: Settings[Scope],
       state: State
-  ): ScopedKey[_] => ManagedLogger = {
+  ): ScopedKey[?] => ManagedLogger = {
     val context = state.get(Keys.loggerContext).getOrElse(LoggerContext.globalContext)
     constructBackgroundLog(data, state, context)
   }
@@ -85,8 +85,8 @@ object LogManager {
       data: Settings[Scope],
       state: State,
       context: LoggerContext
-  ): (ScopedKey[_]) => ManagedLogger =
-    (task: ScopedKey[_]) => {
+  ): (ScopedKey[?]) => ManagedLogger =
+    (task: ScopedKey[?]) => {
       val manager: LogManager =
         (task.scope / logManager).get(data) getOrElse defaultManager(state.globalLogging.console)
       manager.backgroundLog(data, state, task, context)
@@ -102,18 +102,18 @@ object LogManager {
       extra = extra
     )
 
-  def withScreenLogger(mk: (ScopedKey[_], State) => Appender): LogManager =
+  def withScreenLogger(mk: (ScopedKey[?], State) => Appender): LogManager =
     withLoggers(screen = mk)
 
   def withLoggers(
-      screen: (ScopedKey[_], State) => Appender = (_, s) => defaultScreen(s.globalLogging.console),
+      screen: (ScopedKey[?], State) => Appender = (_, s) => defaultScreen(s.globalLogging.console),
       backed: PrintWriter => Appender = defaultBacked,
       relay: Unit => Appender = defaultRelay,
       extra: AppenderSupplier = _ => Nil
   ): LogManager = new DefaultLogManager(screen, backed, relay, extra)
 
   private class DefaultLogManager(
-      screen: (ScopedKey[_], State) => Appender,
+      screen: (ScopedKey[?], State) => Appender,
       backed: PrintWriter => Appender,
       relay: Unit => Appender,
       extra: AppenderSupplier
@@ -121,7 +121,7 @@ object LogManager {
     def apply(
         data: Settings[Scope],
         state: State,
-        task: ScopedKey[_],
+        task: ScopedKey[?],
         to: PrintWriter,
         context: LoggerContext,
     ): ManagedLogger =
@@ -139,7 +139,7 @@ object LogManager {
     def backgroundLog(
         data: Settings[Scope],
         state: State,
-        task: ScopedKey[_],
+        task: ScopedKey[?],
         context: LoggerContext
     ): ManagedLogger = {
       val console = ConsoleAppender.safe("bg-" + ConsoleAppender.generateName(), ITerminal.current)
@@ -161,7 +161,7 @@ object LogManager {
   def defaultLogger(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       console: Appender,
       backed: Appender,
       relay: Appender,
@@ -172,7 +172,7 @@ object LogManager {
   def defaultLogger(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       console: Appender,
       backed: Appender,
       relay: Appender,
@@ -220,7 +220,7 @@ object LogManager {
     if (state.interactive) -1 else Int.MaxValue
 
   def suppressedMessage(
-      key: ScopedKey[_],
+      key: ScopedKey[?],
       state: State
   ): SuppressedTraceContext => Option[String] = {
     val display = Project.showContextKey(state)
@@ -236,7 +236,7 @@ object LogManager {
     }
   }
 
-  def unwrapStreamsKey(key: ScopedKey[_]): ScopedKey[_] = key.scope.task match {
+  def unwrapStreamsKey(key: ScopedKey[?]): ScopedKey[?] = key.scope.task match {
     case Select(task) => ScopedKey(key.scope.copy(task = Zero), task)
     case _            => key // should never get here
   }
@@ -244,7 +244,7 @@ object LogManager {
   def backgroundLog(
       data: Settings[Scope],
       state: State,
-      task: ScopedKey[_],
+      task: ScopedKey[?],
       console: Appender,
       /* TODO: backed: Appender,*/
       relay: Appender,
@@ -302,7 +302,7 @@ object LogManager {
 
   private lazy val defaultRelayImpl: ConsoleAppender = new RelayAppender("Relay0")
 
-  private[sbt] def settingsLogger(state: State): Def.Setting[_] =
+  private[sbt] def settingsLogger(state: State): Def.Setting[?] =
     // strict to avoid retaining a reference to `state`
     Global / sLog :== globalWrapper(state)
 

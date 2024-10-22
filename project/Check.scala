@@ -1,7 +1,7 @@
 import java.io.File
 import java.util.zip.ZipFile
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 object Check {
 

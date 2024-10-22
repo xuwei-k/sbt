@@ -8,7 +8,7 @@
 
 package sbt.internal.util
 
-import Relation._
+import Relation.*
 
 object Relation {
 

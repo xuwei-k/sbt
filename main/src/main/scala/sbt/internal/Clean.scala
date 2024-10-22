@@ -12,14 +12,14 @@ package internal
 import java.io.IOException
 import java.nio.file.{ DirectoryNotEmptyException, Files, Path }
 
-import sbt.Def._
-import sbt.Keys._
+import sbt.Def.*
+import sbt.Keys.*
 // import sbt.Project.richInitializeTask
 import sbt.ProjectExtra.*
 import sbt.SlashSyntax0.given
-import sbt.io.syntax._
-import sbt.nio.Keys._
-import sbt.nio.file._
+import sbt.io.syntax.*
+import sbt.nio.Keys.*
+import sbt.nio.file.*
 import sbt.nio.file.syntax.pathToPathOps
 import sbt.nio.file.Glob.{ GlobOps }
 import sbt.util.Level
@@ -76,7 +76,7 @@ private[sbt] object Clean {
   }
 
   private[sbt] def scopedTask: Def.Initialize[Task[Unit]] =
-    Keys.resolvedScoped.toTaskable.toTask.flatMapTask { case (r: ScopedKey[_]) =>
+    Keys.resolvedScoped.toTaskable.toTask.flatMapTask { case (r: ScopedKey[?]) =>
       task(r.scope, full = true)
     }
 

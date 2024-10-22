@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 
 object ConflictWarningSpec extends BaseIvySpecification {
 

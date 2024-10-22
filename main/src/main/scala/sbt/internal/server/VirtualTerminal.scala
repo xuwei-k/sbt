@@ -44,7 +44,7 @@ import sbt.protocol.{
   TerminalSetSizeCommand,
   TerminalSetRawModeCommand,
 }
-import sbt.protocol.codec.JsonProtocol._
+import sbt.protocol.codec.JsonProtocol.*
 
 object VirtualTerminal {
   private val pendingTerminalProperties =
@@ -242,7 +242,7 @@ object VirtualTerminal {
   private val notificationHandler: Handler[JsonRpcNotificationMessage] =
     callback => {
       case n if n.method == systemIn =>
-        import sjsonnew.BasicJsonProtocol._
+        import sjsonnew.BasicJsonProtocol.*
         n.params.flatMap(Converter.fromJson[Byte](_).toOption).foreach { byte =>
           StandardMain.exchange.channelForName(callback.name) match {
             case Some(nc: NetworkChannel) => nc.write(byte)

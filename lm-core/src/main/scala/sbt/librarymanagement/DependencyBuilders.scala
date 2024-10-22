@@ -14,7 +14,7 @@ trait DependencyBuilders {
   // Avoid calling super
   // Avoid initializer statements in the body
 
-  import DependencyBuilders._
+  import DependencyBuilders.*
 
   implicit def stringToOrganization(organization: String): Organization = {
     nonEmpty(organization, "Organization")

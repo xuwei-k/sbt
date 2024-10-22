@@ -10,20 +10,20 @@ package sbt
 
 import java.io.File
 
-import sbt.Def._
-import sbt.Keys._
-import sbt.nio.Keys._
+import sbt.Def.*
+import sbt.Keys.*
+import sbt.nio.Keys.*
 import sbt.ProjectExtra.*
-import sbt.ScopeFilter.Make._
+import sbt.ScopeFilter.Make.*
 import sbt.SlashSyntax0.given
 import sbt.internal.inc.ModuleUtilities
 import sbt.internal.inc.classpath.ClasspathUtil
 import sbt.internal.librarymanagement.cross.CrossVersionUtil
 import sbt.internal.util.complete.{ DefaultParsers, Parser }
-import sbt.io._
-import sbt.io.syntax._
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.io.*
+import sbt.io.syntax.*
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 import sbt.nio.file.{ Glob, RecursiveGlob }
 import scala.util.Try
 
@@ -53,7 +53,7 @@ object ScriptedPlugin extends AutoPlugin {
     val scriptedDependencies = taskKey[Unit]("")
     val scripted = inputKey[Unit]("")
   }
-  import autoImport._
+  import autoImport.*
 
   override lazy val globalSettings: Seq[Setting[_]] = Seq(
     scriptedBufferLog := true,
@@ -113,7 +113,7 @@ object ScriptedPlugin extends AutoPlugin {
   private[sbt] final case class ScriptedTestPage(page: Int, total: Int)
 
   private[sbt] def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
-    import DefaultParsers._
+    import DefaultParsers.*
 
     val scriptedFiles: NameFilter =
       ("test": NameFilter) | "test.script" | "pending" | "pending.script"

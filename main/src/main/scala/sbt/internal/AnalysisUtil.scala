@@ -12,7 +12,7 @@ package internal
 import java.nio.file.Path
 import sbt.internal.inc.MixedAnalyzingCompiler
 import scala.concurrent.ExecutionContext
-import xsbti.compile.{ AnalysisStore => XAnalysisStore }
+import xsbti.compile.{ AnalysisStore as XAnalysisStore }
 import xsbti.compile.analysis.ReadWriteMappers
 
 private[sbt] object AnalysisUtil {

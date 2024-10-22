@@ -11,22 +11,22 @@ package plugins
 
 import java.io.File
 
-import sbt.Def._
-import sbt.Keys._
+import sbt.Def.*
+import sbt.Keys.*
 import sbt.ProjectExtra.*
-import sbt.internal.graph._
+import sbt.internal.graph.*
 import sbt.internal.graph.backend.SbtUpdateReport
 import sbt.internal.graph.rendering.{ DagreHTML, TreeView }
-import sbt.internal.librarymanagement._
+import sbt.internal.librarymanagement.*
 import sbt.internal.util.complete.{ Parser, Parsers }
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.librarymanagement._
+import sbt.io.syntax.*
+import sbt.librarymanagement.*
 
 object DependencyTreeSettings {
-  import sjsonnew.BasicJsonProtocol._
-  import MiniDependencyTreeKeys._
-  import DependencyTreeKeys._
+  import sjsonnew.BasicJsonProtocol.*
+  import MiniDependencyTreeKeys.*
+  import DependencyTreeKeys.*
 
   /**
    * Core settings needed for any graphing tasks.
@@ -249,7 +249,7 @@ object DependencyTreeSettings {
 
   case class ArtifactPattern(organization: String, name: String, version: Option[String])
 
-  import sbt.internal.util.complete.DefaultParsers._
+  import sbt.internal.util.complete.DefaultParsers.*
   val artifactPatternParser: Def.Initialize[State => Parser[ArtifactPattern]] =
     Keys.resolvedScoped { ctx => (state: State) =>
       val graph =

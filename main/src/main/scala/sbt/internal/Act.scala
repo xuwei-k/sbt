@@ -13,9 +13,9 @@ import Def.{ showRelativeKey2, ScopedKey }
 import Keys.sessionSettings
 import sbt.internal.util.complete.{ DefaultParsers, Parser }
 import Aggregation.{ KeyValue, Values }
-import DefaultParsers._
+import DefaultParsers.*
 import sbt.internal.util.Types.idFun
-import sbt.ProjectExtra.{ failure => _, * }
+import sbt.ProjectExtra.{ failure as _, * }
 import java.net.URI
 import sbt.internal.CommandStrings.{ MultiTaskCommand, ShowCommand, PrintCommand }
 import sbt.internal.util.{
@@ -30,7 +30,7 @@ import sbt.internal.util.{
 import sbt.util.Show
 import scala.collection.mutable
 
-final class ParsedKey(val key: ScopedKey[_], val mask: ScopeMask):
+final class ParsedKey(val key: ScopedKey[?], val mask: ScopeMask):
   override def equals(o: Any): Boolean =
     this.eq(o.asInstanceOf[AnyRef]) || (o match {
       case x: ParsedKey => (this.key == x.key) && (this.mask == x.mask)
@@ -190,8 +190,8 @@ object Act {
       conf: Option[String],
       task: Option[AttributeKey[_]],
       extra: ScopeAxis[AttributeMap],
-      key: AttributeKey[_]
-  ): ScopedKey[_] =
+      key: AttributeKey[?]
+  ): ScopedKey[?] =
     ScopedKey(
       Scope(toAxis(proj, Zero), toAxis(conf map ConfigKey.apply, Zero), toAxis(task, Zero), extra),
       key
@@ -219,7 +219,7 @@ object Act {
   def selectByConfig(ss: Seq[ParsedKey]): Seq[ParsedKey] =
     ss match {
       case Seq() => Nil
-      case Seq(x, tail @ _*) => // select the first configuration containing a valid key
+      case Seq(x, tail*) => // select the first configuration containing a valid key
         tail.takeWhile(_.key.scope.config == x.key.scope.config) match {
           case Seq() => x :: Nil
           case xs    => x +: xs
@@ -326,7 +326,7 @@ object Act {
   def getKey[T](
       keyMap: Map[String, AttributeKey[_]],
       keyString: String,
-      f: AttributeKey[_] => T
+      f: AttributeKey[?] => T
   ): Parser[T] =
     keyMap.get(keyString) match {
       case Some(k) => success(f(k))
@@ -350,7 +350,7 @@ object Act {
       allKnown: Map[String, AttributeKey[_]],
   ): Parser[ParsedAxis[AttributeKey[_]]] = {
     val taskSeq = tasks.toSeq
-    def taskKeys(f: AttributeKey[_] => String): Seq[(String, AttributeKey[_])] =
+    def taskKeys(f: AttributeKey[?] => String): Seq[(String, AttributeKey[_])] =
       taskSeq.map(key => (f(key), key))
     val normKeys = taskKeys(_.label)
     val valid = allKnown ++ normKeys
@@ -365,7 +365,7 @@ object Act {
   def resolveTask(task: ParsedAxis[AttributeKey[_]]): Option[AttributeKey[_]] =
     task match {
       case ParsedZero | ParsedGlobal | Omitted        => None
-      case t: ParsedValue[AttributeKey[_]] @unchecked => Some(t.value)
+      case t: ParsedValue[AttributeKey[?]] @unchecked => Some(t.value)
     }
 
   def filterStrings(base: Parser[String], valid: Set[String], label: String): Parser[String] =
@@ -414,7 +414,7 @@ object Act {
   private[sbt] def resolvedReferenceIdent(
       index: KeyIndex,
       currentBuild: URI,
-      trailing: Parser[_]
+      trailing: Parser[?]
   ): Parser[ResolvedReference] = {
     def projectID(uri: URI) =
       token(
@@ -443,7 +443,7 @@ object Act {
   def resolvedReference(
       index: KeyIndex,
       currentBuild: URI,
-      trailing: Parser[_]
+      trailing: Parser[?]
   ): Parser[ResolvedReference] = {
     def projectID(uri: URI) =
       token(examplesStrict(ID, index projects uri, "project ID") <~ trailing)

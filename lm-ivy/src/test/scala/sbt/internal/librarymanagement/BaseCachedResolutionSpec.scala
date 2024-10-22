@@ -1,7 +1,7 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
-import sbt.librarymanagement.ivy._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.ivy.*
 
 trait BaseCachedResolutionSpec extends BaseIvySpecification {
   override def module(

@@ -77,7 +77,7 @@ object IMap {
     def mapValues[V2[_]](f: [A] => V[A] => V2[A]) =
       new IMap0[K, V2](Map(backing.iterator.map { case (k, v) =>
         k -> f(v.asInstanceOf[V[Any]])
-      }.toArray: _*))
+      }.toArray*))
 
     def toSeq = backing.toSeq.asInstanceOf[Seq[(K[Any], V[Any])]]
     def keys = backing.keys.asInstanceOf[Iterable[K[Any]]]

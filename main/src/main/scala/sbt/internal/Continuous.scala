@@ -9,7 +9,7 @@
 package sbt
 package internal
 
-import java.io.{ ByteArrayInputStream, IOException, InputStream, File => _ }
+import java.io.{ ByteArrayInputStream, IOException, InputStream, File as _ }
 import java.nio.file.Path
 import java.util.concurrent.{
   ConcurrentHashMap,
@@ -20,31 +20,31 @@ import java.util.concurrent.{
 }
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicInteger }
 
-import sbt.BasicCommandStrings._
-import sbt.Def._
-import sbt.Keys._
+import sbt.BasicCommandStrings.*
+import sbt.Def.*
+import sbt.Keys.*
 import sbt.ProjectExtra.extract
 import sbt.SlashSyntax0.given
 import sbt.internal.Continuous.{ ContinuousState, FileStampRepository }
-import sbt.internal.LabeledFunctions._
+import sbt.internal.LabeledFunctions.*
 import sbt.internal.io.WatchState
-import sbt.internal.nio._
+import sbt.internal.nio.*
 import sbt.internal.ui.UITask
-import sbt.internal.util.JoinThread._
+import sbt.internal.util.JoinThread.*
 import sbt.internal.util.complete.DefaultParsers.Space
-import sbt.internal.util.complete.Parser._
+import sbt.internal.util.complete.Parser.*
 import sbt.internal.util.complete.{ Parser, Parsers }
-import sbt.internal.util._
-import sbt.nio.Keys.{ fileInputs, _ }
+import sbt.internal.util.*
+import sbt.nio.Keys.{ fileInputs, * }
 import sbt.nio.Watch.{ Creation, Deletion, ShowOptions, Update }
 import sbt.nio.file.{ FileAttributes, Glob }
 import sbt.nio.{ FileStamp, FileStamper, Watch }
-import sbt.util.{ Level, _ }
+import sbt.util.{ Level, * }
 
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration.FiniteDurationIsOrdered
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.{ Failure, Success, Try }
 import scala.util.control.NonFatal
 import scala.annotation.nowarn
@@ -172,7 +172,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
    */
   private def getConfig(
       state: State,
-      scopedKey: ScopedKey[_],
+      scopedKey: ScopedKey[?],
       compiledMap: CompiledMap,
       dynamicInputs: mutable.Set[DynamicInput],
   )(implicit extracted: Extracted, logger: Logger): Config = {
@@ -180,7 +180,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
     // Extract all of the globs that we will monitor during the continuous build.
     val inputs = {
       val configs = scopedKey.get(internalDependencyConfigurations).getOrElse(Nil)
-      import WatchTransitiveDependencies.{ Arguments => DArguments }
+      import WatchTransitiveDependencies.{ Arguments as DArguments }
       val args = new DArguments(scopedKey, extracted, compiledMap, logger, configs, state)
       WatchTransitiveDependencies.transitiveDynamicInputs(args)
     }
@@ -225,7 +225,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
     val scopedKeyParser: Parser[Seq[ScopedKey[_]]] = Act.aggregatedKeyParser(state) <~ Parsers.any.*
     @tailrec def impl(current: String): Seq[ScopedKey[_]] = {
       Parser.parse(current, scopedKeyParser) match {
-        case Right(scopedKeys: Seq[ScopedKey[_]]) => scopedKeys
+        case Right(scopedKeys: Seq[ScopedKey[?]]) => scopedKeys
         case Left(e) =>
           val aliases = BasicCommands.allAliases(state)
           aliases.collectFirst { case (`command`, aliased) => aliased } match {
@@ -356,7 +356,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
       isCommand: Boolean
   ): (Watch.Action, String, Int, State) => State = {
     configs.flatMap(_.watchSettings.onTermination).distinct match {
-      case Seq(head, tail @ _*) =>
+      case Seq(head, tail*) =>
         tail.foldLeft(head) { case (onTermination, configOnTermination) =>
           (action, cmd, count, state) =>
             configOnTermination(action, cmd, count, onTermination(action, cmd, count, state))
@@ -927,7 +927,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
    * @param key the [[ScopedKey]] instance that sets the [[Scope]] for the settings we're extracting
    * @param extracted the [[Extracted]] instance for the build
    */
-  private final class WatchSettings private[Continuous] (val key: ScopedKey[_])(implicit
+  private final class WatchSettings private[Continuous] (val key: ScopedKey[?])(implicit
       extracted: Extracted
   ) {
     val antiEntropy: FiniteDuration =
@@ -989,14 +989,14 @@ private[sbt] object Continuous extends DeprecatedContinuous {
   end Config
 
   @nowarn
-  private def getStartMessage(key: ScopedKey[_])(implicit e: Extracted): StartMessage = Some {
+  private def getStartMessage(key: ScopedKey[?])(implicit e: Extracted): StartMessage = Some {
     lazy val default = key.get(watchStartMessage).getOrElse(Watch.defaultStartWatch)
     key.get(deprecatedWatchingMessage).map(Left(_)).getOrElse(Right(default))
   }
 
   @nowarn
   private def getTriggerMessage(
-      key: ScopedKey[_]
+      key: ScopedKey[?]
   )(implicit e: Extracted): TriggerMessage = {
     lazy val default =
       key.get(watchTriggeredMessage).getOrElse(Watch.defaultOnTriggerMessage)
@@ -1035,7 +1035,7 @@ private[sbt] object Continuous extends DeprecatedContinuous {
     }
   }
 
-  private implicit class ScopedKeyOps(val scopedKey: ScopedKey[_]) extends AnyVal {
+  private implicit class ScopedKeyOps(val scopedKey: ScopedKey[?]) extends AnyVal {
 
     /**
      * Gets the value for a setting key scoped to the wrapped [[ScopedKey]]. If the task axis is not

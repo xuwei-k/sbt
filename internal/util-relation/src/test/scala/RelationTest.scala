@@ -8,8 +8,8 @@
 
 package sbt.internal.util
 
-import org.scalacheck._
-import Prop._
+import org.scalacheck.*
+import Prop.*
 
 object RelationTest extends Properties("Relation") {
   property("Added entry check") = forAll { (pairs: List[(Int, Double)]) =>

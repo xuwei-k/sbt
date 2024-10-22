@@ -11,7 +11,7 @@ package sbt.util
 import java.io.File
 import java.util.Optional
 import java.util.function.Supplier
-import java.{ util => ju }
+import java.{ util as ju }
 
 import xsbti.{
   Action,
@@ -32,7 +32,7 @@ object InterfaceUtil {
     override def get: A = a
   }
 
-  import java.util.function.{ Function => JavaFunction }
+  import java.util.function.{ Function as JavaFunction }
   def toJavaFunction[A1, R](f: A1 => R): JavaFunction[A1, R] = new JavaFunction[A1, R] {
     override def apply(t: A1): R = f(t)
   }

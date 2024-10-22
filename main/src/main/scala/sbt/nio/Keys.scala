@@ -19,7 +19,7 @@ import sbt.internal.nio.FileTreeRepository
 import sbt.internal.util.AttributeKey
 import sbt.internal.util.complete.Parser
 import sbt.nio.file.{ FileAttributes, FileTreeView, Glob, PathFilter }
-import sbt._
+import sbt.*
 
 import scala.concurrent.duration.FiniteDuration
 

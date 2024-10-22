@@ -46,7 +46,7 @@ object ProjectQuery:
         .examples("@scalaBinaryVersion=3")
         .?)
       .map { case (proj, params) =>
-        ProjectQuery(proj, Map(params.toSeq: _*))
+        ProjectQuery(proj, Map(params.toSeq*))
       }
       .filter(
         (q) => q.projectName.contains("...") || q.params.nonEmpty,

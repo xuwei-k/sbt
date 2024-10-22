@@ -35,7 +35,7 @@ object Configurations {
   }
 
   private[sbt] def internal(base: Configuration, ext: Configuration*) =
-    Configuration.of(base.id + "Internal", base.name + "-internal").extend(ext: _*).hide
+    Configuration.of(base.id + "Internal", base.name + "-internal").extend(ext*).hide
   private[sbt] def fullInternal(base: Configuration): Configuration =
     internal(base, base, Optional, Provided)
   private[sbt] def optionalInternal(base: Configuration): Configuration =
@@ -66,9 +66,9 @@ object Configurations {
   private[sbt] def removeDuplicates(configs: Iterable[Configuration]) =
     Set(
       scala.collection.mutable
-        .Map(configs.map(config => (config.name, config)).toSeq: _*)
+        .Map(configs.map(config => (config.name, config)).toSeq*)
         .values
-        .toList: _*
+        .toList*
     )
 
   /** Returns true if the configuration should be under the influence of scalaVersion. */

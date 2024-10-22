@@ -1,9 +1,9 @@
 package sbt.internal.librarymanagement
 
 import org.scalatest.Inside
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
-import InternalDefaults._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
+import InternalDefaults.*
 
 object IvyRepoSpec extends BaseIvySpecification {
 
@@ -30,7 +30,7 @@ object IvyRepoSpec extends BaseIvySpecification {
 
     val report = ivyUpdate(m)
 
-    import Inside._
+    import Inside.*
     inside(report.configuration(ConfigRef("compile")).map(_.modules)) { case Some(Seq(mr)) =>
       inside(mr.artifacts) { case Seq((ar, _)) =>
         assert(ar.`type` == "jar")
@@ -86,7 +86,7 @@ object IvyRepoSpec extends BaseIvySpecification {
         .updateClassifiers(gcm, UnresolvedWarningConfiguration(), Vector(), log)
         .fold(e => throw e.resolveException, identity)
 
-    import Inside._
+    import Inside.*
     inside(report2.configuration(ConfigRef("compile")).map(_.modules)) { case Some(Seq(mr)) =>
       inside(mr.artifacts) { case Seq((ar, _)) =>
         assert(ar.name == "libmodule-source")

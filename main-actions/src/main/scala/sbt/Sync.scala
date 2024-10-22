@@ -14,7 +14,7 @@ import java.util.zip.ZipException
 import sbt.internal.inc.MappedFileConverter
 import sbt.internal.util.Relation
 import sbt.internal.io.TranslatedException
-import sbt.util.CacheImplicits._
+import sbt.util.CacheImplicits.*
 import sbt.util.{ CacheStore, FileInfo }
 import sbt.io.IO
 import sjsonnew.{

@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Properties
-import scala.xml.{ Elem, Node => XNode, XML }
+import scala.xml.{ Elem, Node as XNode, XML }
 import testing.{
-  Event => TEvent,
+  Event as TEvent,
   NestedTestSelector,
-  Status => TStatus,
+  Status as TStatus,
   OptionalThrowable,
   TestSelector
 }

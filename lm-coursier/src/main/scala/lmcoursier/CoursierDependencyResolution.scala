@@ -21,9 +21,9 @@ import lmcoursier.internal.{
   UpdateParams,
   UpdateRun
 }
-import lmcoursier.syntax._
+import lmcoursier.syntax.*
 import sbt.internal.librarymanagement.IvySbt
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.util.Logger
 import coursier.core.Dependency
 import coursier.core.Publication
@@ -92,7 +92,7 @@ class CoursierDependencyResolution(
         report0
 
       case Left(unresolvedWarning) =>
-        import sbt.util.ShowLines._
+        import sbt.util.ShowLines.*
         unresolvedWarning.lines.foreach(log.warn(_))
         throw unresolvedWarning.resolveException
     }

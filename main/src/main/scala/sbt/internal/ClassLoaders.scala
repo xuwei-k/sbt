@@ -12,8 +12,8 @@ package internal
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
-import sbt.ClassLoaderLayeringStrategy._
-import sbt.Keys._
+import sbt.ClassLoaderLayeringStrategy.*
+import sbt.Keys.*
 import sbt.SlashSyntax0.given
 import sbt.internal.classpath.ClassLoaderCache
 import sbt.internal.inc.ScalaInstance
@@ -24,7 +24,7 @@ import sbt.io.IO
 import sbt.librarymanagement.ScalaArtifacts
 import sbt.nio.FileStamp
 import sbt.nio.FileStamp.LastModified
-import sbt.nio.Keys._
+import sbt.nio.Keys.*
 import sbt.util.Logger
 import xsbti.ArtifactInfo
 import xsbti.HashedVirtualFileRef

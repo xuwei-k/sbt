@@ -9,13 +9,13 @@
 package sbt
 
 import sbt.internal.util.complete.{ Parser, DefaultParsers }
-import DefaultParsers._
-import sbt.Keys._
+import DefaultParsers.*
+import sbt.Keys.*
 import Scope.GlobalScope
 import Def.ScopedKey
 import sbt.SlashSyntax0.given
 import sbt.internal.Load
-import sbt.internal.CommandStrings._
+import sbt.internal.CommandStrings.*
 import Cross.{ spacedFirst, requireSession }
 import sbt.librarymanagement.VersionNumber
 import Project.inScope
@@ -36,7 +36,7 @@ private[sbt] object PluginCross {
       }
     }
 
-    def crossExclude(s: Def.Setting[_]): Boolean =
+    def crossExclude(s: Def.Setting[?]): Boolean =
       s.key match {
         case ScopedKey(Scope(_, _, pluginCrossBuild.key, _), sbtVersion.key) => true
         case _                                                               => false
@@ -45,7 +45,7 @@ private[sbt] object PluginCross {
     Command.arb(requireSession(switchParser), pluginSwitchHelp) {
       case (state, (version, command)) =>
         val x = Project.extract(state)
-        import x._
+        import x.*
         state.log.info(s"Setting `pluginCrossBuild / sbtVersion` to $version")
         val add = List(GlobalScope / pluginCrossBuild / sbtVersion :== version) ++
           List(scalaVersion := scalaVersionSetting.value) ++
@@ -70,12 +70,12 @@ private[sbt] object PluginCross {
       }
     def crossVersions(state: State): List[String] = {
       val x = Project.extract(state)
-      import x._
+      import x.*
       ((currentRef / crossSbtVersions) get structure.data getOrElse Nil).toList
     }
     Command.arb(requireSession(crossParser), pluginCrossHelp) { case (state, command) =>
       val x = Project.extract(state)
-      import x._
+      import x.*
       val versions = crossVersions(state)
       val current = (pluginCrossBuild / sbtVersion)
         .get(structure.data)

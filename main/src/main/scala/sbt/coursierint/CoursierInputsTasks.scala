@@ -10,22 +10,22 @@ package sbt
 package coursierint
 
 import java.net.URL
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.util.Logger
-import sbt.Keys._
+import sbt.Keys.*
 import lmcoursier.definitions.{
-  Classifier => CClassifier,
-  Configuration => CConfiguration,
-  Dependency => CDependency,
-  Extension => CExtension,
-  Info => CInfo,
-  Module => CModule,
-  ModuleName => CModuleName,
-  Organization => COrganization,
-  Project => CProject,
-  Publication => CPublication,
-  Type => CType,
-  Strict => CStrict,
+  Classifier as CClassifier,
+  Configuration as CConfiguration,
+  Dependency as CDependency,
+  Extension as CExtension,
+  Info as CInfo,
+  Module as CModule,
+  ModuleName as CModuleName,
+  Organization as COrganization,
+  Project as CProject,
+  Publication as CPublication,
+  Type as CType,
+  Strict as CStrict,
 }
 import lmcoursier.credentials.DirectCredentials
 import lmcoursier.{ FallbackDependency, FromSbt, Inputs }
@@ -33,10 +33,10 @@ import sbt.internal.librarymanagement.mavenint.SbtPomExtraProperties
 import sbt.librarymanagement.ivy.{
   FileCredentials,
   Credentials,
-  DirectCredentials => IvyDirectCredentials
+  DirectCredentials as IvyDirectCredentials
 }
 import sbt.ProjectExtra.transitiveInterDependencies
-import sbt.ScopeFilter.Make._
+import sbt.ScopeFilter.Make.*
 import scala.jdk.CollectionConverters.*
 
 object CoursierInputsTasks {

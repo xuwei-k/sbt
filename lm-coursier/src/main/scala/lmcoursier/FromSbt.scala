@@ -1,6 +1,6 @@
 package lmcoursier
 
-import coursier.ivy.IvyXml.{ mappings => ivyXmlMappings }
+import coursier.ivy.IvyXml.{ mappings as ivyXmlMappings }
 import lmcoursier.definitions.{
   Classifier,
   Configuration,
@@ -15,7 +15,7 @@ import lmcoursier.definitions.{
   Type
 }
 import sbt.internal.librarymanagement.mavenint.SbtPomExtraProperties
-import sbt.librarymanagement.{ Configuration => _, MavenRepository => _, _ }
+import sbt.librarymanagement.{ Configuration as _, MavenRepository as _, * }
 
 object FromSbt {
 

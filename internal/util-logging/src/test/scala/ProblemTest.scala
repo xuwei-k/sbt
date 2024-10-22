@@ -9,11 +9,11 @@
 package sbt
 
 import java.net.URI
-import hedgehog._
-import hedgehog.runner._
+import hedgehog.*
+import hedgehog.runner.*
 import _root_.sbt.util.InterfaceUtil
 import InterfaceUtil.{ jl2l, jo2o, l2jl }
-import xsbti._
+import xsbti.*
 
 object ProblemTest extends Properties {
   override def tests: List[Test] = List(

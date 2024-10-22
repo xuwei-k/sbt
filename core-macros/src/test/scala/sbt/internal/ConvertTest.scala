@@ -1,7 +1,7 @@
 package sbt.internal
 
 import verify.*
-import ConvertTestMacro._
+import ConvertTestMacro.*
 
 object ConvertTest extends BasicTestSuite:
   test("convert") {

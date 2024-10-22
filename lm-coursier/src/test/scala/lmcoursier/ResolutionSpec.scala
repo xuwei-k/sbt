@@ -4,7 +4,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.propspec.AnyPropSpec
 import sbt.internal.librarymanagement.cross.CrossVersionUtil
 import sbt.internal.util.ConsoleLogger
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.Configurations.Component
 import sbt.librarymanagement.Resolver.{
   DefaultMavenRepository,
@@ -12,7 +12,7 @@ import sbt.librarymanagement.Resolver.{
   JavaNet2Repository
 }
 import sbt.librarymanagement.{ Resolver, UnresolvedWarningConfiguration, UpdateConfiguration }
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 
 final class ResolutionSpec extends AnyPropSpec with Matchers {
 

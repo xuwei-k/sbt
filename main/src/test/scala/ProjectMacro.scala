@@ -9,8 +9,8 @@
 package sbt
 
 import scala.util.control.NonFatal
-import org.scalacheck._
-import Prop._
+import org.scalacheck.*
+import Prop.*
 import sbt.BuildExtra.project
 import java.io.File
 
@@ -31,7 +31,7 @@ class ProjectDefs {
 
 object ProjectMacro extends Properties("ProjectMacro") {
   lazy val pd = new ProjectDefs
-  import pd._
+  import pd.*
 
   def secure(f: => Prop): Prop =
     try {

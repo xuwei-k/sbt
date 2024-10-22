@@ -1,6 +1,6 @@
 package lmcoursier.definitions
 
-import dataclass._
+import dataclass.*
 
 @data class Strict(
     include: Set[(String, String)] = Set(("*", "*")),

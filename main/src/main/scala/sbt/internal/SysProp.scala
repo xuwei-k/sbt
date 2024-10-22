@@ -15,13 +15,13 @@ import java.nio.file.{ Path, Paths }
 import java.util.Locale
 
 import scala.util.control.NonFatal
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import sbt.internal.inc.HashUtil
-import sbt.internal.util.{ Terminal => ITerminal, Util }
+import sbt.internal.util.{ Terminal as ITerminal, Util }
 import sbt.internal.util.complete.SizeParser
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sbt.librarymanagement.ivy.{ Credentials, FileCredentials }
-import sbt.nio.Keys._
+import sbt.nio.Keys.*
 
 // See also BuildPaths.scala
 // See also LineReader.scala

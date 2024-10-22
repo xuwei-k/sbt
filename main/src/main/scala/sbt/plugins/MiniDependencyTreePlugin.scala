@@ -16,7 +16,7 @@ import sbt.librarymanagement.Configurations.{ Compile, Test }
 object MiniDependencyTreePlugin extends AutoPlugin {
   object autoImport extends MiniDependencyTreeKeys
 
-  import autoImport._
+  import autoImport.*
   override def trigger: PluginTrigger = AllRequirements
   override def globalSettings: Seq[Def.Setting[_]] = Seq(
     dependencyTreeIncludeScalaLibrary := false

@@ -74,7 +74,7 @@ object SlashSyntax:
   }
 
   sealed trait HasSlashKeyOrAttrKey extends HasSlashKey {
-    def /(key: AttributeKey[_]): Scope = scope.rescope(key)
+    def /(key: AttributeKey[?]): Scope = scope.rescope(key)
   }
 
   /** RichReference wraps a reference to provide the `/` operator for scoping. */

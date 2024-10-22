@@ -10,7 +10,7 @@ package sbt
 package internal
 
 import java.net.URI
-import sbt.internal.util.complete, complete.{ DefaultParsers, Parser }, DefaultParsers._
+import sbt.internal.util.complete, complete.{ DefaultParsers, Parser }, DefaultParsers.*
 import Keys.sessionSettings
 import sbt.ProjectExtra.{ extract, updateCurrent }
 
@@ -60,7 +60,7 @@ final class ProjectNavigation(s: State) {
 
   def fail(msg: String): State = { s.log.error(msg); s.fail }
 
-  import Parser._, complete.Parsers._
+  import Parser.*, complete.Parsers.*
 
   val parser: Parser[Option[ResolvedReference]] = {
     val reference = Act.resolvedReference(structure.index.keyIndex, currentRef.build, success(()))

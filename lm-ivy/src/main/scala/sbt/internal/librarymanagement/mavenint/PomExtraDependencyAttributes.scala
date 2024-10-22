@@ -36,7 +36,7 @@ object PomExtraDependencyAttributes {
   def readFromAether(
       props: java.util.Map[String, AnyRef]
   ): Map[ModuleRevisionId, Map[String, String]] = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     (props.asScala get ExtraAttributesKey) match {
       case None => Map.empty
       case Some(str) =>
@@ -75,7 +75,7 @@ object PomExtraDependencyAttributes {
     }
 
   def qualifiedExtra(item: ExtendableItem): Map[String, String] = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     item.getQualifiedExtraAttributes.asInstanceOf[java.util.Map[String, String]].asScala.toMap
   }
   def filterCustomExtra(item: ExtendableItem, include: Boolean): Map[String, String] =
@@ -88,7 +88,7 @@ object PomExtraDependencyAttributes {
   // This makes the id suitable as a key to associate a dependency parsed from a <dependency> element
   //  with the extra attributes from the <properties> section
   def simplify(id: ModuleRevisionId): ModuleRevisionId = {
-    import scala.jdk.CollectionConverters._
+    import scala.jdk.CollectionConverters.*
     ModuleRevisionId.newInstance(
       id.getOrganisation,
       id.getName,
@@ -118,7 +118,7 @@ object PomExtraDependencyAttributes {
       if (filteredExtra.isEmpty)
         Nil
       else {
-        import scala.jdk.CollectionConverters._
+        import scala.jdk.CollectionConverters.*
         val revId0 = ModuleRevisionId.newInstance(
           revId.getOrganisation,
           revId.getName,

@@ -11,7 +11,7 @@ package internal
 
 import Keys.Classpath
 import Def.Setting
-import PluginManagement._
+import PluginManagement.*
 import sbt.librarymanagement.ModuleID
 
 import java.net.{ URI, URL, URLClassLoader }

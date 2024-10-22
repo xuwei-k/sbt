@@ -8,13 +8,13 @@
 package sbt
 
 import sbt.Def.{ ScopedKey, displayFull, displayMasked }
-import sbt.internal.TestBuild._
+import sbt.internal.TestBuild.*
 import sbt.internal.util.complete.Parser
 import sbt.internal.{ Resolve, TestBuild }
 import sbt.ProjectExtra.equalKeys
-import hedgehog._
+import hedgehog.*
 import hedgehog.core.{ ShrinkLimit, SuccessCount }
-import hedgehog.runner._
+import hedgehog.runner.*
 
 /**
  * Tests that the scoped key parser in Act can correctly parse a ScopedKey converted by Def.show*Key.
@@ -118,7 +118,7 @@ object ParseKeySpec extends Properties {
     } yield Def.setting(ScopedKey(scope, t.key), Def.value(""))
   }
 
-  final case class StructureKeyMask(structure: Structure, key: ScopedKey[_], mask: ScopeMask)
+  final case class StructureKeyMask(structure: Structure, key: ScopedKey[?], mask: ScopeMask)
 
   val arbStructureKeyMask: Gen[StructureKeyMask] =
     (for {
@@ -134,7 +134,7 @@ object ParseKeySpec extends Properties {
       .filter(configExistsInIndex)
 
   private def configExistsInIndex(skm: StructureKeyMask): Boolean = {
-    import skm._
+    import skm.*
     val resolvedKey = resolve(structure, key, mask)
     val proj = resolvedKey.scope.project.toOption
     val maybeResolvedProj = proj.collect { case ref: ResolvedReference =>
@@ -151,7 +151,7 @@ object ParseKeySpec extends Properties {
     checkName.getOrElse(true)
   }
 
-  def resolve(structure: Structure, key: ScopedKey[_], mask: ScopeMask): ScopedKey[_] =
+  def resolve(structure: Structure, key: ScopedKey[?], mask: ScopeMask): ScopedKey[?] =
     ScopedKey(
       Resolve(structure.extra, Select(structure.current), key.key, mask)(key.scope),
       key.key
@@ -159,10 +159,10 @@ object ParseKeySpec extends Properties {
 
   def parseCheck(
       structure: Structure,
-      key: ScopedKey[_],
+      key: ScopedKey[?],
       mask: ScopeMask,
       showZeroConfig: Boolean = false,
-  )(f: ScopedKey[_] => hedgehog.Result): hedgehog.Result = {
+  )(f: ScopedKey[?] => hedgehog.Result): hedgehog.Result = {
     val s = displayMasked(key, mask, showZeroConfig)
     val parser = makeParser(structure)
     val parsed = Parser.result(parser, s).left.map(_().toString)
@@ -186,7 +186,7 @@ object ParseKeySpec extends Properties {
   // then a scoped key like `foo/<conf>/foo/name` would render as `foo/name`
   // which would be interpreted as `foo/Zero/Zero/name`
   // so we mitigate this by explicitly displaying the configuration axis set to Zero
-  def hasAmbiguousLowercaseAxes(key: ScopedKey[_], structure: Structure): Boolean = {
+  def hasAmbiguousLowercaseAxes(key: ScopedKey[?], structure: Structure): Boolean = {
     val label = key.key.label
     val allProjects = for {
       uri <- structure.keyIndex.buildURIs

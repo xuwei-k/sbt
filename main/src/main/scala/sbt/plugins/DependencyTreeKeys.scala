@@ -11,8 +11,8 @@ package plugins
 
 import java.io.File
 import java.net.URI
-import sbt.internal.graph._
-import sbt.Def._
+import sbt.internal.graph.*
+import sbt.Def.*
 import sbt.librarymanagement.{ ModuleID, UpdateReport }
 
 trait MiniDependencyTreeKeys {

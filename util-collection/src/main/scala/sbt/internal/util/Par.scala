@@ -6,7 +6,7 @@
  */
 
 package sbt.internal.util
-import scala.collection.parallel.CollectionConverters._
+import scala.collection.parallel.CollectionConverters.*
 import scala.collection.parallel.ParSeq
 
 private[util] object Par {

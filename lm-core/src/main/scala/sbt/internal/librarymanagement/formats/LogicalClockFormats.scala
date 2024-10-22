@@ -1,6 +1,6 @@
 package sbt.internal.librarymanagement.formats
 
-import sjsonnew._
+import sjsonnew.*
 
 import sbt.librarymanagement.LogicalClock
 

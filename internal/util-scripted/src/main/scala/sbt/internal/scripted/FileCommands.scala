@@ -12,8 +12,8 @@ package scripted
 
 import java.io.File
 import sbt.io.{ IO, Path }
-import sbt.io.syntax._
-import Path._
+import sbt.io.syntax.*
+import Path.*
 
 class FileCommands(baseDirectory: File) extends BasicStatementHandler {
   lazy val commands = commandMap

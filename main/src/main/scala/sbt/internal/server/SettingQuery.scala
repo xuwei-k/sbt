@@ -14,13 +14,13 @@ import java.net.URI
 import sjsonnew.shaded.scalajson.ast.unsafe.JValue
 import scala.util.{ Left, Right }
 import sbt.util.{ SomeJsonWriter, NoJsonWriter }
-import sbt.protocol._
-import sjsonnew._
-import sjsonnew.support.scalajson.unsafe._
+import sbt.protocol.*
+import sjsonnew.*
+import sjsonnew.support.scalajson.unsafe.*
 
 object SettingQuery {
   import sbt.internal.util.{ AttributeKey, Settings }
-  import sbt.internal.util.complete.{ DefaultParsers, Parser }, DefaultParsers._
+  import sbt.internal.util.complete.{ DefaultParsers, Parser }, DefaultParsers.*
   import sbt.Def.{ showBuildRelativeKey2, ScopedKey }
 
   // Similar to Act.ParsedAxis / Act.projectRef / Act.resolveProject except you can't omit the project reference
@@ -44,7 +44,7 @@ object SettingQuery {
   def resolveProject(parsed: ParsedExplicitAxis[ResolvedReference]): Option[ResolvedReference] =
     parsed match {
       case ParsedExplicitGlobal       => None
-      case pv: ParsedExplicitValue[_] => Some(pv.value)
+      case pv: ParsedExplicitValue[?] => Some(pv.value)
     }
 
   def scopedKeyFull(
@@ -99,8 +99,8 @@ object SettingQuery {
       .get(key.scope, key.key)
       .toRight(s"Key ${Def displayFull key} not found")
       .flatMap {
-        case _: Task[_] => Left(s"Key ${Def displayFull key} is a task, can only query settings")
-        case _: InputTask[_] =>
+        case _: Task[?] => Left(s"Key ${Def displayFull key} is a task, can only query settings")
+        case _: InputTask[?] =>
           Left(s"Key ${Def displayFull key} is an input task, can only query settings")
         case x => Right(x)
       }

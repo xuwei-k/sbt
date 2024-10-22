@@ -16,8 +16,8 @@ import java.util.Properties
 import java.util.concurrent.ForkJoinPool
 
 import sbt.internal.io.Resources
-import sbt.internal.scripted._
-import RemoteSbtCreatorProp._
+import sbt.internal.scripted.*
+import RemoteSbtCreatorProp.*
 
 import scala.annotation.nowarn
 import scala.collection.parallel.ForkJoinTaskSupport
@@ -590,7 +590,7 @@ class ScriptedRunner {
     val scriptedRunners =
       runner.batchScriptedRunner(scriptedTests, addTestFile, groupCount, prop, logger)
     if (parallelExecution && instances > 1) {
-      import sbt.internal.CompatParColls.Converters._
+      import sbt.internal.CompatParColls.Converters.*
       val parallelRunners = scriptedRunners.toArray.par
       parallelRunners.tasksupport = new ForkJoinTaskSupport(new ForkJoinPool(instances))
       runAll(parallelRunners)
@@ -714,7 +714,7 @@ private[sbt] final class ListTests(
         log.warn(s"Tests skipped in group $groupName:")
         skipped.foreach(testName => log.warn(s" ${testName.getName}"))
       }
-      Set(included.map(_.getName): _*)
+      Set(included.map(_.getName)*)
     }
   }
 }

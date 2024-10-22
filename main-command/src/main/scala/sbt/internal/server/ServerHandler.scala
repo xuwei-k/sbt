@@ -11,10 +11,10 @@ package internal
 package server
 
 import sjsonnew.JsonFormat
-import sbt.internal.protocol._
+import sbt.internal.protocol.*
 import sbt.util.Logger
-import sbt.protocol.{ CompletionParams => CP, SettingQuery => Q }
-import sbt.internal.langserver.{ CancelRequestParams => CRP }
+import sbt.protocol.{ CompletionParams as CP, SettingQuery as Q }
+import sbt.internal.langserver.{ CancelRequestParams as CRP }
 
 /**
  * ServerHandler allows plugins to extend sbt server.

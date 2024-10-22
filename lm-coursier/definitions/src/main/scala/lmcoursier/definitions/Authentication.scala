@@ -1,6 +1,6 @@
 package lmcoursier.definitions
 
-import dataclass._
+import dataclass.*
 
 @data class Authentication(
     user: String,

@@ -15,7 +15,7 @@ import _root_.sjsonnew.{
   Unbuilder,
   deserializationError
 }
-import sjsonnew.shaded.scalajson.ast.unsafe._
+import sjsonnew.shaded.scalajson.ast.unsafe.*
 
 trait JsonRpcResponseMessageFormats {
   self: sbt.internal.util.codec.JValueFormats

@@ -8,8 +8,8 @@
 
 package sbt.internal.server
 
-import sbt._
-import sbt.internal.bsp._
+import sbt.*
+import sbt.internal.bsp.*
 import sbt.librarymanagement.Configuration
 import sbt.util.InterfaceUtil
 import sjsonnew.support.scalajson.unsafe.Converter
@@ -38,7 +38,7 @@ case class BspCompileTask private (
     inputs: Inputs,
     startTimeMillis: Long
 ) {
-  import sbt.internal.bsp.codec.JsonProtocol._
+  import sbt.internal.bsp.codec.JsonProtocol.*
 
   private[sbt] def notifyStart(): Unit = {
     val message = s"Compiling $targetName"

@@ -9,9 +9,9 @@
 package sbt
 package internal
 
-import java.nio.file.{ Path => NioPath }
+import java.nio.file.{ Path as NioPath }
 
-import sbt.nio.Keys._
+import sbt.nio.Keys.*
 import sbt.nio.{ FileChanges, FileStamp }
 
 import scala.annotation.compileTimeOnly
@@ -66,7 +66,7 @@ object FileChangesMacro:
       mapKey = '{ outputFileStamps },
     )
 
-  def rescope[A](left: TaskKey[_], right: TaskKey[A]): TaskKey[A] =
+  def rescope[A](left: TaskKey[?], right: TaskKey[A]): TaskKey[A] =
     Scoped.scopedTask(left.scope.copy(task = Select(left.key)), right.key)
 
   def rescope[A](left: Scope, right: TaskKey[A]): TaskKey[A] =

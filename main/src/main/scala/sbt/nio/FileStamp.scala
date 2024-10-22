@@ -12,13 +12,13 @@ import java.io.{ File, IOException }
 import java.nio.file.{ Path, Paths }
 import java.util.concurrent.ConcurrentHashMap
 
-import sbt.internal.inc.{ EmptyStamp, Stamper, Hash => IncHash, LastModified => IncLastModified }
+import sbt.internal.inc.{ EmptyStamp, Stamper, Hash as IncHash, LastModified as IncLastModified }
 import sbt.internal.inc.JavaInterfaceUtil.given
 import sbt.io.IO
 import sbt.nio.file.FileAttributes
 import sbt.util.Digest
 import sjsonnew.{ Builder, JsonFormat, Unbuilder, deserializationError }
-import xsbti.compile.analysis.{ Stamp => XStamp }
+import xsbti.compile.analysis.{ Stamp as XStamp }
 import xsbti.VirtualFileRef
 
 /**

@@ -1,8 +1,8 @@
 import com.typesafe.tools.mima.plugin.MimaPlugin
-import com.typesafe.tools.mima.plugin.MimaKeys._
-import sbt._
-import sbt.Keys._
-import sys.process._
+import com.typesafe.tools.mima.plugin.MimaKeys.*
+import sbt.*
+import sbt.Keys.*
+import sys.process.*
 
 object Mima {
 
@@ -31,7 +31,7 @@ object Mima {
 
   lazy val lmCoursierFilters = {
     mimaBinaryIssueFilters ++= {
-      import com.typesafe.tools.mima.core._
+      import com.typesafe.tools.mima.core.*
 
       Seq(
         // spurious errors on CI
@@ -64,7 +64,7 @@ object Mima {
 
   lazy val lmCoursierShadedFilters = {
     mimaBinaryIssueFilters ++= {
-      import com.typesafe.tools.mima.core._
+      import com.typesafe.tools.mima.core.*
 
       Seq(
         // spurious errors on CI

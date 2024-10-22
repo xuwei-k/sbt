@@ -1,8 +1,8 @@
 package sbt.internal.librarymanagement
 
 import sbt.util.ShowLines
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 
 abstract class ResolutionSpec extends AbstractEngineSpec {
 

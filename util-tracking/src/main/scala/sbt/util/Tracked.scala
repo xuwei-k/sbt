@@ -8,7 +8,7 @@
 
 package sbt.util
 
-import scala.util.{ Failure, Try, Success => USuccess }
+import scala.util.{ Failure, Try, Success as USuccess }
 
 import java.io.File
 import sbt.io.IO

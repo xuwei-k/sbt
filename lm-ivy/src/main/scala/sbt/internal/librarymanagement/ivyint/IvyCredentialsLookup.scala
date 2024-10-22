@@ -2,7 +2,7 @@ package sbt.internal.librarymanagement
 package ivyint
 
 import org.apache.ivy.util.url.CredentialsStore
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 /** A key used to store credentials in the ivy credentials store. */
 private[sbt] sealed trait CredentialKey

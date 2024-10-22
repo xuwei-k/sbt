@@ -9,15 +9,15 @@
 package sbt
 package std
 
-import java.io.{ File => _, _ }
+import java.io.{ File as _, * }
 import java.util.concurrent.ConcurrentHashMap
 
 import sbt.internal.io.DeferredWriter
 import sbt.internal.util.ManagedLogger
 import sbt.internal.util.Util.nil
 import sbt.io.IO
-import sbt.io.syntax._
-import sbt.util._
+import sbt.io.syntax.*
+import sbt.util.*
 
 // no longer specific to Tasks, so 'TaskStreams' should be renamed
 /**

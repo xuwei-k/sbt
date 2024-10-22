@@ -8,7 +8,7 @@
 
 package sbt.internal.util
 
-import sbt.util._
+import sbt.util.*
 
 /** Implements the level-setting methods of Logger. */
 abstract class BasicLogger extends AbstractLogger {

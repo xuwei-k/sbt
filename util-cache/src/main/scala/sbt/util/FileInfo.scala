@@ -12,9 +12,9 @@ import java.io.File
 
 import scala.util.control.NonFatal
 import sbt.io.{ Hash, IO }
-import sjsonnew.{ arrayFormat => _, _ }
-import sbt.nio.file._
-import sbt.nio.file.syntax._
+import sjsonnew.{ arrayFormat as _, * }
+import sbt.nio.file.*
+import sbt.nio.file.syntax.*
 
 sealed trait FileInfo { def file: File }
 sealed trait HashFileInfo extends FileInfo {

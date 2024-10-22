@@ -1,6 +1,6 @@
 import scala.util.control.NonFatal
-import sbt._
-import Keys._
+import sbt.*
+import Keys.*
 import scalafix.sbt.ScalafixPlugin.autoImport.scalafix
 
 import sbt.internal.inc.Analysis
@@ -34,7 +34,7 @@ object Utils {
     Compile / doc / scalacOptions -= "-Xfatal-warnings",
   )
 
-  def projectComponent: Setting[_] =
+  def projectComponent: Setting[?] =
     projectID := (componentID.value match {
       case Some(id) => projectID.value extra ("e:component" -> id)
       case None     => projectID.value
@@ -109,15 +109,15 @@ object Utils {
   )
 
   def cleanPom(pomNode: scala.xml.Node) = {
-    import scala.xml._
+    import scala.xml.*
     def cleanNodes(nodes: Seq[Node]): Seq[Node] = nodes flatMap {
       case elem @ Elem(_, "dependency", _, _, _*) if excludePomDependency(elem) =>
         NodeSeq.Empty
       case Elem(_, "classifier", _, _, _*) =>
         NodeSeq.Empty
-      case Elem(prefix, label, attributes, scope, children @ _*) =>
+      case Elem(prefix, label, attributes, scope, children*) =>
         val cleanedNodes = cleanNodes(children)
-        Elem(prefix, label, attributes, scope, cleanedNodes.isEmpty, cleanedNodes: _*).theSeq
+        Elem(prefix, label, attributes, scope, cleanedNodes.isEmpty, cleanedNodes*).theSeq
       case other => other
     }
     cleanNodes(pomNode.theSeq)(0)

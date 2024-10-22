@@ -354,7 +354,7 @@ object Index {
   def taskToKeyMap(data: Settings[Scope]): Map[Task[_], ScopedKey[Task[_]]] = {
 
     val pairs = data.scopes flatMap (scope =>
-      data.data(scope).entries collect { case AttributeEntry(key, value: Task[_]) =>
+      data.data(scope).entries collect { case AttributeEntry(key, value: Task[?]) =>
         (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]]))
       }
     )
@@ -380,7 +380,7 @@ object Index {
 
   private def stringToKeyMap0(
       settings: Set[AttributeKey[_]]
-  )(label: AttributeKey[_] => String): Map[String, AttributeKey[_]] = {
+  )(label: AttributeKey[?] => String): Map[String, AttributeKey[_]] = {
     val multiMap = settings.groupBy(label)
     val duplicates = multiMap.iterator
       .collect { case (k, xs) if xs.size > 1 => (k, xs.map(_.tag)) }

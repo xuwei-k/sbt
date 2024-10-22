@@ -3,19 +3,19 @@ package internal
 
 import build.bazel.remote.execution.v2.{
   ActionCacheGrpc,
-  ActionResult => XActionResult,
+  ActionResult as XActionResult,
   BatchReadBlobsRequest,
   BatchReadBlobsResponse,
   BatchUpdateBlobsRequest,
   BatchUpdateBlobsResponse,
   Compressor,
   ContentAddressableStorageGrpc,
-  Digest => XDigest,
+  Digest as XDigest,
   DigestFunction,
   FindMissingBlobsRequest,
-  GetActionResultRequest => XGetActionResultRequest,
+  GetActionResultRequest as XGetActionResultRequest,
   OutputFile,
-  UpdateActionResultRequest => XUpdateActionResultRequest,
+  UpdateActionResultRequest as XUpdateActionResultRequest,
 }
 import com.eed3si9n.remoteapis.shaded.com.google.protobuf.ByteString
 import com.eed3si9n.remoteapis.shaded.io.grpc.{
@@ -175,7 +175,7 @@ class GrpcActionCacheStore(
     val responses = result.getResponsesList().asScala.toList
     // do not assume responses to come in order
     val lookupResponse: Map[Digest, BatchUpdateBlobsResponse.Response] =
-      Map(responses.map(res => toDigest(res.getDigest()) -> res): _*)
+      Map(responses.map(res => toDigest(res.getDigest()) -> res)*)
     blobs.flatMap: blob =>
       val d = Digest(blob)
       if lookupResponse.contains(d) then
@@ -192,7 +192,7 @@ class GrpcActionCacheStore(
     if allOk then
       // do not assume the responses to come in order
       val lookupResponse: Map[Digest, BatchReadBlobsResponse.Response] =
-        Map(blobs.map(res => toDigest(res.getDigest) -> res): _*)
+        Map(blobs.map(res => toDigest(res.getDigest) -> res)*)
       refs.map: r =>
         val digest = Digest(r)
         val blob = lookupResponse(digest)

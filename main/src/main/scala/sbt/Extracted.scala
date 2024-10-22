@@ -116,7 +116,7 @@ final case class Extracted(
   private def resolve[K <: Scoped.ScopingSetting[K] with Scoped](key: K): K =
     Scope.resolveScope(GlobalScope, currentRef.build, rootProject)(key.scope) / key
 
-  private def getOrError[T](scope: Scope, key: AttributeKey[_], value: Option[T])(implicit
+  private def getOrError[T](scope: Scope, key: AttributeKey[?], value: Option[T])(implicit
       display: Show[ScopedKey[_]]
   ): T =
     value getOrElse sys.error(display.show(ScopedKey(scope, key)) + " is undefined.")

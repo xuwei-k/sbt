@@ -1,8 +1,8 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.UpdateOptions
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 
 object FrozenModeSpec extends BaseIvySpecification {
   private final val targetDir = Some(currentDependency)

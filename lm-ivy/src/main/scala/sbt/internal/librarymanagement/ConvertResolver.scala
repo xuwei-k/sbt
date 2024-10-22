@@ -24,22 +24,22 @@ import org.apache.ivy.plugins.resolver.{
   SshResolver,
   URLResolver
 }
-import org.apache.ivy.plugins.repository.url.{ URLRepository => URLRepo }
-import org.apache.ivy.plugins.repository.file.{ FileResource, FileRepository => FileRepo }
+import org.apache.ivy.plugins.repository.url.{ URLRepository as URLRepo }
+import org.apache.ivy.plugins.repository.file.{ FileResource, FileRepository as FileRepo }
 import java.io.{ File, IOException }
 import java.util.Date
 
-import org.apache.ivy.core.module.descriptor.{ Artifact => IArtifact }
+import org.apache.ivy.core.module.descriptor.{ Artifact as IArtifact }
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.ivy.core.module.descriptor.DefaultArtifact
 import org.apache.ivy.core.report.DownloadReport
 import org.apache.ivy.plugins.resolver.util.{ ResolvedResource, ResourceMDParser }
 import org.apache.ivy.util.{ ChecksumHelper, FileUtil, Message }
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import sbt.internal.librarymanagement.mavenint.PomExtraDependencyAttributes
 import sbt.io.IO
 import sbt.util.Logger
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.librarymanagement.ivy.UpdateOptions
 
 private[sbt] object ConvertResolver {
@@ -51,7 +51,7 @@ private[sbt] object ConvertResolver {
    */
   private object ChecksumFriendlyURLResolver {
     import java.lang.reflect.AccessibleObject
-    private def reflectiveLookup[A <: AccessibleObject](f: Class[_] => A): Option[A] =
+    private def reflectiveLookup[A <: AccessibleObject](f: Class[?] => A): Option[A] =
       try {
         val cls = classOf[RepositoryResolver]
         val thing = f(cls)
@@ -98,7 +98,7 @@ private[sbt] object ConvertResolver {
    * TODO - See about contributing back to ivy.
    */
   private trait ChecksumFriendlyURLResolver extends RepositoryResolver {
-    import ChecksumFriendlyURLResolver._
+    import ChecksumFriendlyURLResolver.*
     private def signerName: String = signerNameField match {
       case Some(field) => field.get(this).asInstanceOf[String]
       case None        => null
@@ -278,7 +278,7 @@ private[sbt] object ConvertResolver {
      */
     def managedChecksumsEnabled: Boolean
 
-    import sbt.io.syntax._
+    import sbt.io.syntax.*
     private def downloadChecksum(
         resource: Resource,
         targetChecksumFile: File,
@@ -352,8 +352,8 @@ private[sbt] object ConvertResolver {
       resolver: AbstractSshBasedResolver,
       connection: SshConnection
   ): Unit = {
-    import resolver._
-    import connection._
+    import resolver.*
+    import connection.*
     hostname.foreach(setHost)
     port.foreach(setPort)
     authentication foreach {

@@ -19,19 +19,19 @@ import sbt.internal.util.complete.{
   HistoryCommands,
   Parser,
   TokenCompletions,
-  History => CHistory
+  History as CHistory
 }
 import sbt.internal.util.Types.{ const, idFun }
 import sbt.internal.util.Util.*
 import sbt.internal.inc.classpath.ClasspathUtil.toLoader
 import sbt.internal.inc.ModuleUtilities
 import sbt.internal.client.NetworkClient
-import DefaultParsers._
+import DefaultParsers.*
 
 import Command.applyEffect
-import BasicCommandStrings._
-import CommandUtil._
-import BasicKeys._
+import BasicCommandStrings.*
+import CommandUtil.*
+import BasicKeys.*
 import java.io.File
 
 import sbt.io.IO
@@ -280,8 +280,8 @@ object BasicCommands {
   lazy val otherCommandParser: State => Parser[String] =
     (s: State) => token(OptSpace ~> combinedLax(s, NotSpaceClass ~ any.*))
 
-  def combinedLax(s: State, any: Parser[_]): Parser[String] =
-    matched((s.combinedParser: Parser[_]) | token(any, hide = const(true)))
+  def combinedLax(s: State, any: Parser[?]): Parser[String] =
+    matched((s.combinedParser: Parser[?]) | token(any, hide = const(true)))
 
   def ifLast: Command =
     Command(IfLast, Help.more(IfLast, IfLastDetailed))(otherCommandParser)((s, arg) =>
@@ -485,7 +485,7 @@ object BasicCommands {
 
   def alias: Command =
     Command(AliasCommand, Help.more(AliasCommand, AliasDetailed)) { s =>
-      val name = token(OpOrID.examples(aliasNames(s): _*))
+      val name = token(OpOrID.examples(aliasNames(s)*))
       val assign = token(OptSpace ~ '=' ~ OptSpace)
       val sfree = removeAliases(s)
       val to = matched(sfree.combinedParser, partial = true).failOnException | any.+.string
@@ -515,10 +515,10 @@ object BasicCommands {
   def removeAlias(s: State, name: String): State =
     s.copy(definedCommands = s.definedCommands.filter(c => !isAliasNamed(name, c)))
 
-  def removeTagged(s: State, tag: AttributeKey[_]): State =
+  def removeTagged(s: State, tag: AttributeKey[?]): State =
     s.copy(definedCommands = removeTagged(s.definedCommands, tag))
 
-  def removeTagged(as: Seq[Command], tag: AttributeKey[_]): Seq[Command] =
+  def removeTagged(as: Seq[Command], tag: AttributeKey[?]): Seq[Command] =
     as.filter(c => !(c.tags contains tag))
 
   def isAliasNamed(name: String, c: Command): Boolean = isNamed(name, getAlias(c))

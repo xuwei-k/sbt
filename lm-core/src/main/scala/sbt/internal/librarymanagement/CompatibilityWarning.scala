@@ -1,9 +1,9 @@
 package sbt.internal.librarymanagement
 
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 import sbt.util.{ Level, Logger }
 
-import Configurations._
+import Configurations.*
 
 final class CompatibilityWarningOptions private[sbt] (
     val configurations: Seq[Configuration],

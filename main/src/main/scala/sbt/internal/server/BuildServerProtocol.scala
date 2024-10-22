@@ -13,14 +13,14 @@ package server
 import java.net.URI
 import sbt.BuildExtra.*
 import sbt.BuildPaths.{ configurationSources, projectStandard }
-import sbt.Def._
-import sbt.Keys._
+import sbt.Def.*
+import sbt.Keys.*
 import sbt.ProjectExtra.*
-import sbt.ScopeFilter.Make._
+import sbt.ScopeFilter.Make.*
 import sbt.Scoped.richTaskSeq
 import sbt.SlashSyntax0.given
 import sbt.StandardMain.exchange
-import sbt.internal.bsp._
+import sbt.internal.bsp.*
 import sbt.internal.langserver.ErrorCodes
 import sbt.internal.protocol.JsonRpcRequestMessage
 import sbt.internal.util.{ Attributed, ErrorHandling }
@@ -30,7 +30,7 @@ import sbt.librarymanagement.{ Configuration, ScalaArtifacts }
 import sbt.std.TaskExtra
 import sbt.util.Logger
 import sjsonnew.shaded.scalajson.ast.unsafe.{ JNull, JValue }
-import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Converter, Parser => JsonParser }
+import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Converter, Parser as JsonParser }
 import xsbti.CompileFailed
 
 import java.io.File
@@ -46,7 +46,7 @@ import xsbti.VirtualFileRef
 import java.util.concurrent.atomic.AtomicReference
 
 object BuildServerProtocol {
-  import sbt.internal.bsp.codec.JsonProtocol._
+  import sbt.internal.bsp.codec.JsonProtocol.*
 
   private val capabilities = BuildServerCapabilities(
     CompileProvider(BuildServerConnection.languages),
@@ -1030,7 +1030,7 @@ object BuildServerProtocol {
         .groupBy(_._1)
         .mapValues { deps =>
           // We use a list set to maintain the order of configs
-          ListSet(deps.flatMap { case (_, configs) => configs }: _*)
+          ListSet(deps.flatMap { case (_, configs) => configs }*)
         }
         .toSeq
     }

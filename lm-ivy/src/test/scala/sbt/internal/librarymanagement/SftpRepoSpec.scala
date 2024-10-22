@@ -1,10 +1,10 @@
 package sbt.internal.librarymanagement
 
-import sbt.io._
-import sbt.io.syntax._
+import sbt.io.*
+import sbt.io.syntax.*
 import sbt.util.Level
-import sbt.librarymanagement._
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.*
+import sbt.librarymanagement.syntax.*
 import java.nio.file.Paths
 
 //by default this test is ignored

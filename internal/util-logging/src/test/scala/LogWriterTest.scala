@@ -8,11 +8,11 @@
 
 package sbt.internal.util
 
-import sbt.util._
-import org.scalacheck._
-import Arbitrary._
+import sbt.util.*
+import org.scalacheck.*
+import Arbitrary.*
 import Gen.{ listOfN, oneOf }
-import Prop._
+import Prop.*
 
 import java.io.Writer
 

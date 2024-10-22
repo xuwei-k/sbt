@@ -1,7 +1,7 @@
 package sbt.librarymanagement
 
 import sbt.internal.librarymanagement.cross.CrossVersionUtil
-import sbt.librarymanagement.syntax._
+import sbt.librarymanagement.syntax.*
 
 final case class ScalaVersion(full: String, binary: String)
 

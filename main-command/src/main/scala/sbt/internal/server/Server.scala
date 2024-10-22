@@ -22,12 +22,12 @@ import scala.util.{ Failure, Success, Try }
 import sbt.internal.protocol.{ PortFile, TokenFile }
 import sbt.util.Logger
 import sbt.io.IO
-import sbt.io.syntax._
+import sbt.io.syntax.*
 import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Converter }
-import sbt.internal.protocol.codec._
+import sbt.internal.protocol.codec.*
 import sbt.internal.util.ErrorHandling
 import sbt.internal.util.Util.isWindows
-import org.scalasbt.ipcsocket._
+import org.scalasbt.ipcsocket.*
 import sbt.internal.bsp.BuildServerConnection
 import xsbti.AppConfiguration
 
@@ -50,7 +50,7 @@ private[sbt] object Server {
       log: Logger
   ): ServerInstance =
     new ServerInstance { self =>
-      import connection._
+      import connection.*
       val running = new AtomicBoolean(false)
       val p: Promise[Unit] = Promise[Unit]()
       val ready: Future[Unit] = p.future
@@ -174,7 +174,7 @@ private[sbt] object Server {
       }
 
       private def writeTokenfile(): Unit = {
-        import JsonProtocol._
+        import JsonProtocol.*
 
         val uri = connection.shortName
         val t = TokenFile(uri, token)
@@ -193,7 +193,7 @@ private[sbt] object Server {
         def acl(owner: UserPrincipal) = {
           val builder = AclEntry.newBuilder
           builder.setPrincipal(owner)
-          builder.setPermissions(AclEntryPermission.values(): _*)
+          builder.setPermissions(AclEntryPermission.values()*)
           builder.setType(AclEntryType.ALLOW)
           builder.build
         }
@@ -209,7 +209,7 @@ private[sbt] object Server {
 
       // This file exists through the lifetime of the server.
       private def writePortfile(): Unit = {
-        import JsonProtocol._
+        import JsonProtocol.*
 
         val uri = connection.shortName
         val p =

@@ -9,10 +9,10 @@
 package sbt
 
 import sbt.internal.util.Types.idFun
-import sbt.internal.TestBuild._
-import hedgehog._
+import sbt.internal.TestBuild.*
+import hedgehog.*
 import hedgehog.Result.{ all, assert, failure, success }
-import hedgehog.runner._
+import hedgehog.runner.*
 
 object Delegates extends Properties {
 
@@ -134,7 +134,7 @@ object Delegates extends Properties {
       )
     )
 
-  def allAxes(f: (Scope, Seq[Scope], Scope => ScopeAxis[_]) => hedgehog.Result): Property =
+  def allAxes(f: (Scope, Seq[Scope], Scope => ScopeAxis[?]) => hedgehog.Result): Property =
     keysGen.forAll.map { keys =>
       allDelegates(keys) { (s, ds) =>
         all(List(f(s, ds, _.project), f(s, ds, _.config), f(s, ds, _.task), f(s, ds, _.extra)))
@@ -149,7 +149,7 @@ object Delegates extends Properties {
         .log("Delegates:\n\t" + delegates.map(scope => Scope.display(scope, "_")).mkString("\n\t"))
     }.toList)
 
-  def alwaysZero(s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[_]): hedgehog.Result =
+  def alwaysZero(s: Scope, ds: Seq[Scope], axis: Scope => ScopeAxis[?]): hedgehog.Result =
     assert(axis(s) != Zero).or(
       all(ds.map { d =>
         axis(d) ==== Zero

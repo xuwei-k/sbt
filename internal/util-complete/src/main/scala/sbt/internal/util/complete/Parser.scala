@@ -9,7 +9,7 @@
 package sbt.internal.util
 package complete
 
-import Parser._
+import Parser.*
 import sbt.internal.util.Types.{ left, right, some }
 import sbt.internal.util.Util.{ makeList, separate }
 
@@ -100,7 +100,7 @@ sealed trait RichParser[A] {
    * Apply the original parser, but only succeed if `o` also succeeds. Note that `o` does not need
    * to consume the same amount of input to satisfy this condition.
    */
-  def &(o: Parser[_]): Parser[A]
+  def &(o: Parser[?]): Parser[A]
 
   /** Explicitly defines the completions for the original Parser. */
   def examples(s: String*): Parser[A]
@@ -164,7 +164,7 @@ object Parser extends ParserMain:
     def either[B](b: => Result[B]): Result[Either[T, B]]
     def map[B](f: T => B): Result[B]
     def flatMap[B](f: T => Result[B]): Result[B]
-    def &&(b: => Result[_]): Result[T]
+    def &&(b: => Result[?]): Result[T]
     def filter(f: T => Boolean, msg: => String): Result[T]
     def seq[B](b: => Result[B]): Result[(T, B)] = app(b)((m, n) => (m, n))
     def app[B, C](b: => Result[B])(f: (T, B) => C): Result[C]
@@ -181,7 +181,7 @@ object Parser extends ParserMain:
       case Value(bv)     => Value(f(value, bv))
     }
 
-    def &&(b: => Result[_]): Result[T] = b match { case f: Failure => f; case _ => this }
+    def &&(b: => Result[?]): Result[T] = b match { case f: Failure => f; case _ => this }
     def or[B >: T](b: => Result[B]): Result[B] = this
     def either[B](b: => Result[B]): Result[Either[T, B]] = Value(Left(value))
     def map[B](f: T => B): Result[B] = Value(f(value))
@@ -210,7 +210,7 @@ object Parser extends ParserMain:
 
     def filter(f: Nothing => Boolean, msg: => String) = this
     def app[B, C](b: => Result[B])(f: (Nothing, B) => C): Result[C] = this
-    def &&(b: => Result[_]) = this
+    def &&(b: => Result[?]) = this
     def toEither = Left(() => errors)
 
     private[sbt] def ++(f: Failure) = mkFailures(errors ++ f.errors)
@@ -332,7 +332,7 @@ object Parser extends ParserMain:
     }
   }
 
-  def and[T](a: Parser[T], b: Parser[_]): Parser[T] = a.ifValid(b.ifValid(new And(a, b)))
+  def and[T](a: Parser[T], b: Parser[?]): Parser[T] = a.ifValid(b.ifValid(new And(a, b)))
 
 end Parser
 
@@ -358,7 +358,7 @@ trait ParserMain {
     def !!!(msg: String): Parser[A] = onFailure(a, msg)
     def failOnException: Parser[A] = trapAndFail(a)
 
-    def &(o: Parser[_]) = and(a, o)
+    def &(o: Parser[?]) = and(a, o)
     def examples(s: String*): Parser[A] = examples(s.toSet)
 
     def examples(s: Set[String], check: Boolean = false): Parser[A] =
@@ -424,7 +424,7 @@ trait ParserMain {
    * Presents a Char range as a Parser. A single Char is parsed only if it is in the given range.
    */
   def range(r: collection.immutable.NumericRange[Char], label: String): Parser[Char] =
-    charClass(r contains _, label).examples(r.map(_.toString): _*)
+    charClass(r contains _, label).examples(r.map(_.toString)*)
 
   /** Defines a Parser that parses a single character only if it is contained in `legal`. */
   def chars(legal: String): Parser[Char] = {
@@ -481,7 +481,7 @@ trait ParserMain {
    *
    * See also [[sampleParse]] and [[sampleCompletions]].
    */
-  def sample(str: String, parser: Parser[_], completions: Boolean = false): Unit =
+  def sample(str: String, parser: Parser[?], completions: Boolean = false): Unit =
     if (completions) sampleCompletions(str, parser) else sampleParse(str, parser)
 
   /**
@@ -489,7 +489,7 @@ trait ParserMain {
    * the result of parsing is printed using the result's `toString` method. If parsing fails, the
    * error message is displayed.
    */
-  def sampleParse(str: String, parser: Parser[_]): Unit =
+  def sampleParse(str: String, parser: Parser[?]): Unit =
     parse(str, parser) match {
       case Left(msg) => println(msg)
       case Right(v)  => println(v)
@@ -500,7 +500,7 @@ trait ParserMain {
    * the available completions are displayed on separate lines. If parsing fails, the error message
    * is displayed.
    */
-  def sampleCompletions(str: String, parser: Parser[_], level: Int = 1): Unit =
+  def sampleCompletions(str: String, parser: Parser[?], level: Int = 1): Unit =
     Parser.completions(parser, str, level).get foreach println
 
   // intended to be temporary pending proper error feedback
@@ -536,7 +536,7 @@ trait ParserMain {
    * increasing positive numbers corresponding to increasing verbosity. Typically no more than a few
    * levels are defined.
    */
-  def completions(p: Parser[_], s: String, level: Int): Completions =
+  def completions(p: Parser[?], s: String, level: Int): Completions =
     // The x Completions.empty removes any trailing token completions where append.isEmpty
     apply(p)(s).completions(level) x Completions.empty
 
@@ -575,7 +575,7 @@ trait ParserMain {
     } else a
 
   def matched(
-      t: Parser[_],
+      t: Parser[?],
       seen: Vector[Char] = Vector.empty,
       partial: Boolean = false
   ): Parser[String] =
@@ -636,7 +636,7 @@ trait ParserMain {
     case (_, _)                     => new HomParser(a, b)
   }
 
-  def not(p: Parser[_], failMessage: String): Parser[Unit] = p.result match {
+  def not(p: Parser[?], failMessage: String): Parser[Unit] = p.result match {
     case None    => new Not(p, failMessage)
     case Some(_) => failure(failMessage)
   }
@@ -832,7 +832,7 @@ private final class Filter[T](p: Parser[T], f: T => Boolean, seen: String, msg: 
   override def isTokenStart = p.isTokenStart
 }
 
-private final class MatchedString(delegate: Parser[_], seenV: Vector[Char], partial: Boolean)
+private final class MatchedString(delegate: Parser[?], seenV: Vector[Char], partial: Boolean)
     extends ValidParser[String] {
   lazy val seen = seenV.mkString
   def derive(c: Char) = matched(delegate derive c, seenV :+ c, partial)
@@ -863,7 +863,7 @@ private final class TokenStart[T](delegate: Parser[T], seen: String, complete: T
   override def toString = "token('" + complete + ", " + delegate + ")"
 }
 
-private final class And[T](a: Parser[T], b: Parser[_]) extends ValidParser[T] {
+private final class And[T](a: Parser[T], b: Parser[?]) extends ValidParser[T] {
   lazy val result = tuple(a.result, b.result) map { _._1 }
   def derive(c: Char) = (a derive c) & (b derive c)
   def completions(level: Int) = a.completions(level).filterS(s => apply(b)(s).resultEmpty.isValid)
@@ -871,14 +871,14 @@ private final class And[T](a: Parser[T], b: Parser[_]) extends ValidParser[T] {
   override def toString = "(%s) && (%s)".format(a, b)
 }
 
-private final class Not(delegate: Parser[_], failMessage: String) extends ValidParser[Unit] {
+private final class Not(delegate: Parser[?], failMessage: String) extends ValidParser[Unit] {
   def derive(c: Char) = if (delegate.valid) not(delegate derive c, failMessage) else this
   def completions(level: Int) = Completions.empty
   def result = None
 
   lazy val resultEmpty = delegate.resultEmpty match {
     case _: Failure  => Value(())
-    case _: Value[_] => mkFailure(failMessage)
+    case _: Value[?] => mkFailure(failMessage)
   }
 
   override def toString = " -(%s)".format(delegate)

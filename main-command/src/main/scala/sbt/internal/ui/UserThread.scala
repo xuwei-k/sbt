@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 import java.util.concurrent.Executors
 
 import sbt.State
-import scala.concurrent.duration._
-import sbt.internal.util.JoinThread._
+import scala.concurrent.duration.*
+import sbt.internal.util.JoinThread.*
 import sbt.internal.util.{ ConsoleAppender, ProgressEvent, ProgressState, Prompt }
 
 private[sbt] class UserThread(val channel: CommandChannel) extends AutoCloseable {

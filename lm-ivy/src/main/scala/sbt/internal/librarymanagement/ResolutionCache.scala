@@ -11,7 +11,7 @@ import core.module.descriptor.ModuleDescriptor
 import ResolutionCache.{ Name, ReportDirectory, ResolvedName, ResolvedPattern }
 import parser.xml.XmlModuleDescriptorParser
 import sbt.io.IO
-import sbt.librarymanagement._
+import sbt.librarymanagement.*
 
 /**
  * Replaces the standard Ivy resolution cache in order to:
