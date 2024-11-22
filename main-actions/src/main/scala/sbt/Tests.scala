@@ -12,6 +12,7 @@ import std._
 import xsbt.api.{ Discovered, Discovery }
 import sbt.internal.inc.Analysis
 import TaskExtra._
+import TaskExtra.given
 import sbt.internal.Action
 import sbt.internal.util.FeedbackProvidedException
 import xsbti.api.Definition

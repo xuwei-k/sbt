@@ -429,14 +429,6 @@ object Def extends BuildSyntax with Init with InitializeImplicits:
         )
       )
 
-  class InitOps[T](private val x: Initialize[T]) extends AnyVal {
-    def toTaskable: Taskable[T] = x
-  }
-
-  class InitTaskOps[T](private val x: Initialize[Task[T]]) extends AnyVal {
-    def toTaskable: Taskable[T] = x
-  }
-
   /**
    * This works around Scala 2.12.12's
    * "a pure expression does nothing in statement position"
@@ -466,8 +458,15 @@ object Def extends BuildSyntax with Init with InitializeImplicits:
 end Def
 
 sealed trait InitializeImplicits { self: Def.type =>
-  implicit def initOps[T](x: Def.Initialize[T]): Def.InitOps[T] = new Def.InitOps(x)
+  given InitOps: AnyRef with {
+    extension [T](x: Initialize[T]) {
+      def toTaskable: Taskable[T] = x
+    }
+  }
 
-  implicit def initTaskOps[T](x: Def.Initialize[Task[T]]): Def.InitTaskOps[T] =
-    new Def.InitTaskOps(x)
+  given InitTaskOps: AnyRef with {
+    extension [T](x: Initialize[Task[T]]) {
+      def toTaskable: Taskable[T] = x
+    }
+  }
 }

@@ -19,7 +19,7 @@ import org.apache.ivy.core.module.descriptor.ModuleDescriptor
 import org.apache.ivy.core.module.id.ModuleRevisionId
 import org.apache.logging.log4j.core.{ Appender => XAppender }
 import org.scalasbt.ipcsocket.Win32SecurityLevel
-import sbt.Def.{ Initialize, ScopedKey, Setting, SettingsDefinition, parsed }
+import sbt.Def.{ Initialize, ScopedKey, Setting, SettingsDefinition, parsed, given }
 import sbt.Keys._
 import sbt.OptionSyntax._
 import sbt.Project.{

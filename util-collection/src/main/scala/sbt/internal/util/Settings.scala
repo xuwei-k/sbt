@@ -663,12 +663,12 @@ trait Init:
   end Initialize
 
   object Initialize:
-    implicit def joinInitialize[A1](s: Seq[Initialize[A1]]): JoinInitSeq[A1] = new JoinInitSeq(s)
-
-    final class JoinInitSeq[A1](s: Seq[Initialize[A1]]):
-      def joinWith[A2](f: Seq[A1] => A2): Initialize[A2] = uniform(s)(f)
-      def join: Initialize[Seq[A1]] = uniform(s)(identity)
-    end JoinInitSeq
+    given JoinInitSeq: AnyRef with {
+      extension [A1](s: Seq[Initialize[A1]]) {
+        def joinWith[A2](f: Seq[A1] => A2): Initialize[A2] = uniform(s)(f)
+        def join: Initialize[Seq[A1]] = uniform(s)(identity)
+      }
+    }
 
     def join[A1](inits: Seq[Initialize[A1]]): Initialize[Seq[A1]] = uniform(inits)(identity)
 

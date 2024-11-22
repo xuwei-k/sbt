@@ -33,7 +33,8 @@ private[sbt] object ForkTests {
       log: Logger,
       tags: (Tag, Int)*
   ): Task[TestOutput] = {
-    import std.TaskExtra._
+    import std.TaskExtra.given
+    import std.TaskExtra.*
     val dummyLoader =
       this.getClass.getClassLoader // can't provide the loader for test classes, which is in another jvm
     def all(work: Seq[ClassLoader => Unit]) = work.fork(f => f(dummyLoader))

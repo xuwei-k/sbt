@@ -65,10 +65,7 @@ sealed trait SingleInTask[S] {
   )
   def flatMapR[T](f: Result[S] => Task[T]): Task[T]
 }
-sealed trait ForkTask[S, CC[_]] {
-  def fork[T](f: S => T): CC[Task[T]]
-  def tasks: Seq[Task[S]]
-}
+
 sealed trait JoinTask[S, CC[_]] {
   def join: Task[CC[S]]
   // had to rename from 'reduce' for 2.9.0
@@ -99,17 +96,22 @@ trait TaskExtra extends TaskExtra0 {
   }
 
   final implicit def toTasks[S](in: Seq[() => S]): Seq[Task[S]] = in.map(toTask)
-  final implicit def iterableTask[S](in: Seq[S]): ForkTask[S, Seq] = new ForkTask[S, Seq] {
-    def fork[T](f: S => T): Seq[Task[T]] = in.map(x => task(f(x)))
-    def tasks: Seq[Task[S]] = fork(identity)
+  given IterableTask: AnyRef with {
+    extension [S](in: Seq[S]) {
+      def fork[T](f: S => T): Seq[Task[T]] = in.map(x => task(f(x)))
+      def tasks: Seq[Task[S]] = fork(identity)
+    }
   }
 
   import TaskExtra.{ allM, anyFailM, failM, successM }
 
-  final implicit def joinTasks[S](in: Seq[Task[S]]): JoinTask[S, Seq] = new JoinTask[S, Seq] {
-    def join: Task[Seq[S]] =
-      Task[Seq[S]](Action.Join(in, (s: Seq[Result[S]]) => Right(TaskExtra.all(s))))
-    def reduced(f: (S, S) => S): Task[S] = TaskExtra.reduced(in.toIndexedSeq, f)
+  given JoinTasks: AnyRef with {
+    extension [S](in: Seq[Task[S]]) {
+      def join: Task[Seq[S]] =
+        Task[Seq[S]](Action.Join(in, (s: Seq[Result[S]]) => Right(TaskExtra.all(s))))
+
+      def reduced(f: (S, S) => S): Task[S] = TaskExtra.reduced(in.toIndexedSeq, f)
+    }
   }
 
   final implicit def multT2Task[A1, A2](in: (Task[A1], Task[A2])): MultiInTask[(A1, A2)] =

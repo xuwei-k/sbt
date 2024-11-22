@@ -17,7 +17,7 @@ import sbt.Def._
 import sbt.Keys._
 import sbt.ProjectExtra.*
 import sbt.ScopeFilter.Make._
-import sbt.Scoped.richTaskSeq
+import sbt.Scoped.given
 import sbt.SlashSyntax0.given
 import sbt.StandardMain.exchange
 import sbt.internal.bsp._
@@ -945,7 +945,8 @@ object BuildServerProtocol {
                 (scope / testOnly).toTask(" " + classes.mkString(" "))
             }
           }
-          testTasks.joinWith(ts => TaskExtra.joinTasks(ts).join).result
+          import TaskExtra.given
+          testTasks.joinWith(_.join).result
 
         case Some(dataKind) =>
           throw LangServerError(

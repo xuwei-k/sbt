@@ -17,7 +17,7 @@ import sbt.util.OptJsonWriter
 import sbt.ConcurrentRestrictions.Tag
 import sbt.Def.{ Initialize, ScopedKey, Setting, setting }
 import std.TaskMacro
-import std.TaskExtra.{ task => mktask, _ }
+import std.TaskExtra.{ task => mktask, _, given }
 import scala.reflect.ClassTag
 
 /** An abstraction on top of Settings for build configuration and task definition. */
@@ -495,18 +495,20 @@ object Scoped:
 
   type AnyInitTask = Initialize[Task[?]]
 
-  implicit def richTaskSeq[T](in: Seq[Initialize[Task[T]]]): RichTaskSeq[T] = new RichTaskSeq(in)
-  final class RichTaskSeq[T](keys: Seq[Initialize[Task[T]]]) {
-    def join: Initialize[Task[Seq[T]]] = tasks(_.join)
-    def tasks: Initialize[Seq[Task[T]]] = Initialize.join(keys)
+  given RichTaskSeq: AnyRef with {
+    extension [T](keys: Seq[Initialize[Task[T]]]) {
+      def join: Initialize[Task[Seq[T]]] = tasks(_.join)
+      def tasks: Initialize[Seq[Task[T]]] = Initialize.join(keys)
+    }
   }
 
-  implicit def richAnyTaskSeq(in: Seq[AnyInitTask]): RichAnyTaskSeq = new RichAnyTaskSeq(in)
-  final class RichAnyTaskSeq(keys: Seq[AnyInitTask]) {
-    def dependOn: Initialize[Task[Unit]] =
-      Initialize
-        .joinAny[Task](coerceToAnyTaskSeq(keys))
-        .apply(deps => nop.dependsOn(deps*))
+  given RichAnyTaskSeq: AnyRef with {
+    extension (keys: Seq[AnyInitTask]) {
+      def dependOn: Initialize[Task[Unit]] =
+        Initialize
+          .joinAny[Task](coerceToAnyTaskSeq(keys))
+          .apply(deps => nop.dependsOn(deps*))
+    }
   }
 
   sealed abstract class RichTaskables[Tup <: Tuple](final val keys: Tuple.Map[Tup, Taskable]):

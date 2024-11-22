@@ -11,6 +11,7 @@ import sbt._
 import org.scalacheck._
 import Prop._
 import TaskGen._
+import TaskGen.given
 import math.abs
 
 object TaskRunnerForkTest extends Properties("TaskRunner Fork") {
