@@ -16,17 +16,17 @@ jobs:
       with:
         java-version: 24
         distribution: zulu
-    - run: sbt "show name"
-    - run: sbt "show name"
-    - run: sbt "show name"
-    - run: sbt "show name"
-    - run: sbt "show name"
+    - run: sbt -v "show name"
+    - run: sbt -v "show name"
+    - run: sbt -v "show name"
+    - run: sbt -v "show name"
+    - run: sbt -v "show name"
 
-    - run: sbt -J-XXX:AOTMode=record -J-XXX:AOTConfiguration=app.aotconf "show name"
-    - run: sbt -J-XXX:AOTMode=create -J-XXX:AOTConfiguration=app.aotconf -J-XXX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTMode=record -J-XX:AOTConfiguration=app.aotconf "show name"
+    - run: sbt -v -J-XX:AOTMode=create -J-XX:AOTConfiguration=app.aotconf -J-XX:AOTCache=app.aot "show name"
 
-    - run: sbt -J-XX:AOTCache=app.aot "show name"
-    - run: sbt -J-XX:AOTCache=app.aot "show name"
-    - run: sbt -J-XX:AOTCache=app.aot "show name"
-    - run: sbt -J-XX:AOTCache=app.aot "show name"
-    - run: sbt -J-XX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTCache=app.aot "show name"
+    - run: sbt -v -J-XX:AOTCache=app.aot "show name"
