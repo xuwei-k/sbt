@@ -165,8 +165,7 @@ object Compiler:
       state: State,
       topLoader: ClassLoader,
   ): ScalaInstance =
-    import sbt.State.*
-    val classLoaderCache = state.extendedClassLoaderCache
+    val classLoaderCache = sbt.State.StateOpsImpl(state).extendedClassLoaderCache
     val compilerJars = allCompilerJars.filterNot(libraryJars.contains).distinct.toArray
     val docJars = allDocJars
       .filterNot(jar => libraryJars.contains(jar) || compilerJars.contains(jar))

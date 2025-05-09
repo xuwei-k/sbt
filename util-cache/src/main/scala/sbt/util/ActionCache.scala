@@ -34,7 +34,7 @@ object ActionCache:
    * - config: The configuration that's used to store where the cache backends are.
    * - action: The actual action to be cached.
    */
-  def cache[I: HashWriter, O: JsonFormat: ClassTag](
+  def cache[I: HashWriter, O: JsonFormat](
       key: I,
       codeContentHash: Digest,
       extraHash: Digest,
@@ -81,7 +81,7 @@ object ActionCache:
   /**
    * Retrieves the cached value.
    */
-  def get[I: HashWriter, O: JsonFormat: ClassTag](
+  def get[I: HashWriter, O: JsonFormat](
       key: I,
       codeContentHash: Digest,
       extraHash: Digest,

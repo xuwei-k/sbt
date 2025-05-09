@@ -37,7 +37,7 @@ object SingletonCache {
     }
 
   /** A lazy `SingletonCache` */
-  def lzy[A: JsonFormat](mkCache: => SingletonCache[A]): SingletonCache[A] =
+  def lzy[A](mkCache: => SingletonCache[A]): SingletonCache[A] =
     new SingletonCache[A] {
       lazy val cache = mkCache
       override def read(from: Input): A = cache.read(from)

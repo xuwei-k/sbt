@@ -90,7 +90,7 @@ class TrackedSpec extends AnyFlatSpec {
             in
           case (false, _) =>
             fail()
-        }(using implicitly, implicitly)(input0)
+        }(using implicitly)(input0)
       assert(res0 === input0)
 
       val res1 =
@@ -100,7 +100,7 @@ class TrackedSpec extends AnyFlatSpec {
           case (false, in) =>
             assert(in === input0)
             in
-        }(using implicitly, implicitly)(input0)
+        }(using implicitly)(input0)
       assert(res1 === input0)
 
       ()
@@ -119,7 +119,7 @@ class TrackedSpec extends AnyFlatSpec {
             in
           case (false, _) =>
             fail()
-        }(using implicitly, implicitly)(input0)
+        }(using implicitly)(input0)
       assert(res0 === input0)
 
       val res1 =
@@ -129,7 +129,7 @@ class TrackedSpec extends AnyFlatSpec {
             in
           case (false, _) =>
             fail()
-        }(using implicitly, implicitly)(input1)
+        }(using implicitly)(input1)
       assert(res1 === input1)
 
       ()
