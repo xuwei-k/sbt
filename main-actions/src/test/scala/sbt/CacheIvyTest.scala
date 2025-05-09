@@ -38,7 +38,7 @@ class CacheIvyTest extends Properties("CacheIvy") {
       content = converter.toJsonUnsafe(value)
   }
 
-  private def testCache[T: JsonFormat, U](
+  private def testCache[T, U](
       f: (SingletonCache[T], CacheStore) => U
   )(using cache: SingletonCache[T]): U = {
     val store = new InMemoryStore(Converter)

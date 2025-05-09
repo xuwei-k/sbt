@@ -199,7 +199,7 @@ object Tracked {
    * cachedDoc(inputs)(() => exists(outputDirectory.allPaths.get.toSet))
    * }}}
    */
-  def inputChanged[I: JsonFormat: SingletonCache, O](store: CacheStore)(
+  def inputChanged[I: JsonFormat, O](store: CacheStore)(
       f: (Boolean, I) => O
   ): I => O =
     inputChangedW(store)(f)
@@ -251,7 +251,7 @@ object Tracked {
    * cachedDoc(inputs)(() => exists(outputDirectory.allPaths.get.toSet))
    * }}}
    */
-  def inputChanged[I: JsonFormat: SingletonCache, O](cacheFile: File)(
+  def inputChanged[I: JsonFormat, O](cacheFile: File)(
       f: (Boolean, I) => O
   ): I => O =
     inputChanged(CacheStore(cacheFile))(f)

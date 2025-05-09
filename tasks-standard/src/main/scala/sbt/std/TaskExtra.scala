@@ -203,9 +203,14 @@ trait TaskExtra extends TaskExtra0 {
       }
   }
 
+  // TODO remove `@annotation.unused`
+  // https://github.com/scala/scala3/issues/23125#issuecomment-2866047280
   extension [Key](
       in: Task[?]
-  )(using streams: Task[TaskStreams[Key]], key: Task[?] => Key) {
+  )(using
+      @annotation.unused streams: Task[TaskStreams[Key]],
+      @annotation.unused key: Task[?] => Key
+  ) {
     def binary[T](f: BufferedInputStream => T): Task[T] = pipeBinary(None, f)
     def binary[T](sid: String)(f: BufferedInputStream => T): Task[T] = pipeBinary(Some(sid), f)
 

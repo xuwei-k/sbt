@@ -29,8 +29,8 @@ private[sbt] object InMemoryCacheStore {
       .build()
     def get[T](path: Path): Option[(T, Long)] = {
       files.getIfPresent(path) match {
-        case null                                   => None
-        case (value: T @unchecked, lastModified, _) => Some((value, lastModified))
+        case null                     => None
+        case (value, lastModified, _) => Some((value.asInstanceOf[T], lastModified))
       }
     }
     def put(path: Path, value: Any, lastModified: Long): Unit = {

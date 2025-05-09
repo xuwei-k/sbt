@@ -153,7 +153,7 @@ object TaskMacro:
           case Some(ev) =>
             val v2 = v.asExprOf[Def.Initialize[Task[a]]]
             '{
-              $rec.+=($v2.taskValue)(using $ev)
+              $rec.+=($v2.taskValue)
             }
           case _ =>
             report.errorAndAbort(s"Append.Value[${Type.show[A1]}, ${Type.show[Task[a]]}] missing")

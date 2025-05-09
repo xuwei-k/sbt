@@ -25,7 +25,6 @@ import sbt.util.{
 import Util.*
 import sbt.util.Show
 import xsbti.{ HashedVirtualFileRef, VirtualFile, VirtualFileRef }
-import sjsonnew.JsonFormat
 import scala.reflect.ClassTag
 
 trait BuildSyntax:
@@ -298,7 +297,7 @@ object Def extends BuildSyntax with Init with InitializeImplicits:
     )
   }
 
-  inline def cachedTask[A1: JsonFormat](inline a1: A1): Def.Initialize[Task[A1]] =
+  inline def cachedTask[A1](inline a1: A1): Def.Initialize[Task[A1]] =
     ${ TaskMacro.taskMacroImpl[A1]('a1, cached = true) }
 
   inline def task[A1](inline a1: A1): Def.Initialize[Task[A1]] =
@@ -397,7 +396,7 @@ object Def extends BuildSyntax with Init with InitializeImplicits:
 
   extension [A1](inline in: TaskKey[A1])
     // implicit def macroPrevious[T](@deprecated("unused", "") in: TaskKey[T]): MacroPrevious[T] = ???
-    inline def previous(using JsonFormat[A1]): Option[A1] =
+    inline def previous: Option[A1] =
       ${ TaskMacro.previousImpl[A1]('in) }
 
   // The following conversions enable the types Parser[T], Initialize[Parser[T]], and

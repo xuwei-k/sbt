@@ -2,12 +2,11 @@ package sbt.internal
 
 import sbt.internal.util.Types.Id
 import sbt.internal.util.appmacro.*
-import sbt.util.Applicative
 import scala.quoted.*
 import ConvertTestMacro.InputInitConvert
 
 object ContTestMacro:
-  inline def uncachedContMapNMacro[F[_]: Applicative, A](inline expr: A): List[A] =
+  inline def uncachedContMapNMacro[F[_], A](inline expr: A): List[A] =
     ${ uncachedContMapNMacroImpl[F, A]('expr) }
 
   def uncachedContMapNMacroImpl[F[_]: Type, A: Type](expr: Expr[A])(using
