@@ -3,7 +3,6 @@ import Keys.*
 
 object Dependencies {
   // WARNING: Please Scala update versions in PluginCross.scala too
-  val scala213 = "2.13.16"
   val scala3 = "3.7.2"
   val checkPluginCross = settingKey[Unit]("Make sure scalaVersion match up")
   val baseScalaVersion = scala3
@@ -99,7 +98,6 @@ object Dependencies {
 
   val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
   val scalaParsers = "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
-  val scalaReflect = "org.scala-lang" % "scala-reflect" % scala213
   val scalaPar = "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0"
 
   // specify all of log4j modules to prevent misalignment
