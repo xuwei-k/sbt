@@ -111,7 +111,6 @@ object Dependencies {
   val caffeine = "com.github.ben-manes.caffeine" % "caffeine" % "2.8.5"
 
   val hedgehog = "qa.hedgehog" %% "hedgehog-sbt" % "0.13.0"
-  val disruptor = "com.lmax" % "disruptor" % "3.4.2"
   val ivy = "org.scala-sbt.ivy" % "ivy" % "2.3.0-sbt-77cc781d727b367d3761f097d89f5a4762771d41"
 
   // lm dependencies

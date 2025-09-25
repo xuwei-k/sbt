@@ -311,7 +311,6 @@ lazy val utilLogging = project
         jline3Terminal,
         jline3JNI,
         jline3Native,
-        disruptor,
         sjsonNewScalaJson.value,
       ),
     testDependencies,
