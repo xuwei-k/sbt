@@ -363,7 +363,7 @@ public class BootServerSocket implements AutoCloseable {
     }
   }
 
-  private static ServerSocketWrapper newUnixDomainSocket(final String pathName, final boolean jni)
+  static ServerSocketWrapper newUnixDomainSocket(final String pathName, final boolean jni)
       throws IOException {
     try {
       final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
@@ -381,7 +381,6 @@ public class BootServerSocket implements AutoCloseable {
       serverSocketChannel.bind(address);
       return ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
     } catch (ReflectiveOperationException e) {
-      System.err.println(e);
       return ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
     }
   }
