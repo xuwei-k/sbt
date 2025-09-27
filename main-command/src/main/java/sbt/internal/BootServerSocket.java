@@ -14,7 +14,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.StandardProtocolFamily;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -171,7 +176,14 @@ public class BootServerSocket implements AutoCloseable {
       }
     }
 
-    private void flush() {}
+    private void flush() {
+      try {
+        socket.flush();
+      } catch (final IOException e) {
+        alive.set(false);
+        close();
+      }
+    }
 
     @SuppressWarnings("EmptyCatchBlock")
     @Override
@@ -265,7 +277,8 @@ public class BootServerSocket implements AutoCloseable {
           while (running.get()) {
             try {
               ClientSocket clientSocket = new ClientSocket(serverSocket.getClientSocketWrapper());
-            } catch (final Throwable e) {
+            } catch (final SocketTimeoutException e) {
+            } catch (final IOException e) {
               running.set(false);
             }
           }
@@ -334,9 +347,17 @@ public class BootServerSocket implements AutoCloseable {
       System.getProperty("os.name", "").toLowerCase().startsWith("win");
 
   static ServerSocketWrapper newSocket(final String sock) throws ServerAlreadyBootingException {
+    ServerSocketWrapper socket = null;
+    String name = socketName(sock);
+    boolean jni = requiresJNI() || System.getProperty("sbt.ipcsocket.jni", "false").equals("true");
     try {
-      final String name = socketName(sock);
-      return newUnixDomainSocket(name, false);
+      if (!isWindows) Files.deleteIfExists(Paths.get(sock));
+      socket =
+          isWindows
+              ? ServerSocketWrapper.fromServerSocket(
+                  new Win32NamedPipeServerSocket(name, jni, Win32SecurityLevel.OWNER_DACL))
+              : newUnixDomainSocket(name, jni);
+      return socket;
     } catch (final IOException e) {
       throw new ServerAlreadyBootingException(e);
     }
@@ -360,7 +381,7 @@ public class BootServerSocket implements AutoCloseable {
       serverSocketChannel.bind(address);
       return ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
     } catch (ReflectiveOperationException e) {
-      throw new IOException(e);
+      return ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
     }
   }
 

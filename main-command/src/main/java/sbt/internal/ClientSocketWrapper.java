@@ -18,6 +18,8 @@ abstract class ClientSocketWrapper {
 
   abstract int read() throws IOException;
 
+  abstract void flush() throws IOException;
+
   static ClientSocketWrapper fromSocket(Socket socket) {
     return new SocketImpl(socket);
   }
@@ -64,6 +66,11 @@ abstract class ClientSocketWrapper {
         return buf.getInt();
       }
     }
+
+    @Override
+    void flush() {
+      // TODO ???
+    }
   }
 
   private static final class SocketImpl extends ClientSocketWrapper {
@@ -90,12 +97,18 @@ abstract class ClientSocketWrapper {
 
     @Override
     void close() throws IOException {
-      socket.close();
+      socket.getOutputStream().close();
+      socket.getInputStream().close();
     }
 
     @Override
     int read() throws IOException {
       return socket.getInputStream().read();
+    }
+
+    @Override
+    void flush() throws IOException {
+      socket.getOutputStream().flush();
     }
   }
 }
