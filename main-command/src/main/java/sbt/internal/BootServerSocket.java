@@ -350,39 +350,46 @@ public class BootServerSocket implements AutoCloseable {
     ServerSocketWrapper socket = null;
     String name = socketName(sock);
     boolean jni = requiresJNI() || System.getProperty("sbt.ipcsocket.jni", "false").equals("true");
+    boolean jdk = System.getProperty("sbt.ipcsocket.jdk", "true").equals("true");
     try {
       if (!isWindows) Files.deleteIfExists(Paths.get(sock));
       socket =
           isWindows
               ? ServerSocketWrapper.fromServerSocket(
                   new Win32NamedPipeServerSocket(name, jni, Win32SecurityLevel.OWNER_DACL))
-              : newUnixDomainSocket(name, jni);
+              : newUnixDomainSocket(name, jni, jdk);
       return socket;
     } catch (final IOException e) {
       throw new ServerAlreadyBootingException(e);
     }
   }
 
-  static ServerSocketWrapper newUnixDomainSocket(final String pathName, final boolean jni)
-      throws IOException {
-    try {
-      final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
-      final Method method = clazz.getMethod("of", String.class);
-      final SocketAddress address = (SocketAddress) method.invoke(null, pathName);
-      final StandardProtocolFamily protocolFamily =
-          Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
-              .filter(a -> "UNIX".equals(a.name()))
-              .findFirst()
-              .get();
-      final Method openMethod =
-          ServerSocketChannel.class.getMethod("open", java.net.ProtocolFamily.class);
-      final ServerSocketChannel serverSocketChannel =
-          (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
-      serverSocketChannel.bind(address);
-      return ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
-    } catch (ReflectiveOperationException e) {
-      return ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
+  static ServerSocketWrapper newUnixDomainSocket(
+      final String pathName, final boolean jni, final boolean jdk) throws IOException {
+    ServerSocketWrapper result;
+    if (jdk) {
+      try {
+        final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
+        final Method method = clazz.getMethod("of", String.class);
+        final SocketAddress address = (SocketAddress) method.invoke(null, pathName);
+        final StandardProtocolFamily protocolFamily =
+            Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
+                .filter(a -> "UNIX".equals(a.name()))
+                .findFirst()
+                .get();
+        final Method openMethod =
+            ServerSocketChannel.class.getMethod("open", java.net.ProtocolFamily.class);
+        final ServerSocketChannel serverSocketChannel =
+            (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
+        serverSocketChannel.bind(address);
+        result = ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
+      } catch (ReflectiveOperationException e) {
+        result = ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
+      }
+    } else {
+      result = ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
     }
+    return result;
   }
 
   public static Boolean requiresJNI() {

@@ -16,7 +16,7 @@ class BootServerSocketTest extends AnyFreeSpec {
           if (!Files.isDirectory(dir)) {
             Files.createDirectories(dir)
           }
-          val serverSocket = BootServerSocket.newUnixDomainSocket(path, false)
+          val serverSocket = BootServerSocket.newUnixDomainSocket(path, false, true)
           try {
             val expect = if (scala.util.Properties.isJavaAtLeast(17)) {
               "ServerSocketChannelImpl"
