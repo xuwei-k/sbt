@@ -21,6 +21,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -346,13 +347,20 @@ public class BootServerSocket implements AutoCloseable {
       final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
       final Method method = clazz.getMethod("of", String.class);
       final SocketAddress address = (SocketAddress) method.invoke(null, pathName);
+      final StandardProtocolFamily protocolFamily =
+          Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
+              .filter(a -> "UNIX".equals(a.name()))
+              .findFirst()
+              .get();
+
+      final Method openMethod =
+          ServerSocketChannel.class.getMethod("open", StandardProtocolFamily.class);
       final ServerSocketChannel serverSocketChannel =
-          ServerSocketChannel.open(StandardProtocolFamily.UNIX);
+          (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
       serverSocketChannel.bind(address);
       return serverSocketChannel;
     } catch (ReflectiveOperationException e) {
-      e.printStackTrace();
-      throw new RuntimeException(e);
+      throw new IOException(e);
     }
   }
 
