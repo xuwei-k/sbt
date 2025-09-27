@@ -375,7 +375,7 @@ public class BootServerSocket implements AutoCloseable {
               .findFirst()
               .get();
       final Method openMethod =
-          ServerSocketChannel.class.getMethod("open", StandardProtocolFamily.class);
+          ServerSocketChannel.class.getMethod("open", java.net.ProtocolFamily.class);
       final ServerSocketChannel serverSocketChannel =
           (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
       serverSocketChannel.bind(address);
