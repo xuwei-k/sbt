@@ -260,12 +260,16 @@ public class BootServerSocket implements AutoCloseable {
 
   private final Runnable acceptRunnable =
       () -> {
-        while (running.get()) {
-          try {
-            ClientSocket clientSocket = new ClientSocket(serverSocket.getClientSocketWrapper());
-          } catch (final Throwable e) {
-            running.set(false);
+        try {
+          serverSocket.setSoTimeout(5000);
+          while (running.get()) {
+            try {
+              ClientSocket clientSocket = new ClientSocket(serverSocket.getClientSocketWrapper());
+            } catch (final Throwable e) {
+              running.set(false);
+            }
           }
+        } catch (final SocketException e) {
         }
       };
 
@@ -317,7 +321,7 @@ public class BootServerSocket implements AutoCloseable {
       service.shutdownNow();
       try {
         if (serverSocket != null) serverSocket.close();
-      } catch (final Exception e) {
+      } catch (final IOException e) {
       }
       try {
         if (socketFile != null) Files.deleteIfExists(socketFile);

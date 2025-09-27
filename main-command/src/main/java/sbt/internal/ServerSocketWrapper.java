@@ -2,10 +2,13 @@ package sbt.internal;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 import java.nio.channels.ServerSocketChannel;
 
 abstract class ServerSocketWrapper {
   private ServerSocketWrapper() {}
+
+  abstract void setSoTimeout(int timeout) throws SocketException;
 
   abstract ClientSocketWrapper getClientSocketWrapper() throws IOException;
 
@@ -27,6 +30,11 @@ abstract class ServerSocketWrapper {
     }
 
     @Override
+    void setSoTimeout(int timeout) throws SocketException {
+      socket.setSoTimeout(timeout);
+    }
+
+    @Override
     ClientSocketWrapper getClientSocketWrapper() throws IOException {
       return ClientSocketWrapper.fromSocket(socket.accept());
     }
@@ -42,6 +50,11 @@ abstract class ServerSocketWrapper {
 
     ServerSocketChannelImpl(ServerSocketChannel channel) {
       this.channel = channel;
+    }
+
+    @Override
+    void setSoTimeout(int timeout) throws SocketException {
+      // TODO ???
     }
 
     @Override
