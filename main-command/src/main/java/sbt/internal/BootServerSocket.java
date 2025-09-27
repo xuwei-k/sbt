@@ -381,6 +381,7 @@ public class BootServerSocket implements AutoCloseable {
       serverSocketChannel.bind(address);
       return ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
     } catch (ReflectiveOperationException e) {
+      System.err.println(e);
       return ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
     }
   }
