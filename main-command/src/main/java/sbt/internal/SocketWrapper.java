@@ -5,8 +5,8 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 
-abstract class ClientSocketWrapper {
-  private ClientSocketWrapper() {}
+abstract class SocketWrapper {
+  private SocketWrapper() {}
 
   abstract void write(int value) throws IOException;
 
@@ -20,15 +20,15 @@ abstract class ClientSocketWrapper {
 
   abstract void flush() throws IOException;
 
-  static ClientSocketWrapper fromSocket(Socket socket) {
+  static SocketWrapper fromSocket(Socket socket) {
     return new SocketImpl(socket);
   }
 
-  static ClientSocketWrapper fromByteChannel(ByteChannel channel) {
+  static SocketWrapper fromByteChannel(ByteChannel channel) {
     return new ByteChannelImpl(channel);
   }
 
-  private static final class ByteChannelImpl extends ClientSocketWrapper {
+  private static final class ByteChannelImpl extends SocketWrapper {
     private final ByteChannel channel;
 
     private ByteChannelImpl(ByteChannel channel) {
@@ -57,11 +57,16 @@ abstract class ClientSocketWrapper {
 
     @Override
     int read() throws IOException {
-      ByteBuffer buf = ByteBuffer.allocate(1);
-      if (-1 == channel.read(buf)) {
+      final ByteBuffer buf = ByteBuffer.allocate(1);
+      int n;
+      do {
+        n = channel.read(buf);
+      } while (n == 0);
+
+      if (-1 == n) {
         return -1;
       } else {
-        return buf.get() & 0xff;
+        return buf.get(0) & 0xff;
       }
     }
 
@@ -69,7 +74,7 @@ abstract class ClientSocketWrapper {
     void flush() {}
   }
 
-  private static final class SocketImpl extends ClientSocketWrapper {
+  private static final class SocketImpl extends SocketWrapper {
     private final Socket socket;
 
     private SocketImpl(Socket socket) {

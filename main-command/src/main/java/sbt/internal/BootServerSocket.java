@@ -94,14 +94,14 @@ public class BootServerSocket implements AutoCloseable {
   private final AtomicBoolean needInput = new AtomicBoolean(false);
 
   private class ClientSocket implements AutoCloseable {
-    final ClientSocketWrapper socket;
+    final SocketWrapper socket;
     final AtomicBoolean alive = new AtomicBoolean(true);
     final Future<?> future;
     private final LinkedBlockingQueue<Integer> bytes = new LinkedBlockingQueue<Integer>();
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     @SuppressWarnings("deprecation")
-    ClientSocket(final ClientSocketWrapper socket) {
+    ClientSocket(final SocketWrapper socket) {
       this.socket = socket;
       clientSockets.add(this);
       Future<?> f = null;
