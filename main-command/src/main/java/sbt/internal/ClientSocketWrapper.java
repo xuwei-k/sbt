@@ -37,9 +37,7 @@ abstract class ClientSocketWrapper {
 
     @Override
     void write(int value) throws IOException {
-      ByteBuffer buf = ByteBuffer.allocate(4);
-      buf.putInt(value);
-      channel.write(buf);
+      channel.write(ByteBuffer.wrap(new byte[]{(byte)value}));
     }
 
     @Override
@@ -59,11 +57,11 @@ abstract class ClientSocketWrapper {
 
     @Override
     int read() throws IOException {
-      ByteBuffer buf = ByteBuffer.allocate(4);
+      ByteBuffer buf = ByteBuffer.allocate(1);
       if (-1 == channel.read(buf)) {
         return -1;
       } else {
-        return buf.getInt();
+        return buf.get() & 0xff;
       }
     }
 
