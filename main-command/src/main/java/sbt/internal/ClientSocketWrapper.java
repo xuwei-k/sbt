@@ -3,7 +3,7 @@ package sbt.internal;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.ByteChannel;
 
 abstract class ClientSocketWrapper {
   private ClientSocketWrapper() {}
@@ -24,20 +24,20 @@ abstract class ClientSocketWrapper {
     return new SocketImpl(socket);
   }
 
-  static ClientSocketWrapper fromSocketChannel(SocketChannel channel) {
-    return new SocketChannelImpl(channel);
+  static ClientSocketWrapper fromByteChannel(ByteChannel channel) {
+    return new ByteChannelImpl(channel);
   }
 
-  private static final class SocketChannelImpl extends ClientSocketWrapper {
-    private final SocketChannel channel;
+  private static final class ByteChannelImpl extends ClientSocketWrapper {
+    private final ByteChannel channel;
 
-    private SocketChannelImpl(SocketChannel channel) {
+    private ByteChannelImpl(ByteChannel channel) {
       this.channel = channel;
     }
 
     @Override
     void write(int value) throws IOException {
-      channel.write(ByteBuffer.wrap(new byte[]{(byte)value}));
+      channel.write(ByteBuffer.wrap(new byte[] {(byte) value}));
     }
 
     @Override

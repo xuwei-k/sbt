@@ -57,7 +57,7 @@ abstract class ServerSocketWrapper {
 
     @Override
     ClientSocketWrapper accept() throws IOException {
-      return ClientSocketWrapper.fromSocketChannel(channel.accept());
+      return ClientSocketWrapper.fromByteChannel(channel.accept());
     }
 
     @Override
