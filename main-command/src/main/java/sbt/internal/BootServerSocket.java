@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ProtocolFamily;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
@@ -364,25 +365,38 @@ public class BootServerSocket implements AutoCloseable {
     }
   }
 
-  static ServerSocketWrapper newUnixDomainSocket(
+  static SocketAddress unixDomainSocketAddress(final String pathName)
+      throws ReflectiveOperationException {
+    final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
+    final Method method = clazz.getMethod("of", String.class);
+    return (SocketAddress) method.invoke(null, pathName);
+  }
+
+  static ProtocolFamily unixProtocolFamily() {
+    return Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
+        .filter(a -> "UNIX".equals(a.name()))
+        .findFirst()
+        .get();
+  }
+
+  static ServerSocketWrapper newJdkUnixDomainSocket(final String pathName)
+      throws ReflectiveOperationException, IOException {
+    final SocketAddress address = unixDomainSocketAddress(pathName);
+    final ProtocolFamily protocolFamily = unixProtocolFamily();
+    final Method openMethod =
+        ServerSocketChannel.class.getMethod("open", java.net.ProtocolFamily.class);
+    final ServerSocketChannel serverSocketChannel =
+        (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
+    serverSocketChannel.bind(address);
+    return ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
+  }
+
+  private static ServerSocketWrapper newUnixDomainSocket(
       final String pathName, final boolean jni, final boolean jdk) throws IOException {
     ServerSocketWrapper result;
     if (jdk) {
       try {
-        final Class<?> clazz = Class.forName("java.net.UnixDomainSocketAddress");
-        final Method method = clazz.getMethod("of", String.class);
-        final SocketAddress address = (SocketAddress) method.invoke(null, pathName);
-        final StandardProtocolFamily protocolFamily =
-            Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
-                .filter(a -> "UNIX".equals(a.name()))
-                .findFirst()
-                .get();
-        final Method openMethod =
-            ServerSocketChannel.class.getMethod("open", java.net.ProtocolFamily.class);
-        final ServerSocketChannel serverSocketChannel =
-            (ServerSocketChannel) openMethod.invoke(null, protocolFamily);
-        serverSocketChannel.bind(address);
-        result = ServerSocketWrapper.fromServerSocketChannel(serverSocketChannel);
+        result = newJdkUnixDomainSocket(pathName);
       } catch (ReflectiveOperationException e) {
         result = ServerSocketWrapper.fromServerSocket(new UnixDomainServerSocket(pathName, jni));
       }
