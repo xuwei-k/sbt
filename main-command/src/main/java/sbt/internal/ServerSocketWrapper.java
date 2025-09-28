@@ -10,7 +10,7 @@ abstract class ServerSocketWrapper {
 
   abstract void setSoTimeout(int timeout) throws SocketException;
 
-  abstract ClientSocketWrapper getClientSocketWrapper() throws IOException;
+  abstract ClientSocketWrapper accept() throws IOException;
 
   abstract void close() throws IOException;
 
@@ -35,7 +35,7 @@ abstract class ServerSocketWrapper {
     }
 
     @Override
-    ClientSocketWrapper getClientSocketWrapper() throws IOException {
+    ClientSocketWrapper accept() throws IOException {
       return ClientSocketWrapper.fromSocket(socket.accept());
     }
 
@@ -58,7 +58,7 @@ abstract class ServerSocketWrapper {
     }
 
     @Override
-    ClientSocketWrapper getClientSocketWrapper() throws IOException {
+    ClientSocketWrapper accept() throws IOException {
       return ClientSocketWrapper.fromSocketChannel(channel.accept());
     }
 

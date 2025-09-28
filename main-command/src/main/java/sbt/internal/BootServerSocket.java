@@ -276,7 +276,7 @@ public class BootServerSocket implements AutoCloseable {
           serverSocket.setSoTimeout(5000);
           while (running.get()) {
             try {
-              ClientSocket clientSocket = new ClientSocket(serverSocket.getClientSocketWrapper());
+              ClientSocket clientSocket = new ClientSocket(serverSocket.accept());
             } catch (final SocketTimeoutException e) {
             } catch (final IOException e) {
               running.set(false);
