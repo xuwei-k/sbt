@@ -40,7 +40,7 @@ abstract class ServerSocketWrapper {
     }
 
     @Override
-    public void close() throws IOException {
+    void close() throws IOException {
       socket.close();
     }
   }
@@ -63,7 +63,7 @@ abstract class ServerSocketWrapper {
     }
 
     @Override
-    public void close() throws IOException {
+    void close() throws IOException {
       channel.close();
     }
   }
