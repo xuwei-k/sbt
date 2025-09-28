@@ -376,7 +376,7 @@ public class BootServerSocket implements AutoCloseable {
     return Arrays.stream(StandardProtocolFamily.class.getEnumConstants())
         .filter(a -> "UNIX".equals(a.name()))
         .findFirst()
-        .get();
+        .orElseThrow(() -> new RuntimeException("not found UNIX value in StandardProtocolFamily"));
   }
 
   static ServerSocketWrapper newJdkUnixDomainSocket(final String pathName)

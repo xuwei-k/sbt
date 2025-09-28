@@ -41,32 +41,59 @@ class BootServerSocketTest extends AnyFreeSpec {
         val values: List[Byte] =
           Random.shuffle((Byte.MinValue to Byte.MaxValue).toList.map(_.toByte))
 
-        "server to client" in withServerAndClient { (server, client) =>
-          values.foreach(x => server.write(x))
-          server.close()
-
-          val clientReadResult =
-            Iterator
-              .continually {
-                val buf = ByteBuffer.allocate(1)
-                val x = client.read(buf)
-                x -> buf.array().head
-              }
-              .takeWhile(_._1 != -1)
-              .map(_._2)
-              .toList
-
-          assert(clientReadResult == values)
+        def readAll(client: SocketChannel): List[Byte] = {
+          Iterator
+            .continually {
+              val buf = ByteBuffer.allocate(1)
+              val x = client.read(buf)
+              x -> buf.array().head
+            }
+            .takeWhile(_._1 != -1)
+            .map(_._2)
+            .toList
         }
 
-        "client to server" in withServerAndClient { (server, client) =>
-          client.write(ByteBuffer.wrap(values.toArray))
-          client.close()
+        "write(int)" in withServerAndClient { (server, client) =>
+          try {
+            values.foreach(x => server.write(x))
+          } finally {
+            server.close()
+          }
+          val res = readAll(client)
+          assert(res == values)
+        }
+
+        "write(byte[])" in withServerAndClient { (server, client) =>
+          try {
+            server.write(values.toArray)
+          } finally {
+            server.close()
+          }
+          val res = readAll(client)
+          assert(res == values)
+        }
+
+        "write(byte[], int, int)" in withServerAndClient { (server, client) =>
+          val offset = 10
+          val length = 20
+          try {
+            server.write(values.toArray, offset, length)
+          } finally {
+            server.close()
+          }
+          val res = readAll(client)
+          assert(res == values.slice(offset, offset + length))
+        }
+
+        "read" in withServerAndClient { (server, client) =>
+          try {
+            client.write(ByteBuffer.wrap(values.toArray))
+          } finally {
+            client.close()
+          }
 
           val result = Iterator
-            .continually(
-              server.read()
-            )
+            .continually(server.read())
             .takeWhile(_ != -1)
             .toList
 
