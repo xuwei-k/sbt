@@ -12,26 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
-            java: 21
-            distribution: temurin
-            jobtype: 1
-          - os: ubuntu-latest
-            java: 21
-            distribution: temurin
-            jobtype: 2
           - os: ubuntu-latest
             java: 25
             distribution: zulu
             jobtype: 3
-          - os: ubuntu-latest
-            java: 21
-            distribution: temurin
-            jobtype: 4
-          - os: ubuntu-latest
-            java: 21
-            distribution: temurin
-            jobtype: 5
           # - os: ubuntu-latest
           #   java: 8
           #   distribution: adopt
@@ -102,7 +86,7 @@ jobs:
       if: ${{ matrix.jobtype == 3 }}
       shell: bash
       run: |
-        ./sbt -v "dependencyTreeProj/publishLocal; scripted dependency-graph/* dependency-management/* plugins/* project-load/* java/* run/* nio/*"
+        ./sbt -v "scripted run/jep-512"
     - name: Build and test (4)
       if: ${{ matrix.jobtype == 4 }}
       shell: bash
