@@ -11,7 +11,7 @@ package sbt
 import java.io.File
 import java.nio.file.{ Path as NioPath }
 import java.lang.reflect.Method
-import java.lang.reflect.Modifier.{ isPublic, isStatic }
+import java.lang.reflect.Modifier.{ isPrivate, isPublic, isStatic }
 import sbt.internal.inc.ScalaInstance
 import sbt.internal.inc.classpath.{ ClasspathFilter, ClasspathUtil }
 import sbt.internal.util.MessageOnlyException
@@ -149,10 +149,17 @@ class Run(private[sbt] val newLoader: Seq[NioPath] => ClassLoader, trapExit: Boo
     currentThread.setContextClassLoader(loader)
     try {
       if (main.isStatic) {
+        if (Run.isJava25Plus) {
+          main.method.setAccessible(true)
+        }
         if (main.parameterCount > 0) main.method.invoke(null, options.toArray[String])
         else main.method.invoke(null)
       } else {
-        val ref = main.mainClass.getDeclaredConstructor().newInstance().asInstanceOf[AnyRef]
+        val constructor = main.mainClass.getDeclaredConstructor()
+        if (Run.isJava25Plus) {
+          constructor.setAccessible(true)
+        }
+        val ref = constructor.newInstance().asInstanceOf[AnyRef]
         if (main.parameterCount > 0) main.method.invoke(ref, options.toArray[String])
         else main.method.invoke(ref)
       }
@@ -182,10 +189,24 @@ class Run(private[sbt] val newLoader: Seq[NioPath] => ClassLoader, trapExit: Boo
         try {
           mainClass.getMethod("main", classOf[Array[String]])
         } catch {
-          case _: NoSuchMethodException => mainClass.getMethod("main")
+          case _: NoSuchMethodException =>
+            try {
+              mainClass.getMethod("main")
+            } catch {
+              case _: NoSuchMethodException =>
+                try {
+                  mainClass.getDeclaredMethod("main", classOf[Array[String]])
+                } catch {
+                  case _: NoSuchMethodException =>
+                    mainClass.getDeclaredMethod("main")
+                }
+            }
         }
-      method.setAccessible(true)
       val modifiers = method.getModifiers
+      if (isPrivate(modifiers)) {
+        throw new NoSuchMethodException(s"${mainClassName}.main is private")
+      }
+      method.setAccessible(true)
       DetectedMain(mainClass, method, isStatic(modifiers), method.getParameterCount())
     } else {
       val method = mainClass.getMethod("main", classOf[Array[String]])

@@ -39,6 +39,7 @@ set sbt_args_color=
 set sbt_args_no_colors=
 set sbt_args_no_global=
 set sbt_args_no_share=
+set sbt_args_no_hide_jdk_warnings=
 set sbt_args_sbt_jar=
 set sbt_args_ivy=
 set sbt_args_supershell=
@@ -228,6 +229,14 @@ if "%~0" == "--no-server" set _no_server_arg=true
 if defined _no_server_arg (
   set _no_server_arg=
   set sbt_args_no_server=1
+  goto args_loop
+)
+
+if "%~0" == "--no-hide-jdk-warnings" set _no_hide_jdk_warnings=true
+
+if defined _no_hide_jdk_warnings (
+  set _no_hide_jdk_warnings=
+  set sbt_args_no_hide_jdk_warnings=1
   goto args_loop
 )
 
@@ -675,6 +684,12 @@ if defined sbt_args_traces (
 
 if defined sbt_args_no_server (
   set _SBT_OPTS=-Dsbt.io.virtual=false -Dsbt.server.autostart=false !_SBT_OPTS!
+)
+
+if not defined sbt_args_no_hide_jdk_warnings (
+  if /I !JAVA_VERSION! EQU 25 (
+    set _SBT_OPTS=--sun-misc-unsafe-memory-access=allow --enable-native-access=ALL-UNNAMED !_SBT_OPTS!
+  )
 )
 
 rem TODO: _SBT_OPTS needs to be processed as args and diffed against SBT_ARGS

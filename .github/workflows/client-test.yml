@@ -33,7 +33,9 @@ jobs:
       uses: actions/setup-java@v5
       with:
         distribution: "zulu"
-        java-version: "8"
+        java-version: |
+          25
+          8
         cache: sbt
     - uses: sbt/setup-sbt@v1
       with:
@@ -55,12 +57,13 @@ jobs:
         ./client/target/bin/sbtn --sbt-script=$(pwd)/sbt about
         ./client/target/bin/sbtn --sbt-script=$(pwd)/sbt shutdown
         # test launcher script
-        echo build using JDK 8 test using JDK 8 and JDK 11
+        echo build using JDK 8 test using JDK 8 and JDK 25
         cd launcher-package
         sbt -Dsbt.build.version=$TEST_SBT_VER rpm:packageBin debian:packageBin
         sbt -Dsbt.build.version=$TEST_SBT_VER integrationTest/test
         cd citest && ./test.sh
-        $HOME/bin/jabba install $JDK11 && exec $HOME/bin/jabba which --home $JDK11
+        JAVA_HOME="$JAVA_HOME_25_X64"
+        PATH="$JAVA_HOME_25_X64/bin:$PATH"
         java -Xmx32m -version
         ./test.sh
     - name: Client test (macOS)
@@ -85,7 +88,7 @@ jobs:
         ./client/target/bin/sbtn --sbt-script=$(pwd)/launcher-package/src/universal/bin/sbt.bat about
         ./client/target/bin/sbtn --sbt-script=$(pwd)/launcher-package/src/universal/bin/sbt.bat shutdown
         # test launcher script
-        echo build using JDK 8, test using JDK 8, on Windows
+        echo build using JDK 8 test using JDK 8 and JDK 25
         cd launcher-package
         bin/coursier.bat resolve
         sbt -Dsbt.build.version=$TEST_SBT_VER integrationTest/test

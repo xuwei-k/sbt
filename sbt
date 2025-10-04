@@ -28,6 +28,7 @@ declare sbtn_command="$SBTN_CMD"
 declare sbtn_version="1.11.6"
 declare use_colors=1
 declare is_this_dir_sbt=""
+declare hide_jdk_warnings=1
 
 ###  ------------------------------- ###
 ###  Helper methods for BASH scripts ###
@@ -85,7 +86,7 @@ CYGWIN_FLAG=$(if is_cygwin; then echo true; else echo false; fi)
 # windows style paths.
 cygwinpath() {
   local file="$1"
-  if [[ "$CYGWIN_FLAG" == "true" ]]; then #"
+  if [[ "$CYGWIN_FLAG" == "true" ]]; then
     echo $(cygpath -w $file)
   else
     echo $file
@@ -114,7 +115,7 @@ echoerr_error () {
     echoerr -e "[${RED}error${NC}] $@"
   else
     echoerr "[error] $@"
-  fi
+  fi #"
 }
 vlog () {
   [[ $sbt_verbose || $sbt_debug ]] && echoerr "$@"
@@ -350,6 +351,18 @@ addSbtScriptProperty () {
   fi
 }
 
+addJdkWorkaround () {
+  local is_25="$(expr $java_version "=" 25)"
+  if [[ "$hide_jdk_warnings" == "0" ]]; then
+    :
+  else
+    if [[ "$is_25" == "1" ]]; then
+      addJava "--sun-misc-unsafe-memory-access=allow"
+      addJava "--enable-native-access=ALL-UNNAMED"
+    fi
+  fi
+}
+
 require_arg () {
   local type="$1"
   local opt="$2"
@@ -535,7 +548,7 @@ run() {
   copyRt
 
   # If we're in cygwin, we should use the windows config, and terminal hacks
-  if [[ "$CYGWIN_FLAG" == "true" ]]; then #"
+  if [[ "$CYGWIN_FLAG" == "true" ]]; then
     stty -icanon min 1 -echo > /dev/null 2>&1
     addJava "-Djline.terminal=jline.UnixTerminal"
     addJava "-Dsbt.cygwin=true"
@@ -575,7 +588,7 @@ run() {
   exit_code=$?
 
   # Clean up the terminal from cygwin hacks.
-  if [[ "$CYGWIN_FLAG" == "true" ]]; then #"
+  if [[ "$CYGWIN_FLAG" == "true" ]]; then
     stty icanon echo > /dev/null 2>&1
   fi
   exit $exit_code
@@ -708,6 +721,7 @@ process_args () {
            -client|--client) use_sbtn=1 && shift ;;
                    --server) use_sbtn=0 && shift ;;
                --jvm-client) use_sbtn=0 && use_jvm_client=1 && addSbt "--client" && shift ;;
+     --no-hide-jdk-warnings) hide_jdk_warnings=0 && shift ;;
 
                  -mem|--mem) require_arg integer "$1" "$2" && addMemory "$2" && shift 2 ;;
      -jvm-debug|--jvm-debug) require_arg port "$1" "$2" && addDebugger $2 && shift 2 ;;
@@ -870,6 +884,7 @@ else
   vlog "[process_args] java_version = '$java_version'"
   addDefaultMemory
   addSbtScriptProperty
+  addJdkWorkaround
   set -- "${residual_args[@]}"
   argumentCount=$#
   run
