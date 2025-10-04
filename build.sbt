@@ -684,6 +684,8 @@ lazy val mainProj = (project in file("main"))
   .settings(
     testedBaseSettings,
     name := "Main",
+    envVars += ("HEDGEHOG_SEED" -> "1121554172185"),
+    Test / fork := true,
     checkPluginCross := {
       val sv = scalaVersion.value
       val f = baseDirectory.value / "src" / "main" / "scala" / "sbt" / "PluginCross.scala"
