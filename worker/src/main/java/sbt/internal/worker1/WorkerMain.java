@@ -168,8 +168,7 @@ public final class WorkerMain {
   void test(long id, TestInfo info) throws Exception {
     if (info.jvm) {
       RunInfo.JvmRunInfo jvmRunInfo = info.jvmRunInfo;
-      ClassLoader parent = new ForkTestMain().getClass().getClassLoader();
-      try (URLClassLoader cl = createClassLoader(jvmRunInfo, parent)) {
+      try (URLClassLoader cl = createClassLoader(jvmRunInfo, null)) {
         ForkTestMain.main(id, info, this.jsonOut, cl);
       }
     } else {
