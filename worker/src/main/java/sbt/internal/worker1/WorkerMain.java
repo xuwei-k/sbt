@@ -26,7 +26,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Stream;
+
 import sbt.testing.*;
 
 /**
@@ -169,7 +172,25 @@ public final class WorkerMain {
     if (info.jvm) {
       RunInfo.JvmRunInfo jvmRunInfo = info.jvmRunInfo;
       ClassLoader parent = new ForkTestMain().getClass().getClassLoader();
-      try (URLClassLoader cl = createClassLoader(jvmRunInfo, parent)) {
+      URL[] urls =
+          jvmRunInfo
+              .classpath
+              .stream()
+              .map(
+                  path -> {
+                    try {
+                      return path.path.toURL();
+                    } catch (MalformedURLException e) {
+                      throw new RuntimeException(e);
+                    }
+                  })
+              .toArray(URL[]::new);
+      if (parent instanceof URLClassLoader) {
+        urls =
+            Stream.concat(Arrays.stream(urls), Arrays.stream(((URLClassLoader) parent).getURLs()))
+                .toArray(URL[]::new);
+      }
+      try (URLClassLoader cl = new URLClassLoader(urls)) {
         ForkTestMain.main(id, info, this.jsonOut, cl);
       }
     } else {
