@@ -59,6 +59,7 @@ jobs:
         # test launcher script
         echo build using JDK 8 test using JDK 8 and JDK 25
         cd launcher-package
+        sbt -Dsbt.build.version=$TEST_SBT_VER scalafmtSbtCheck scalafmtCheckAll
         sbt -Dsbt.build.version=$TEST_SBT_VER rpm:packageBin debian:packageBin
         sbt -Dsbt.build.version=$TEST_SBT_VER integrationTest/test
         cd citest && ./test.sh
