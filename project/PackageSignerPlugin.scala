@@ -25,45 +25,6 @@ object PackageSignerPlugin extends sbt.AutoPlugin {
     art.withExtension(ext)
 
   def packageSignerSettings: Seq[Setting[?]] = Seq(
-    signedArtifacts := {
-      val artifacts = packagedArtifacts.value
-      val r = pgpSigner.value
-      val skipZ = (pgpSigner / skip).value
-      val s = streams.value
-      if (!skipZ) {
-        artifacts flatMap { case (art, f) =>
-          Seq(
-            art -> f,
-            subExtension(art, art.extension + gpgExtension) ->
-              r.sign(f, file(f.getAbsolutePath + gpgExtension), s)
-          )
-        }
-      } else artifacts
-    },
-    publishSignedConfiguration := Classpaths.publishConfig(
-      publishMavenStyle = publishMavenStyle.value,
-      deliverIvyPattern =
-        (Compile / packageBin / artifactPath).value.getParent + "/[artifact]-[revision](-[classifier]).[ext]",
-      status = if (isSnapshot.value) "integration" else "release",
-      configurations = Vector.empty,
-      artifacts = signedArtifacts.value.toVector,
-      checksums = (publish / checksums).value.toVector,
-      resolverName = Classpaths.getPublishTo(publishTo.value).name,
-      logging = ivyLoggingLevel.value,
-      overwrite = isSnapshot.value
-    ),
-    publishLocalSignedConfiguration := Classpaths.publishConfig(
-      publishMavenStyle = publishMavenStyle.value,
-      deliverIvyPattern =
-        (Compile / packageBin / artifactPath).value.getParent + "/[artifact]-[revision](-[classifier]).[ext]",
-      status = if (isSnapshot.value) "integration" else "release",
-      configurations = Vector.empty,
-      artifacts = signedArtifacts.value.toVector,
-      checksums = (publish / checksums).value.toVector,
-      resolverName = "local",
-      logging = ivyLoggingLevel.value,
-      overwrite = isSnapshot.value
-    ),
     publishSigned := Def.taskDyn {
       val config = publishSignedConfiguration.value
       val s = streams.value

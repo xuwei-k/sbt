@@ -16,15 +16,6 @@ object SbtLauncherPlugin extends AutoPlugin {
   override def projectConfigurations: Seq[Configuration] = Seq(SbtLaunchConfiguration)
   override def projectSettings: Seq[Setting[?]] = Seq(
     libraryDependencies += Dependencies.rawLauncher % SbtLaunchConfiguration.name,
-    rawSbtLaunchJar := {
-      Classpaths.managedJars(SbtLaunchConfiguration, Set("jar"), update.value).headOption match {
-        case Some(jar) => jar.data
-        case None =>
-          sys.error(
-            s"Could not resolve sbt launcher!, dependencies := ${libraryDependencies.value}"
-          )
-      }
-    },
     sbtLaunchJar := {
       val propFiles = (Compile / resources).value
       val propFileLocations =

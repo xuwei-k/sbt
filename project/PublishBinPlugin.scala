@@ -22,32 +22,15 @@ object PublishBinPlugin extends AutoPlugin {
     publishLocalBin := Classpaths
       .publishOrSkip(publishLocalBinConfig, publishLocalBin / skip)
       .value,
-    publishLocalBinConfig := Classpaths.publishConfig(
-      false, // publishMavenStyle.value,
-      Classpaths.deliverPattern(crossTarget.value),
-      if (isSnapshot.value) "integration" else "release",
-      ivyConfigurations.value.map(c => ConfigRef(c.name)).toVector,
-      (publishLocalBin / packagedArtifacts).value.toVector,
-      (publishLocalBin / checksums).value.toVector,
-      logging = ivyLoggingLevel.value,
-      overwrite = isSnapshot.value
-    ),
     publishLocalBinConfig := publishLocalBinConfig
       .dependsOn(
-        // Copied from sbt.internal.
-        Def.taskDyn {
-          val doGen = useCoursier.value
-          if (doGen)
-            Def.task {
-              val currentProject = {
-                val proj = csrProject.value
-                val publications = csrPublications.value
-                proj.withPublications(publications)
-              }
-              IvyXml.writeFiles(currentProject, None, ivySbt.value, streams.value.log)
-            }
-          else
-            Def.task(())
+        Def.task {
+          val currentProject = {
+            val proj = csrProject.value
+            val publications = csrPublications.value
+            proj.withPublications(publications)
+          }
+          IvyXml.writeFiles(currentProject, None, ivySbt.value, streams.value.log)
         }
       )
       .value,
@@ -59,10 +42,5 @@ object PublishBinPlugin extends AutoPlugin {
       } catch { case _: FileAlreadyExistsException => }
       dummyFile
     },
-    dummyDoc / packagedArtifact := (Compile / packageDoc / artifact).value -> dummyDoc.value,
-    publishLocalBin / packagedArtifacts :=
-      Classpaths
-        .packaged(Seq(Compile / packageBin, Compile / packageSrc, makePom, dummyDoc))
-        .value
   )
 }

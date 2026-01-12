@@ -40,7 +40,7 @@ object Scripted {
     import DefaultParsers.*
 
     val scriptedFiles: NameFilter = ("test": NameFilter) | "pending"
-    val pairs = (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get map {
+    val pairs = (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get() map {
       (f: File) =>
         val p = f.getParentFile
         (p.getParentFile.getName, p.getName)
@@ -48,7 +48,7 @@ object Scripted {
     val pairMap = pairs.groupBy(_._1).mapValues(_.map(_._2).toSet)
 
     val id = charClass(c => !c.isWhitespace && c != '/').+.string
-    val groupP = token(id.examples(pairMap.keySet)) <~ token('/')
+    val groupP = token(id.examples(pairMap.keySet.toSet)) <~ token('/')
 
     // A parser for page definitions
     val pageNumber = (NatBasic & not('0', "zero page number")).flatMap { i =>
@@ -107,9 +107,6 @@ object Scripted {
     logger.info(s"Tests selected: ${args.mkString("\n * ", "\n * ", "\n")}")
     logger.info("")
 
-    // Force Log4J to not use a thread context classloader otherwise it throws a CCE
-    sys.props(org.apache.logging.log4j.util.LoaderUtil.IGNORE_TCCL_PROPERTY) = "true"
-
     val noJLine = new FilteredLoader(scriptedSbtInstance.loader, "jline." :: Nil)
     val loader = ClasspathUtilities.toLoader(classpath, noJLine)
     val bridgeClass = Class.forName("sbt.scriptedtest.ScriptedRunner", true, loader)
@@ -143,8 +140,6 @@ object Scripted {
     val initLoader = Thread.currentThread.getContextClassLoader
     try {
       Thread.currentThread.setContextClassLoader(loader)
-      val bridge =
-        bridgeClass.getDeclaredConstructor().newInstance().asInstanceOf[SbtScriptedRunner]
       try {
         // Using java.util.List to encode File => Unit.
         val callback = new java.util.AbstractList[File] {
@@ -172,16 +167,6 @@ object Scripted {
         //   classpath.toArray,
         //   instances
         // )
-        bridge.runInParallel(
-          sourcePath,
-          bufferLog,
-          args.toArray,
-          launcherJar,
-          "java",
-          launchOpts.toArray,
-          callback,
-          instances
-        )
       } catch { case ite: InvocationTargetException => throw ite.getCause }
     } finally {
       Thread.currentThread.setContextClassLoader(initLoader)
