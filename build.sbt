@@ -123,7 +123,7 @@ def testedBaseSettings: Seq[Setting[?]] =
 
 val sbt20Plus =
   Seq(
-    "2.0.0-RC9",
+    "2.0.0-RC10",
   )
 val mimaSettings = mimaSettingsSince(sbt20Plus)
 def mimaSettingsSince(versions: Seq[String]): Seq[Def.Setting[?]] = Def settings (
@@ -346,7 +346,6 @@ lazy val utilLogging = project
     Test / fork := true,
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[MissingClassProblem]("com.github.ghik.silencer.silent")
     ),
   )
   .configure(addSbtIO)
@@ -477,12 +476,6 @@ lazy val taskProj = (project in file("tasks"))
     name := "Tasks",
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[MissingTypesProblem]("sbt.Execute$State$"),
-      ProblemFilters.exclude[DirectMissingMethodProblem]("sbt.Execute#State.this"),
-      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sbt.Execute#State.Pending"),
-      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sbt.Execute#State.Running"),
-      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sbt.Execute#State.Calling"),
-      ProblemFilters.exclude[IncompatibleResultTypeProblem]("sbt.Execute#State.Done"),
     )
   )
 
@@ -612,13 +605,6 @@ lazy val commandProj = (project in file("main-command"))
     contrabandSettings,
     mimaSettings,
     mimaBinaryIssueFilters ++= Vector(
-      exclude[MissingClassProblem]("sbt.internal.util.JoinThread"),
-      exclude[MissingClassProblem]("sbt.internal.util.JoinThread$"),
-      exclude[MissingClassProblem]("sbt.internal.util.ReadJsonFromInputStream"),
-      exclude[MissingClassProblem]("sbt.internal.util.ReadJsonFromInputStream$"),
-      exclude[MissingClassProblem]("sbt.internal.client.ServerConnection"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.client.NetworkClient.connection"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.client.NetworkClient.init")
     ),
     Compile / headerCreate / unmanagedSources := {
       val old = (Compile / headerCreate / unmanagedSources).value
@@ -686,7 +672,6 @@ lazy val zincLmIntegrationProj = (project in file("zinc-lm-integration"))
       Tests.Argument(TestFrameworks.ScalaTest, s"-Dsbt.zinc.version=$zincVersion"),
     mimaSettings,
     mimaBinaryIssueFilters ++= Seq(
-      exclude[DirectMissingMethodProblem]("sbt.internal.inc.ZincLmUtil.*"),
     ),
     libraryDependencies += launcherInterface,
   )
@@ -754,30 +739,6 @@ lazy val mainProj = (project in file("main"))
     Compile / doc / sources := Nil,
     mimaSettings,
     mimaBinaryIssueFilters ++= Vector(
-      // Moved to sbt-ivy module (Step 5 of sbt#7640)
-      exclude[DirectMissingMethodProblem]("sbt.Classpaths.depMap"),
-      exclude[DirectMissingMethodProblem]("sbt.Classpaths.ivySbt0"),
-      exclude[DirectMissingMethodProblem]("sbt.Classpaths.mkIvyConfiguration"),
-      exclude[MissingClassProblem]("sbt.internal.librarymanagement.IvyXml"),
-      exclude[MissingClassProblem]("sbt.internal.librarymanagement.IvyXml$"),
-      // Removed projectDescriptors key (sbt#8865)
-      exclude[DirectMissingMethodProblem]("sbt.Keys.projectDescriptors"),
-      // Removed descriptors field from GlobalPluginData (sbt#8865)
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData.apply"),
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData.this"),
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData.descriptors"),
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData.copy"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.GlobalPluginData.copy$default$3"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.GlobalPluginData.copy$default$4"),
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData.copy$default$6"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.GlobalPluginData._3"),
-      exclude[IncompatibleResultTypeProblem]("sbt.internal.GlobalPluginData._4"),
-      exclude[DirectMissingMethodProblem]("sbt.internal.GlobalPluginData._6"),
-      // Updating remote vcs projects (sbt#1284)
-      exclude[DirectMissingMethodProblem]("sbt.Resolvers.creates"),
-      exclude[DirectMissingMethodProblem]("sbt.Resolvers.uniqueSubdirectoryFor"),
-      exclude[DirectMissingMethodProblem]("sbt.Resolvers.run"),
-      exclude[MissingClassProblem]("sbt.Resolvers$DistributedVCS")
     ),
   )
   .dependsOn(lmCore, lmCoursierShadedPublishing)
@@ -998,11 +959,6 @@ lazy val upperModules = (project in (file("internal") / "upper"))
 lazy val sbtIgnoredProblems = {
   import com.typesafe.tools.mima.core.*
   Vector(
-    // Adding DependencyMode to Import trait (new abstract members)
-    ProblemFilters.exclude[ReversedMissingMethodProblem]("sbt.Import.DependencyMode"),
-    ProblemFilters.exclude[ReversedMissingMethodProblem](
-      "sbt.Import.sbt$Import$_setter_$DependencyMode_="
-    ),
   )
 }
 
