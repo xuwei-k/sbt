@@ -1356,27 +1356,12 @@ lazy val lmCoursierShaded = project
     assemblyShadeRules := {
       val namespacesToShade = Seq(
         "coursier",
+        "dependency",
         "org.fusesource",
-        "macrocompat",
         "io.github.alexarchambault.isterminal",
         "io.github.alexarchambault.windowsansi",
         "concurrentrefhashmap",
-        "com.github.ghik",
-        // pulled by the plexus-archiver stuff that coursier-cache
-        // depends on for now… can hopefully be removed in the future
-        "com.google.common",
-        "com.jcraft",
-        "com.lmax",
-        "org.apache.commons",
-        "org.apache.tika",
-        "org.apache.xbean",
-        "org.codehaus",
-        "org.iq80",
-        "org.tukaani",
         "com.github.plokhotnyuk.jsoniter_scala",
-        "scala.cli",
-        "com.github.luben.zstd",
-        "javax.inject" // hope shading this is fine… It's probably pulled via plexus-archiver, that sbt shouldn't use anyway…
       )
       namespacesToShade.map { ns =>
         ShadeRule.rename(ns + ".**" -> s"lmcoursier.internal.shaded.$ns.@1").inAll
