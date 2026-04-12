@@ -149,6 +149,50 @@ def mimaSettingsSince(versions: Seq[String]): Seq[Def.Setting[?]] = Def settings
 )
 
 val contrabandSettings: Seq[Def.Setting[?]] = Seq(
+  Compile / generateContrabands / contrabandScalaSealInterface := true,
+  Compile / generateContrabands / contrabandScalaFileNames := {
+    def default(d: sbt.contraband.ast.TypeDefinition): File = {
+      d.namespace
+        .map(ns => new File(ns.replace(".", "/")))
+        .map(
+          new File(
+            _,
+            d.name + ".scala"
+          )
+        )
+        .getOrElse(new File(d.name + ".scala"))
+    }
+
+    def withInterface(
+        i: Seq[sbt.contraband.ast.NamedType],
+        d: sbt.contraband.ast.TypeDefinition
+    ): File = {
+      i match {
+        case Seq(interface) =>
+          val interfaceName = interface.name.split('.').last
+          d.namespace
+            .map(ns => new File(ns.replace(".", "/")))
+            .map(
+              new File(
+                _,
+                interfaceName + ".scala"
+              )
+            )
+            .getOrElse(new File(interfaceName + ".scala"))
+        case Nil =>
+          default(d)
+      }
+    }
+
+    {
+      case d: sbt.contraband.ast.ObjectTypeDefinition =>
+        withInterface(d.interfaces, d)
+      case d: sbt.contraband.ast.InterfaceTypeDefinition =>
+        withInterface(d.interfaces, d)
+      case d: sbt.contraband.ast.TypeDefinition =>
+        default(d)
+    }
+  },
   Compile / generateContrabands / sourceManaged := baseDirectory.value / "src" / "main" / "contraband-scala",
   Compile / managedSourceDirectories +=
     baseDirectory.value / "src" / "main" / "contraband-scala",
