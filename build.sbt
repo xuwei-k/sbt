@@ -91,7 +91,7 @@ def commonSettings: Seq[Setting[?]] = Def.settings(
       import scala.sys.process.*
       val devnull = ProcessLogger(_ => ())
       val tagOrSha =
-        ("git describe --exact-match" #|| "git rev-parse HEAD").lineStream(devnull).head
+        ("git describe --exact-match" #|| "git rev-parse HEAD").lazyLines(devnull).head
       Seq(
         "-source-links:github://sbt/sbt",
         "-revision",
@@ -214,7 +214,7 @@ lazy val sbtRoot: Project = (project in file("."))
           }
       }
       val base = baseDirectory.value.toPath
-      val exec = (sbtClientProj / nativeImage).value.toPath
+      val exec = fileConverter.value.toPath((sbtClientProj / nativeImage).value)
       streams.value.log.info(s"installing thin client ${base.relativize(exec)} to ${target}")
       Files.copy(exec, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
     }
@@ -448,6 +448,7 @@ lazy val workerProj = (project in file("worker"))
   .dependsOn(exampleWorkProj % Test)
   .settings(
     name := "worker",
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Raw,
     testedBaseSettings,
     Compile / doc / javacOptions := Nil,
     crossPaths := false,
@@ -697,6 +698,7 @@ lazy val buildFileProj = (project in file("buildfile"))
     mainSettingsProj,
   )
   .settings(
+    exportJars := false,
     testedBaseSettings,
     name := "build file",
     libraryDependencies ++= Seq(scalaCompiler),
@@ -862,7 +864,7 @@ lazy val serverTestProj = (project in file("server-test"))
       val file =
         (Test / target).value / "generated" / "src" / "test" / "scala" / "testpkg" / "TestProperties.scala"
       IO.write(file, content)
-      file :: Nil
+      Seq(file)
     },
   )
 
@@ -898,7 +900,7 @@ lazy val sbtClientProj = (project in file("client"))
       if (!Files.exists(outputDir)) {
         Files.createDirectories(outputDir)
       }
-      outputDir.resolve("sbtn").toFile
+      fileConverter.value.toVirtualFile(outputDir.resolve("sbtn"))
     },
     nativeImageCommand := {
       val orig = nativeImageCommand.value
@@ -1004,6 +1006,7 @@ lazy val sbtIgnoredProblems = {
 def scriptedTask(launch: Boolean): Def.Initialize[InputTask[Unit]] = Def.inputTask {
   val _ = publishLocalBinAll.value
   val launchJar = s"-Dsbt.launch.jar=${(bundledLauncherProj / Compile / packageBin).value}"
+  val converter = fileConverter.value
   Scripted.doScripted(
     (scriptedSbtProj / scalaInstance).value,
     scriptedSource.value,
@@ -1015,10 +1018,12 @@ def scriptedTask(launch: Boolean): Def.Initialize[InputTask[Unit]] = Def.inputTa
     version.value,
     (scriptedSbtProj / Test / fullClasspathAsJars).value
       .map(_.data)
+      .map(converter.toPath)
+      .map(_.toFile)
       .filterNot(_.getName.contains("scala-compiler")),
-    (bundledLauncherProj / Compile / packageBin).value,
+    converter.toPath((bundledLauncherProj / Compile / packageBin).value).toFile,
     streams.value.log,
-    scriptedKeepTempDirectory.value,
+    local.LocalScriptedPlugin.autoImport.scriptedKeepTempDirectory.value,
     (scripted / includeFilter).value,
     (scripted / excludeFilter).value,
   )
@@ -1090,7 +1095,7 @@ lazy val nonRoots = allProjects.map(p => LocalProject(p.id))
 
 ThisBuild / scriptedBufferLog := true
 ThisBuild / scriptedPrescripted := { _ => }
-ThisBuild / scriptedKeepTempDirectory := false
+ThisBuild / local.LocalScriptedPlugin.autoImport.scriptedKeepTempDirectory := false
 
 def otherRootSettings =
   Seq(
@@ -1247,6 +1252,7 @@ lazy val lmIvy = (project in file("lm-ivy"))
   .enablePlugins(ContrabandPlugin, JsonCodecPlugin)
   .dependsOn(lmCore)
   .settings(
+    exportJars := false,
     commonSettings,
     lmTestSettings,
     name := "librarymanagement-ivy",
@@ -1329,6 +1335,7 @@ lazy val lmCoursier = project
 lazy val lmCoursierShaded = project
   .in(file("lm-coursier/target/shaded-module"))
   .settings(
+    exportJars := false,
     lmCoursierSettings,
     Mima.settings,
     Mima.lmCoursierFilters,
@@ -1425,13 +1432,15 @@ lazy val launcherPackageIntegrationTest =
       Test / fork := true,
       Test / javaOptions += {
         val cp = (Test / fullClasspath).value
-          .map(_.data.getAbsolutePath)
+          .map(_.data)
+          .map(fileConverter.value.toPath)
+          .map(_.toFile.getAbsolutePath)
           .mkString(java.io.File.pathSeparator)
         s"-Dsbt.test.classpath=$cp"
       },
       Test / javaOptions += s"-Dsbt.test.integrationtest.basedir=${(baseDirectory).value.getAbsolutePath}",
-      Test / test := {
-        (Test / test)
+      Test / testFull := Def.uncached {
+        (Test / testFull)
           .dependsOn(launcherPackage / Universal / packageBin)
           .dependsOn(launcherPackage / Universal / stage)
           .value
