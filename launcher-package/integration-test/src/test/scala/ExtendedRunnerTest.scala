@@ -84,11 +84,11 @@ object ExtendedRunnerTest extends BasicTestSuite:
       "compile",
       "-v",
       "--sbt-jar",
-      "../target/universal/stage/bin/sbt-launch.jar"
+      "../../target/out/jvm/u/sbt-launcher-packaging/universal/stage/bin/sbt-launcher.jar"
     ).!!.linesIterator.toList
     assert(
-      out.contains[String]("../target/universal/stage/bin/sbt-launch.jar") ||
-        out.contains[String]("\"../target/universal/stage/bin/sbt-launch.jar\"")
+      out.contains[String]("../../target/out/jvm/u/sbt-launcher-packaging/universal/stage/bin/sbt-launcher.jar") ||
+        out.contains[String]("\"../../target/out/jvm/u/sbt-launcher-packaging/universal/stage/bin/sbt-launcher.jar\"")
     )
     ()
   }
