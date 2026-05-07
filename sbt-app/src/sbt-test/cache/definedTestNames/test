@@ -1,0 +1,10 @@
+> checkDefinedTestNames
+$ copy-file src/test/scala/Test1.scala tmp/Test1.scala
+$ delete src
+-> checkDefinedTestNames
+$ copy-file tmp/Test1.scala src/test/scala/Test1.scala
+$ exists src/test/scala/Test1.scala
+> show Test/sources
+
+# expect success but failure
+> checkDefinedTestNames
