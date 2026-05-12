@@ -9,7 +9,7 @@
 package sbt.util
 
 import com.github.benmanes.caffeine.cache.{ Cache as CCache, Caffeine, Weigher }
-import java.nio.file.{ Files, NoSuchFileException }
+import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.atomic.{ AtomicLong, AtomicReference }
 import sjsonnew.BasicJsonProtocol
@@ -97,14 +97,17 @@ trait CacheImplicits extends BasicCacheImplicits with BasicJsonProtocol:
       ref match
         case pbf: PathBasedFile =>
           val path = pbf.toPath
-          try
+          if (path.toFile.exists()) {
             val attrs = Files.readAttributes(path, classOf[BasicFileAttributes])
             if attrs.isDirectory then fallback
             else
               val lastModified = attrs.lastModifiedTime().toMillis()
               val sizeBytes = attrs.size()
               getOrElseUpdate(ref, lastModified, sizeBytes)(fallback)
-          catch case e: NoSuchFileException => throw e
+          } else {
+            val emptyHash = Digest.sha256Hash(Array.empty[Byte]).contentHashStr
+            s"${ref.id}>${emptyHash}/${0}"
+          }
         case _ => fallback
 
   def virtualFileRefToDigest(vf: VirtualFileRef)(converter: FileConverter): Digest =

@@ -1,2 +1,4 @@
 > compile
 $ exists target/out/jvm/scala-2.12.21/root/src_managed/BuildInfo.scala
+> show Compile/resources
+> packageSrc

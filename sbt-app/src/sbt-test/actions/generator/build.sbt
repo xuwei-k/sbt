@@ -12,4 +12,5 @@ lazy val root = (project in file("."))
     },
     Compile / sourceGenerators += buildInfo,
     Compile / sourceGenerators += Def.task { Seq.empty[File] },
+    Compile / unmanagedResources += file("foo"),
   )
