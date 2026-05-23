@@ -811,6 +811,7 @@ lazy val sbtProj = (project in file("sbt-app"))
     crossPaths := false,
     crossTarget := { target.value / scalaVersion.value },
     javaOptions ++= Seq("-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"),
+    Test / fork := true,
     mimaSettings,
     mimaBinaryIssueFilters ++= sbtIgnoredProblems,
   )
