@@ -5,6 +5,7 @@ lazy val sideEffect1 = taskKey[Unit]("side effect 1")
 lazy val sideEffect2 = taskKey[Unit]("side effect 2")
 lazy val testFile = settingKey[File]("test file")
 lazy val check = taskKey[Unit]("check")
+lazy val dummyTask = taskKey[Unit]("Dummy task.")
 
 lazy val root = project.
   settings(
@@ -35,5 +36,12 @@ lazy val root = project.
       IO.append(t, "2")
     },
     foo := Def.sequential(Compile / compile, sideEffect0, sideEffect1, sideEffect2, (Test / test).toTask(""), bar).value,
-    bar := 1
+    bar := 1,
+    dummyTask := {()},
+    Compile / compile := Def.uncached(
+      Def.sequential(
+        dummyTask,
+        Compile / compile,
+      ).value
+    )
   )
