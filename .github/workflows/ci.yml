@@ -109,7 +109,7 @@ jobs:
           java-version: "${{ matrix.java }}"
           cache: "sbt"
       - name: Setup sbt
-        uses: sbt/setup-sbt@v1
+        uses: sbt/setup-sbt@v1.5.5
       - name: Set up Python 3.12
         uses: actions/setup-python@v6
         with:
