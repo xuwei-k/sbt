@@ -110,7 +110,7 @@ object Dependencies:
   val zeroAllocationHashing = "net.openhft" % "zero-allocation-hashing" % "0.16"
 
   val hedgehog = "qa.hedgehog" %% "hedgehog-sbt" % "0.13.0"
-  val disruptor = "com.lmax" % "disruptor" % "3.4.2"
+  val disruptor = "com.lmax" % "disruptor" % "4.0.0"
 
   // lm dependencies
   val jsch = ("com.github.mwiede" % "jsch" % "0.2.23").intransitive()
