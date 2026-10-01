@@ -117,7 +117,7 @@ object Dependencies:
 
   // lm-coursier dependencies
   val dataclassScalafixVersion = "0.3.0"
-  val coursierVersion = "2.1.25"
+  val coursierVersion = "2.1.26"
 
   val coursier = ("io.get-coursier" %% "coursier" % coursierVersion)
     .exclude("org.codehaus.plexus" % "plexus-archiver")
