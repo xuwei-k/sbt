@@ -387,7 +387,6 @@ object Defaults extends BuildCommon with DefExtra:
         .map(java.lang.Boolean.parseBoolean)
         .getOrElse(GCUtil.defaultForceGarbageCollection),
       minForcegcInterval :== GCUtil.defaultMinForcegcInterval,
-      interactionService :== CommandLineUIService,
       autoStartServer := true,
       serverHost := "127.0.0.1",
       serverIdleTimeout := Some(new FiniteDuration(7, TimeUnit.DAYS)),
@@ -2160,24 +2159,21 @@ object Defaults extends BuildCommon with DefExtra:
 
   def askForMainClass(classes: Seq[String]): Option[String] =
     sbt.SelectMainClass(
-      if classes.length >= 10 then Some(SimpleReader(ITerminal.get).readLine(_))
-      else
-        Some(s =>
-          def print(st: String) =
-            scala.Console.out.print(st); scala.Console.out.flush()
-          print(s)
-          ITerminal.get.withRawInput {
-            try
-              ITerminal.get.inputStream.read match
-                case -1 | -2 => None
-                case b       =>
-                  val res = b.toChar.toString
-                  println(res)
-                  Some(res)
-            catch case e: InterruptedException => None
-          }
-        )
-      ,
+      Some(s =>
+        def print(st: String) =
+          scala.Console.out.print(st); scala.Console.out.flush()
+        print(s)
+        ITerminal.get.withRawInput {
+          try
+            ITerminal.get.inputStream.read match
+              case -1 | -2 => None
+              case b       =>
+                val res = b.toChar.toString
+                println(res)
+                Some(res)
+          catch case e: InterruptedException => None
+        }
+      ),
       classes
     )
 

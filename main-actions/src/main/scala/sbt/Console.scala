@@ -12,7 +12,6 @@ import java.io.File
 import java.nio.channels.ClosedChannelException
 import sbt.internal.inc.{ AnalyzingCompiler, MappedFileConverter, PlainVirtualFile }
 import sbt.internal.util.{ DeprecatedJLine, Terminal }
-import sbt.internal.util.Terminal.*
 import sbt.util.Logger
 import xsbti.compile.{ Compilers, Inputs }
 
@@ -78,7 +77,6 @@ final class Console(compiler: AnalyzingCompiler):
     try
       sys.props("scala.color") = if terminal.isColorEnabled then "true" else "false"
       terminal.withRawOutput {
-        jline.TerminalFactory.set(terminal.toJLine)
         DeprecatedJLine.setTerminalOverride(jline3term)
         terminal.withRawInput(Run.executeSuccess(console0()))
       }

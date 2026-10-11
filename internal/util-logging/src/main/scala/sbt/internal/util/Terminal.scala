@@ -14,7 +14,6 @@ import java.util.{ Arrays, Locale }
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 import java.util.concurrent.{ Executors, LinkedBlockingQueue, TimeUnit }
 
-import jline.console.ConsoleReader
 import scala.annotation.tailrec
 import scala.concurrent.duration.*
 import scala.util.Try
@@ -221,9 +220,7 @@ object Terminal:
   private[sbt] final val VK_LEFT = 259
 
   val NO_BOOT_CLIENTS_CONNECTED: Int = -2
-  // Disable noisy jline log spam
-  if System.getProperty("sbt.jline.verbose", "false") != "true" then
-    jline.internal.Log.setOutput(new PrintStream(_ => {}, false))
+
   private val isCI = System.getProperty("sbt.ci", "") == "true" ||
     sys.env.contains("BUILD_NUMBER") || sys.env.contains("CI")
   def consoleLog(string: String): Unit =
@@ -241,37 +238,6 @@ object Terminal:
   extension (term: Terminal)
     def ansi(richString: => String, string: => String): String =
       if term.isAnsiSupported then richString else string
-    /*
-     * Whenever we are dealing with JLine, which is true in sbt's ConsoleReader
-     * as well as in the scala `console` task, we need to provide a jline.Terminal2
-     * instance that can be consumed by the ConsoleReader. The ConsoleTerminal
-     * already wraps a jline terminal, so we can just return the wrapped jline
-     * terminal.
-     */
-    private[sbt] def toJLine: jline.Terminal & jline.Terminal2 = term match
-      case _ =>
-        new jline.Terminal with jline.Terminal2:
-          override def init(): Unit = {}
-          override def restore(): Unit = {}
-          override def reset(): Unit = {}
-          override def isSupported: Boolean = true
-          override def getWidth: Int = term.getWidth
-          override def getHeight: Int = term.getHeight
-          override def isAnsiSupported: Boolean = term.isAnsiSupported
-          override def wrapOutIfNeeded(out: OutputStream): OutputStream = out
-          override def wrapInIfNeeded(in: InputStream): InputStream = in
-          override def hasWeirdWrap: Boolean = false
-          override def isEchoEnabled: Boolean = term.isEchoEnabled
-          override def setEchoEnabled(enabled: Boolean): Unit = {}
-          override def disableInterruptCharacter(): Unit = {}
-          override def enableInterruptCharacter(): Unit = {}
-          override def getOutputEncoding: String = null
-          override def getBooleanCapability(capability: String): Boolean =
-            term.getBooleanCapability(capability)
-          override def getNumericCapability(capability: String): Integer =
-            term.getNumericCapability(capability)
-          override def getStringCapability(capability: String): String =
-            term.getStringCapability(capability)
   end extension
 
   /*
@@ -323,7 +289,7 @@ object Terminal:
   /**
    * Restore the terminal to its initial state.
    */
-  private[sbt] def restore(): Unit = console.toJLine.restore()
+  private[sbt] def restore(): Unit = ()
 
   private val hasProgress: AtomicBoolean = new AtomicBoolean(false)
 
@@ -424,7 +390,6 @@ object Terminal:
       Terminal.set(consoleTerminalHolder.get)
       try withOut(withIn(f))
       finally
-        jline.TerminalFactory.reset()
         if isServer then
           console match
             case c: ConsoleTerminal if !isWindows =>
@@ -807,7 +772,6 @@ object Terminal:
     new ConsoleTerminal(nonBlockingIn(system), originalOut, system)
 
   private[sbt] def reset(): Unit =
-    jline.TerminalFactory.reset()
     console.close()
     if hasConsole && !isDumbTerminal then consoleTerminalHolder.set(newConsoleTerminal())
 
@@ -830,12 +794,6 @@ object Terminal:
       System.setProperty(terminalProperty, newValue)
       ()
   fixTerminalProperty()
-
-  private[sbt] def createReader(term: Terminal, prompt: Prompt): ConsoleReader =
-    new ConsoleReader(term.inputStream, term.outputStream, term.toJLine):
-      override def readLine(prompt: String, mask: Character): String =
-        term.withRawInput(super.readLine(prompt, mask))
-      override def readLine(prompt: String): String = term.withRawInput(super.readLine(prompt))
 
   def console: Terminal = consoleTerminalHolder.get match
     case null => throw new IllegalStateException("Uninitialized terminal.")

@@ -11,8 +11,6 @@ package sbt.internal.util
 import java.io.*
 import java.util.List as JList
 
-import jline.console.ConsoleReader
-import jline.console.history.{ FileHistory, MemoryHistory }
 import org.jline.reader.{
   Candidate,
   Completer,
@@ -137,60 +135,10 @@ object LineReader:
           term.close()
       end readLine
 
-  def createJLine2Reader(
-      historyPath: Option[File],
-      terminal: Terminal,
-      prompt: Prompt = Prompt.Running,
-  ): ConsoleReader =
-    val cr = Terminal.createReader(terminal, prompt)
-    cr.setExpandEvents(false) // https://issues.scala-lang.org/browse/SI-7650
-    cr.setBellEnabled(false)
-    val h = historyPath match
-      case None       => new MemoryHistory
-      case Some(file) => new FileHistory(file): MemoryHistory
-    h.setMaxSize(MaxHistorySize)
-    cr.setHistory(h)
-    cr.setHistoryEnabled(true)
-    cr
-  def simple(terminal: Terminal): LineReader = new SimpleReader(None, HandleCONT, terminal)
-  def simple(
-      historyPath: Option[File],
-      handleCONT: Boolean = HandleCONT,
-      injectThreadSleep: Boolean = false
-  ): LineReader = new SimpleReader(historyPath, handleCONT, injectThreadSleep)
 end LineReader
 
 abstract class JLine extends LineReader:
   protected def handleCONT: Boolean
-  protected def reader: ConsoleReader
-
-  override def readLine(prompt: String, mask: Option[Char] = None): Option[String] =
-    unsynchronizedReadLine(prompt, mask)
-
-  private def unsynchronizedReadLine(prompt: String, mask: Option[Char]): Option[String] =
-    readLineWithHistory(prompt, mask) map { x =>
-      x.trim
-    }
-
-  private def readLineWithHistory(prompt: String, mask: Option[Char]): Option[String] =
-    reader.getHistory match
-      case fh: FileHistory =>
-        try readLineDirect(prompt, mask)
-        finally fh.flush()
-      case _ => readLineDirect(prompt, mask)
-
-  private def readLineDirect(prompt: String, mask: Option[Char]): Option[String] =
-    if handleCONT then
-      Signals.withHandler(() => resume(), signal = Signals.CONT)(() =>
-        readLineDirectRaw(prompt, mask)
-      )
-    else readLineDirectRaw(prompt, mask)
-
-  private def readLineDirectRaw(prompt: String, mask: Option[Char]): Option[String] =
-    val newprompt = handleMultilinePrompt(prompt)
-    mask match
-      case Some(m) => Option(reader.readLine(newprompt, m))
-      case None    => Option(reader.readLine(newprompt))
 
   private def handleMultilinePrompt(prompt: String): String =
     val lines0 = """\r?\n""".r.split(prompt)
@@ -199,7 +147,6 @@ abstract class JLine extends LineReader:
       case _     =>
         val lines = lines0.toList map handleProgress
         // Workaround for regression jline/jline2#205
-        reader.getOutput.write(lines.init.mkString("\n") + "\n")
         lines.last
 
   private def handleProgress(prompt: String): String =
@@ -209,31 +156,4 @@ abstract class JLine extends LineReader:
 
   private def resume(): Unit =
     Terminal.reset()
-    reader.drawLine()
-    reader.flush()
 end JLine
-
-final class FullReader(
-    historyPath: Option[File],
-    complete: Parser[?],
-    val handleCONT: Boolean,
-    terminal: Terminal
-) extends JLine:
-  protected val reader: ConsoleReader =
-    val cr = LineReader.createJLine2Reader(historyPath, terminal)
-    sbt.internal.util.complete.JLineCompletion.installCustomCompletor(cr, complete)
-    cr
-
-class SimpleReader private[sbt] (
-    historyPath: Option[File],
-    val handleCONT: Boolean,
-    terminal: Terminal
-) extends JLine:
-  def this(historyPath: Option[File], handleCONT: Boolean, injectThreadSleep: Boolean) =
-    this(historyPath, handleCONT, Terminal.console)
-  protected lazy val reader: ConsoleReader =
-    LineReader.createJLine2Reader(historyPath, terminal)
-
-object SimpleReader extends SimpleReader(None, LineReader.HandleCONT, false):
-  def apply(terminal: Terminal): SimpleReader =
-    new SimpleReader(None, LineReader.HandleCONT, terminal)

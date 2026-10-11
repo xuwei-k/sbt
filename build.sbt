@@ -256,7 +256,6 @@ val completeProj = (project in file("internal") / "util-complete")
   .settings(
     testedBaseSettings,
     name := "Completion",
-    libraryDependencies += jline,
     libraryDependencies += jline3Reader,
     libraryDependencies += jline3Builtins,
     mimaSettings,
@@ -334,7 +333,6 @@ lazy val utilLogging = project
     name := "Util Logging",
     libraryDependencies ++=
       Seq(
-        jline,
         jline3Terminal,
         jline3JNI,
         jline3Native,

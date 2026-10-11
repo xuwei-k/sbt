@@ -11,7 +11,7 @@ package sbt
 import java.nio.file.Paths
 import sbt.util.Level
 import sbt.internal.inc.PlainVirtualFile
-import sbt.internal.util.{ AttributeKey, FullReader, LineReader, Terminal }
+import sbt.internal.util.AttributeKey
 import sbt.internal.util.complete.{
   Completion,
   Completions,
@@ -60,7 +60,6 @@ object BasicCommands:
     exit,
     shutdown,
     history,
-    oldshell,
     client,
     read,
     alias,
@@ -361,25 +360,6 @@ object BasicCommands:
           (commands ::: s).continue
         case None => s.fail
     }
-
-  def oldshell: Command = Command.command(OldShell, Help.more(Shell, OldShellDetailed)) { s =>
-    val history = s.get(historyPath).getOrElse(new File(s.baseDir, ".history").some)
-    val prompt = s.get(shellPrompt) match
-      case Some(pf) => pf(s)
-      case None     => "> "
-    val reader = new FullReader(history, s.combinedParser, LineReader.HandleCONT, Terminal.console)
-    val line = reader.readLine(prompt)
-    line match
-      case Some(line) =>
-        val newState = s
-          .copy(
-            onFailure = Some(Exec(OldShell, None)),
-            remainingCommands = Exec(line, s.source) +: Exec(OldShell, None) +: s.remainingCommands
-          )
-          .setInteractive(true)
-        if line.trim.isEmpty then newState else newState.clearGlobalLog
-      case None => s.setInteractive(false)
-  }
 
   def client: Command =
     Command(Client, Help.more(Client, ClientDetailed))(_ => clientParser)(runClient)

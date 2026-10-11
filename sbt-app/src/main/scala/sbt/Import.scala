@@ -154,7 +154,6 @@ trait Import:
   type FilterLogger = sbt.internal.util.FilterLogger
   val FullLogger = sbt.internal.util.FullLogger
   type FullLogger = sbt.internal.util.FullLogger
-  type FullReader = sbt.internal.util.FullReader
   // val HCons = sbt.internal.util.HCons
   // type HCons[H, T <: HList] = sbt.internal.util.HCons[H, T]
   // val HList = sbt.internal.util.HList
@@ -192,8 +191,6 @@ trait Import:
   val ScalaKeywords = sbt.internal.util.ScalaKeywords
   type SharedAttributeKey[T] = sbt.internal.util.SharedAttributeKey[T]
   val Signals = sbt.internal.util.Signals
-  val SimpleReader = sbt.internal.util.SimpleReader
-  type SimpleReader = sbt.internal.util.SimpleReader
   type SourcePosition = sbt.internal.util.SourcePosition
   val StackTrace = sbt.internal.util.StackTrace
   val StringAttributeKey = sbt.internal.util.StringAttributeKey
@@ -229,7 +226,6 @@ trait Import:
     val History = sbt.internal.util.complete.History
     val HistoryCommands = sbt.internal.util.complete.HistoryCommands
     val Infinite = sbt.internal.util.complete.Infinite
-    val JLineCompletion = sbt.internal.util.complete.JLineCompletion
     val Parser = sbt.internal.util.complete.Parser
     type Parser[+T] = sbt.internal.util.complete.Parser[T]
     type ParserMain = sbt.internal.util.complete.ParserMain
